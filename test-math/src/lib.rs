@@ -32,5 +32,14 @@ mod test_math {
         assert_eq!(pnorm(0.65, 0.2, 0.34, false, false), unsafe {
             c::pnorm5(0.65, 0.2, 0.34, false, false)
         });
+        assert_eq!(pnorm(3.21, 0.2, 0.34, false, false), unsafe {
+            c::pnorm5(3.21, 0.2, 0.34, false, false)
+        });
+        assert_eq!(pnorm(3.21, 0.2, 0.34, false, true), unsafe {
+            c::pnorm5(3.21, 0.2, 0.34, false, true)
+        });
+        assert_eq!(pnorm(123.0, 0.2, 0.34, false, true), unsafe {
+            c::pnorm5(123.0, 0.2, 0.34, false, true)
+        });
     }
 }
