@@ -6,3 +6,5 @@ pub fn ml_warn_return_nan() -> f64 {
 pub fn r_finite(x: f64) -> bool {
     x.is_finite()
 }
+
+pub const ML_NAN: f64 = f64::NAN;
