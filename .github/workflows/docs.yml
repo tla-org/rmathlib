@@ -29,7 +29,7 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         if: ${{ github.event_name != 'pull_request' }}
         with:
-          path: './target/doc/math'
+          path: './target/doc'
           retention-days: '1'
 
   deploy:
