@@ -30,7 +30,7 @@ pub fn sinpi(mut x: f64) -> f64 {
         ml_warn_return_nan();
     }
 
-    x = x % 2.0;
+    x %= 2.0;
     if x <= -1.0 {
         x += 2.0;
     } else if x > 1.0 {
@@ -56,7 +56,7 @@ pub fn tanpi(mut x: f64) -> f64 {
         ml_warn_return_nan();
     }
 
-    x = x % 1.0;
+    x %= 1.0;
     if x <= -0.5 {
         x += 1.0;
     } else if x > 0.5 {
