@@ -31,3 +31,11 @@ pub fn r_dt_1(lower_tail: bool, log_p: bool) -> f64 {
         r_d__0(log_p)
     }
 }
+
+pub fn r_d_exp(x: f64, log_p: bool) -> f64 {
+    if log_p {
+        x
+    } else {
+        x.exp()
+    }
+}
