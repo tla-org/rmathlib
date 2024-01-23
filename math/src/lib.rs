@@ -1,9 +1,5 @@
 mod cospi;
-mod rmath;
 mod nmath;
+mod rmath;
 
 pub use cospi::*;
-
-pub fn hi_from_math() {
-    println!("Hi from math!");
-}
