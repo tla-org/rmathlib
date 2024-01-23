@@ -7,7 +7,7 @@ mod test_math {
             pub fn cospi(x: f64) -> f64;
             pub fn sinpi(x: f64) -> f64;
             pub fn tanpi(x: f64) -> f64;
-            pub fn pnorm(x: f64, mu: f64, sigma: f64, lower_tail: bool, log_p: bool) -> f64;
+            pub fn pnorm5(x: f64, mu: f64, sigma: f64, lower_tail: bool, log_p: bool) -> f64;
         }
     }
 
@@ -22,10 +22,11 @@ mod test_math {
         assert_eq!(tanpi(0.234), unsafe { c::tanpi(0.234) });
     }
 
+    #[test]
     fn test_pnorm() {
         assert_eq!(pnorm(0.0, 0.0, 1.0, true, false), 0.5);
         assert_eq!(pnorm(0.0, 0.0, 1.0, false, false), 0.5);
-        assert_eq!(pnorm(0.0, 0.0, 1.0, false, false), unsafe { c::pnorm(0.0, 0.0, 1.0, false, false) });
-        assert_eq!(pnorm(0.65, 0.2, 0.34, false, false), unsafe { c::pnorm(0.65, 0.2, 0.34, false, false) });
+        assert_eq!(pnorm(0.0, 0.0, 1.0, false, false), unsafe { c::pnorm5(0.0, 0.0, 1.0, false, false) });
+        assert_eq!(pnorm(0.65, 0.2, 0.34, false, false), unsafe { c::pnorm5(0.65, 0.2, 0.34, false, false) });
     }
 }

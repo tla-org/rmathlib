@@ -1,6 +1,6 @@
 use crate::dpq::*;
-use crate::rmath::*;
 use crate::nmath::*;
+use crate::rmath::*;
 use libm::*;
 
 /// Computes the cumulative distribution function of the standard normal distribution
@@ -55,21 +55,34 @@ pub fn pnorm(mut x: f64, mu: f64, sigma: f64, lower_tail: bool, log_p: bool) -> 
     let i_tail = if lower_tail { 0 } else { 1 };
     pnorm_both(x, &mut p, &mut cp, i_tail, log_p);
 
-    if lower_tail { p } else { cp }
+    if lower_tail {
+        p
+    } else {
+        cp
+    }
 }
 
 fn d_2(x: f64) -> f64 {
     ldexp(x, -1)
 }
 
-fn do_del(xx: f64, x: f64, cum: &mut f64, ccum: &mut f64, log_p: bool, lower: bool, upper: bool, temp: f64) {
+#[allow(clippy::too_many_arguments)]
+fn do_del(
+    xx: f64,
+    x: f64,
+    cum: &mut f64,
+    ccum: &mut f64,
+    log_p: bool,
+    lower: bool,
+    upper: bool,
+    temp: f64,
+) {
     let xsq = ldexp(ldexp(xx, 4).trunc(), -4);
     let del = (xx - xsq) * (xx + xsq);
     if log_p {
         *cum = (-xsq * d_2(xsq)) - d_2(del) + temp.ln();
         if (lower && x > 0.0) || (upper && x <= 0.0) {
-            *ccum = log1p(-exp(-xsq * d_2(xsq)) *
-                exp(-d_2(del)) * temp);
+            *ccum = log1p(-exp(-xsq * d_2(xsq)) * exp(-d_2(del)) * temp);
         }
     } else {
         *cum = (-xsq * d_2(xsq)).exp() * (-d_2(del)).exp() * temp;
@@ -90,68 +103,65 @@ fn swap_tail(x: f64, cum: &mut f64, ccum: &mut f64, lower: bool) {
 
 fn pnorm_both(x: f64, cum: &mut f64, ccum: &mut f64, i_tail: i32, log_p: bool) {
     let a: [f64; 5] = [
-        2.2352520354606839287,
-        161.02823106855587881,
-        1067.6894854603709582,
-        18154.981253343561249,
-        0.065682337918207449113
+        2.235_252_035_460_683_7,
+        161.028_231_068_555_87,
+        1_067.689_485_460_370_9,
+        18_154.981_253_343_56,
+        0.065_682_337_918_207_45,
     ];
     let b: [f64; 4] = [
-        47.20258190468824187,
-        976.09855173777669322,
-        10260.932208618978205,
-        45507.789335026729956
+        47.202_581_904_688_245,
+        976.098_551_737_776_7,
+        10_260.932_208_618_979,
+        45_507.789_335_026_73,
     ];
     let c: [f64; 9] = [
-        0.39894151208813466764,
-        8.8831497943883759412,
-        93.506656132177855979,
-        597.27027639480026226,
-        2494.5375852903726711,
-        6848.1904505362823326,
-        11602.651437647350124,
-        9842.7148383839780218,
-        1.0765576773720192317e-8
+        0.398_941_512_088_134_66,
+        8.883_149_794_388_377,
+        93.506_656_132_177_85,
+        597.270_276_394_800_2,
+        2_494.537_585_290_372_6,
+        6_848.190_450_536_283,
+        11_602.651_437_647_35,
+        9_842.714_838_383_978,
+        1.076_557_677_372_019_2e-8,
     ];
     let d: [f64; 8] = [
-        22.266688044328115691,
-        235.38790178262499861,
-        1519.377599407554805,
-        6485.558298266760755,
-        18615.571640885098091,
-        34900.952721145977266,
-        38912.003286093271411,
-        19685.429676859990727
+        22.266_688_044_328_117,
+        235.387_901_782_625,
+        1_519.377_599_407_554_7,
+        6_485.558_298_266_761,
+        18_615.571_640_885_097,
+        34_900.952_721_145_98,
+        38_912.003_286_093_27,
+        19_685.429_676_859_992,
     ];
     let p: [f64; 6] = [
-        0.21589853405795699,
-        0.1274011611602473639,
+        0.215_898_534_057_957,
+        0.127_401_161_160_247_36,
         0.022235277870649807,
-        0.001421619193227893466,
+        0.001_421_619_193_227_893_4,
         2.9112874951168792e-5,
-        0.02307344176494017303
+        0.023_073_441_764_940_174,
     ];
     let q: [f64; 5] = [
-        1.28426009614491121,
-        0.468238212480865118,
-        0.0659881378689285515,
-        0.00378239633202758244,
-        7.29751555083966205e-5
+        1.284_260_096_144_911,
+        0.468_238_212_480_865_1,
+        0.065_988_137_868_928_56,
+        0.003_782_396_332_027_582_4,
+        7.297_515_550_839_662e-5,
     ];
 
     let mut xden: f64;
     let mut xnum: f64;
     let mut temp: f64;
-    let mut del: f64;
-    let mut eps: f64;
-    let mut xsq: f64;
-    let mut y: f64;
+    let mut _del: f64;
 
-    let min = f64::MIN_POSITIVE;
+    let xsq: f64;
 
-    let mut i: i32;
-    let mut lower: bool;
-    let mut upper: bool;
+    let _min = f64::MIN_POSITIVE;
+
+    let mut _i: i32;
 
     if x.is_nan() {
         *ccum = x;
@@ -159,12 +169,12 @@ fn pnorm_both(x: f64, cum: &mut f64, ccum: &mut f64, i_tail: i32, log_p: bool) {
         return;
     }
 
-    eps = f64::EPSILON * 0.5;
+    let eps: f64 = f64::EPSILON * 0.5;
 
-    lower = i_tail != 1;
-    upper = i_tail != 0;
+    let lower: bool = i_tail != 1;
+    let upper: bool = i_tail != 0;
 
-    y = x.abs();
+    let y: f64 = x.abs();
     if y <= 0.67448975 {
         if y > eps {
             xsq = x * x;
@@ -207,10 +217,10 @@ fn pnorm_both(x: f64, cum: &mut f64, ccum: &mut f64, i_tail: i32, log_p: bool) {
 
         do_del(y, x, cum, ccum, log_p, lower, upper, temp);
         swap_tail(x, cum, ccum, lower);
-    } else if log_p && y < 1e170 ||
-        lower && -37.5193 < x && x < 8.2924 ||
-        upper && -8.2924 < x && x < 37.5193 {
-
+    } else if log_p && y < 1e170
+        || lower && -37.5193 < x && x < 8.2924
+        || upper && -8.2924 < x && x < 37.5193
+    {
         /* Evaluate pnorm for x in (-37.5, -5.657) union (5.657, 37.5) */
         xsq = 1.0 / (x * x);
         xnum = p[5] * xsq;
