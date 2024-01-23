@@ -7,7 +7,7 @@ edition = "2021"
 cc = "1.0"
 
 [dependencies]
-math = { path = "../" }
+rmathlib = { path = "../" }
 
 [dev-dependencies]
 approx = "0.5.1"

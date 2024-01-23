@@ -25,10 +25,19 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Cargo fmt
-        run: cargo fmt --all --check
+        run: |
+          cargo fmt --all --check
+          cd test-math/
+          cargo fmt --all --check
 
       - name: Cargo clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
+        run: |
+          cargo clippy --all-targets --all-features -- -D warnings
+          cd test-math/
+          cargo clippy --all-targets --all-features -- -D warnings
 
       - name: Cargo test
-        run: cargo test
+        run: |
+          cargo test
+          cd test-math/
+          cargo test
