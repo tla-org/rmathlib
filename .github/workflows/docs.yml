@@ -25,6 +25,8 @@ jobs:
 
       - name: Build docs
         run: cargo doc --all --no-deps
+        env:
+          RUSTDOCFLAGS: "--enable-index-page"
 
       - uses: actions/upload-pages-artifact@v3
         if: ${{ github.event_name != 'pull_request' }}
