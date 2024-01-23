@@ -24,12 +24,12 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Build docs
-        run: cargo doc --all --no-deps
+        run: cargo doc --package math --no-deps
 
       - uses: actions/upload-pages-artifact@v3
         if: ${{ github.event_name != 'pull_request' }}
         with:
-          path: './target/doc'
+          path: './target/doc/math'
           retention-days: '1'
 
   deploy:
