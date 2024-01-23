@@ -1,5 +1,5 @@
 mod cospi;
-mod rmath;
 mod nmath;
+mod rmath;
 
 pub use cospi::*;

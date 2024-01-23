@@ -1,1 +1,1 @@
-pub const M_PI: f64 = 3.14159265358979323846264338327950288;
+pub const M_PI: f64 = std::f64::consts::PI;
