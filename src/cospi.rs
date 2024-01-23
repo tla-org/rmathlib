@@ -1,6 +1,7 @@
 use crate::nmath::*;
 use crate::rmath::*;
 
+/// Calculates the cosine of a number given in multiples of π (pi).
 pub fn cospi(mut x: f64) -> f64 {
     if x.is_nan() {
         return x;
@@ -22,6 +23,7 @@ pub fn cospi(mut x: f64) -> f64 {
     (M_PI * x).cos()
 }
 
+/// Calculates the sinus of a number given in multiples of π (pi).
 pub fn sinpi(mut x: f64) -> f64 {
     if x.is_nan() {
         return x;
@@ -48,6 +50,7 @@ pub fn sinpi(mut x: f64) -> f64 {
     (M_PI * x).sin()
 }
 
+/// Calculates the tangent of a number given in multiples of π (pi).
 pub fn tanpi(mut x: f64) -> f64 {
     if x.is_nan() {
         return x;
