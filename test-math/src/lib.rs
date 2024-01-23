@@ -1,9 +1,3 @@
-mod dpq;
-mod nmath;
-mod pnt;
-mod pt;
-mod rmath;
-
 #[cfg(test)]
 mod test_math {
     use math;
