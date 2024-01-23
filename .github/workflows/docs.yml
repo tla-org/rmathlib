@@ -24,9 +24,9 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Build docs
-        run: cargo doc --all --no-deps
-        env:
-          RUSTDOCFLAGS: "--enable-index-page -Z unstable-options"
+        run: |
+          cargo doc --all --no-deps
+          echo '<meta http-equiv="refresh" content="0; url=rmathlib">' > target/doc/index.html
 
       - uses: actions/upload-pages-artifact@v3
         if: ${{ github.event_name != 'pull_request' }}
