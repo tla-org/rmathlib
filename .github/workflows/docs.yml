@@ -1,5 +1,8 @@
 name: docs
 
+env:
+  CARGO_TERM_COLOR: always
+
 on:
   push:
     branches:
@@ -26,6 +29,8 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Build docs
+        env:
+          RUSTDOCFLAGS: "-D rustdoc::all -A rustdoc::private-doc-tests"
         run: |
           cargo doc --all --no-deps
           echo '<meta http-equiv="refresh" content="0; url=rmathlib">' > target/doc/index.html

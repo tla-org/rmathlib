@@ -1,14 +1,17 @@
 name: ci
 
+env:
+  CARGO_TERM_COLOR: always
+
 on:
   push:
     branches:
       - main
-  pull_request:
-  workflow_dispatch:
+  pull_request: {}
+  workflow_dispatch: null
 
 jobs:
-  test:
+  check:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -36,6 +39,29 @@ jobs:
           cd test-math/
           cargo fmt --all --check
 
+  check-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: cargo doc
+        env:
+          RUSTDOCFLAGS: "-D rustdoc::all -A rustdoc::private-doc-tests"
+        run: cargo doc --all-features --no-deps
+
+  test-versions:
+    needs: check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust: [stable, beta]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+      - uses: Swatinem/rust-cache@v2
       - name: Cargo test
         run: |
           cargo test
