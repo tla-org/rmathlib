@@ -1,5 +1,0 @@
-[package]
-name = "math"
-description = "A Rust Port of R's C Library of Special Functions"
-version = "1.0.0"
-edition = "2021"
