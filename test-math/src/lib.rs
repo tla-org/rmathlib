@@ -1,6 +1,5 @@
 #[cfg(test)]
 mod test_math {
-    
 
     extern "C" {
         fn cospi(x: f64) -> f64;
