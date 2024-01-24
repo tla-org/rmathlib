@@ -2,7 +2,7 @@ use std::f64::{consts::LN_2, INFINITY, NAN};
 
 use log::warn;
 
-use crate::{gammafn, lgammacor, sinpi};
+use crate::{gammafn, lgammacor, sinpi, M_LN_SQRT_2PI};
 
 /// Machine dependent constants for IEEE double precision
 const XMAX: f64 = 2.5327372760800758e+305;
@@ -66,9 +66,9 @@ fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64 {
         if x > 1e17 {
             return x * (x.ln() - 1.0);
         } else if x > 4934720.0 {
-            return LN_2 + (x - 0.5) * x.ln() - x;
+            return M_LN_SQRT_2PI + (x - 0.5) * x.ln() - x;
         } else {
-            return LN_2 + (x - 0.5) * x.ln() - x + lgammacor(x);
+            return M_LN_SQRT_2PI + (x - 0.5) * x.ln() - x + lgammacor(x);
         }
     } else {
         // x < -10; y = -x
@@ -79,7 +79,7 @@ fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64 {
             return NAN;
         }
 
-        let ans = LN_2 + (x - 0.5) * y.ln() - x - sinpiy.ln() - lgammacor(y);
+        let ans = M_LN_SQRT_2PI + (x - 0.5) * y.ln() - x - sinpiy.ln() - lgammacor(y);
 
         // Check for accuracy
         if ((x - x.trunc() - 0.5) * ans / x).abs() < DXREL {
