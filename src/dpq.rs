@@ -102,9 +102,9 @@ pub fn r_q_p01_boundaries(p: f64, left: f64, right: f64, lower_tail: bool, log_p
         if p == ML_NEGINF {
             return Some(if lower_tail { left } else { right });
         }
-        return None;
+        None
     } else {
-        if p < 0.0 || p > 1.0 {
+        if !(0.0..=1.0).contains(&p) {
             ml_warn_return_nan();
         }
         if p == 0.0 {
@@ -113,6 +113,6 @@ pub fn r_q_p01_boundaries(p: f64, left: f64, right: f64, lower_tail: bool, log_p
         if p == 1.0 {
             return Some(if lower_tail { right } else { left });
         }
-        return None;
+        None
     }
 }
