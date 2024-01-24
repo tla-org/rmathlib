@@ -68,7 +68,7 @@ fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64 {
         } else if x > 4934720.0 {
             return LN_2 + (x - 0.5) * x.ln() - x;
         } else {
-            return LN_2 + (x - 0.5) * x.ln() - x + unsafe { lgammacor(x) };
+            return LN_2 + (x - 0.5) * x.ln() - x + lgammacor(x);
         }
     } else {
         // x < -10; y = -x
@@ -79,7 +79,7 @@ fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64 {
             return NAN;
         }
 
-        let ans = LN_2 + (x - 0.5) * y.ln() - x - sinpiy.ln() - unsafe { lgammacor(y) };
+        let ans = LN_2 + (x - 0.5) * y.ln() - x - sinpiy.ln() - lgammacor(y);
 
         // Check for accuracy
         if ((x - x.trunc() - 0.5) * ans / x).abs() < DXREL {

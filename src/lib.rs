@@ -16,6 +16,7 @@ pub use cospi::*;
 pub use gamma::*;
 pub use lgamma::*;
 pub use lgammacor::*;
+pub use nmath::*;
 pub use pgamma::*;
 pub use pnorm::*;
 pub use qnorm::*;

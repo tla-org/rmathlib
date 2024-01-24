@@ -7,12 +7,15 @@ use std::ops::Neg;
 
 use crate::dpq::{r_dt_0, r_dt_1};
 use crate::lgamma::lgammafn;
+use crate::r_log1_exp;
 
 extern "C" {
+    // FIXME: port C function
     pub fn dpois_raw(x: f64, lambda: f64, give_log: bool) -> f64;
+    // FIXME: port C function
     pub fn pnorm5(x: f64, mu: f64, sigma: f64, lower_tail: bool, log_p: bool) -> f64;
+    // FIXME: port C function
     pub fn dnorm(x: f64, mu: f64, sigma: f64, log_p: bool) -> f64;
-    pub fn R_Log1_Exp(x: f64) -> f64;
 }
 
 /// This function computes the distribution function for the
@@ -133,8 +136,7 @@ fn log1pmx(x: f64) -> f64 {
 /// Compute log(gamma(a+1)) accurately also for small a (0 < a < 0.5).
 pub fn lgamma1p(a: f64) -> f64 {
     if a.abs() >= 0.5 {
-        // FIXME: port C function
-        unsafe { lgamma(a + 1.0) }
+        lgamma(a + 1.0)
     } else {
         const EULERS_CONST: f64 = 0.5772156649015328606065120900824024;
         const COEFFS: [f64; 40] = [
@@ -241,8 +243,7 @@ fn dpois_wrap(x_plus_1: f64, lambda: f64, give_log: bool) -> f64 {
         unsafe { dpois_raw(x_plus_1 - 1.0, lambda, give_log) }
     } else {
         if lambda > (x_plus_1 - 1.0).abs() * M_CUTOFF {
-            // FIXME: port C function
-            let res = -lambda - unsafe { lgammafn(x_plus_1) };
+            let res = -lambda - lgammafn(x_plus_1);
             if give_log {
                 res
             } else {
@@ -452,11 +453,14 @@ fn ppois_asymp(x: f64, lambda: f64, lower_tail: bool, log_p: bool) -> f64 {
         .0;
 
     let f = res12 / elfb_term;
+    // FIXME: port C function
     let np = unsafe { pnorm5(s2pt, 0.0, 1.0, !lower_tail, log_p) };
 
     if log_p {
+        // FIXME: port C function
         np + (1.0 + f * unsafe { dnorm(s2pt, 0.0, 1.0, log_p).exp() }).ln()
     } else {
+        // FIXME: port C function
         np + f * unsafe { dnorm(s2pt, 0.0, 1.0, log_p) }
     }
 }
@@ -508,7 +512,7 @@ fn pgamma_raw(x: f64, alph: f64, lower_tail: bool, log_p: bool) -> f64 {
         let d = dpois_wrap(alph, x, log_p);
         if !lower_tail {
             if log_p {
-                unsafe { R_Log1_Exp(d + sum) }
+                r_log1_exp(d + sum)
             } else {
                 1.0 - d * sum.exp()
             }
@@ -549,7 +553,7 @@ fn pgamma_raw(x: f64, alph: f64, lower_tail: bool, log_p: bool) -> f64 {
             }
         } else {
             if log_p {
-                unsafe { R_Log1_Exp(d + sum) }
+                r_log1_exp(d + sum)
             } else {
                 1.0 - d * sum
             }
