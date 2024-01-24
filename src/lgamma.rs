@@ -2,10 +2,9 @@ use std::f64::{consts::LN_2, INFINITY, NAN};
 
 use log::warn;
 
-use crate::sinpi;
+use crate::{gammafn, sinpi};
 
 extern "C" {
-    pub fn gammafn(x: f64) -> f64;
     pub fn lgammacor(x: f64) -> f64;
 }
 
@@ -58,7 +57,7 @@ fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64 {
         return -y.ln();
     }
     if y <= 10.0 {
-        return unsafe { gammafn(x).abs().ln() };
+        return gammafn(x).abs().ln();
     }
 
     // y = |x| > 10
