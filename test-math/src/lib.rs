@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod test_math {
     use rmathlib::*;
+    use approx::abs_diff_eq;
 
     mod c {
         extern "C" {
@@ -49,5 +50,6 @@ mod test_math {
         assert_eq!(qnorm(0.0, 0.5, 1.0, true, false), unsafe { c::qnorm5(0.0, 0.5, 1.0, 1, 0) });
         assert_eq!(qnorm(0.4, 0.5, 1.0, true, false), unsafe { c::qnorm5(0.4, 0.5, 1.0, 1, 0) });
         assert_eq!(qnorm(0.4, 0.5, 1.0, false, false), unsafe { c::qnorm5(0.4, 0.5, 1.0, 0, 0) });
+        abs_diff_eq!(qnorm(-2.3, 0.5, 1.0, false, true), unsafe { c::qnorm5(-2.3, 0.5, 1.0, 0, 1) }, epsilon=1e-10);
     }
 }
