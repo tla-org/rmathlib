@@ -24,7 +24,10 @@ pub fn qnorm(p: f64, mu: f64, sigma: f64, lower_tail: bool, log_p: bool) -> f64 
         return p + mu + sigma;
     }
 
-    r_q_p01_boundaries(p, ML_NEGINF, ML_POSINF, lower_tail, log_p);
+    match r_q_p01_boundaries(p, ML_NEGINF, ML_POSINF, lower_tail, log_p) {
+        Some(x) => return x,
+        None => {}
+    }
 
     if sigma < 0.0 {
         ml_warn_return_nan();

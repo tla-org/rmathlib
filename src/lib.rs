@@ -9,3 +9,4 @@ mod libc;
 
 pub use cospi::*;
 pub use pnorm::*;
+pub use qnorm::*;
