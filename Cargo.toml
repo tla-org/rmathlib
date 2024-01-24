@@ -2,7 +2,24 @@
 name = "rmathlib"
 description = "A Rust Port of R's C Library of Special Functions"
 version = "1.0.0"
+include = ["src/", "LICENSE", "README.md"]
 edition = "2021"
+authors = [
+  "Rik Huijzer <github@huijzer.xyz>",
+  "Jose Storopoli <jose@storopoli.io>",
+]
+license = "GPL 3.0"
+categories = ["science", "mathematics", "algorithms"]
+keywords = [
+  "rmath",
+  "math",
+  "probability",
+  "statistics",
+  "stats",
+  "distribution",
+]
+repository = "https://github.com/poweranalyses-org/rmathlib"
+
 
 [dependencies]
-libm = "0.2.8"
+libm = "0.2"
