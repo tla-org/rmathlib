@@ -1,11 +1,10 @@
 use libm::lgamma;
 use std::f64::consts::LN_2;
-use std::f64::{EPSILON, INFINITY, MAX, MIN, NEG_INFINITY};
 use std::ops::Neg;
 
 use crate::dpq::{r_dt_0, r_dt_1};
 use crate::lgamma::lgammafn;
-use crate::{r_log1_exp, ML_NAN};
+use crate::{r_log1_exp, ML_DBL_EPSILON, ML_DBL_MAX, ML_DBL_MIN, ML_NAN, ML_NEGINF, ML_POSINF};
 
 extern "C" {
     // FIXME: port C function
@@ -57,7 +56,7 @@ pub fn pgamma(x: f64, alph: f64, scale: f64, lower_tail: bool, log_p: bool) -> f
 const SQR: fn(f64) -> f64 = |x| x * x;
 
 /// If |x| > |k| * M_cutoff,  then  log\[ exp(-x) * k^x \] =~= -x
-const M_CUTOFF: f64 = LN_2 * MAX / MIN; // 3.196577e18
+const M_CUTOFF: f64 = LN_2 * ML_DBL_MAX / ML_DBL_MIN; // 3.196577e18
 
 /// Continued fraction for calculation of
 /// 1/i + x/(i+d) + x^2/(i+2*d) + x^3/(i+3*d) + ... = sum_{k=0}^Inf x^k/(i+k*d)
@@ -212,12 +211,12 @@ pub fn logspace_sub(logx: f64, logy: f64) -> f64 {
 /// log(sum_i exp(logx\[i\])) in a way that avoids overflows.
 pub fn logspace_sum(logx: &[f64]) -> f64 {
     match logx.len() {
-        0 => NEG_INFINITY, // log(0) for empty input
+        0 => ML_NEGINF, // log(0) for empty input
         1 => logx[0],
         2 => logspace_add(logx[0], logx[1]),
         _ => {
             // Find the maximum log value to scale other values
-            let mx = logx.iter().cloned().fold(NEG_INFINITY, f64::max);
+            let mx = logx.iter().cloned().fold(ML_NEGINF, f64::max);
             let sum: f64 = logx.iter().map(|&x| (x - mx).exp()).sum();
             mx + sum.ln()
         }
@@ -230,7 +229,7 @@ pub fn logspace_sum(logx: &[f64]) -> f64 {
 fn dpois_wrap(x_plus_1: f64, lambda: f64, give_log: bool) -> f64 {
     if !lambda.is_finite() {
         if give_log {
-            NEG_INFINITY
+            ML_NEGINF
         } else {
             0.0
         }
@@ -269,7 +268,7 @@ fn pgamma_smallx(x: f64, alph: f64, lower_tail: bool, log_p: bool) -> f64 {
         term = c / (alph + n);
         sum += term;
 
-        if term.abs() <= EPSILON * sum.abs() {
+        if term.abs() <= ML_DBL_EPSILON * sum.abs() {
             break;
         }
     }
@@ -311,7 +310,7 @@ fn pd_upper_series(x: f64, y: f64, log_p: bool) -> f64 {
     let mut sum = term;
     let mut y = y;
 
-    while term > sum * std::f64::EPSILON {
+    while term > sum * ML_DBL_EPSILON {
         y += 1.0;
         term *= x / y;
         sum += term;
@@ -330,7 +329,7 @@ fn pd_lower_series(lambda: f64, y: f64) -> f64 {
     let mut sum = 0.0;
     let mut y = y;
 
-    while y >= 1.0 && term > sum * std::f64::EPSILON {
+    while y >= 1.0 && term > sum * ML_DBL_EPSILON {
         term *= y / lambda;
         sum += term;
         y -= 1.0;
@@ -391,7 +390,7 @@ fn pd_lower_cf(y: f64, d: f64) -> f64 {
 
         if b2 != 0.0 {
             f = a2 / b2;
-            if (f - of).abs() <= std::f64::EPSILON * f.abs() {
+            if (f - of).abs() <= ML_DBL_EPSILON * f.abs() {
                 return f;
             }
             of = f;
@@ -465,13 +464,13 @@ fn ppois_asymp(x: f64, lambda: f64, lower_tail: bool, log_p: bool) -> f64 {
 fn pgamma_raw(x: f64, alph: f64, lower_tail: bool, log_p: bool) -> f64 {
     // Check boundaries
     if x.is_nan() || alph.is_nan() || x < 0.0 || alph <= 0.0 {
-        return NEG_INFINITY;
+        return ML_NEGINF;
     }
 
     if x == 0.0 {
         return if lower_tail {
             if log_p {
-                NEG_INFINITY
+                ML_NEGINF
             } else {
                 0.0
             }
@@ -482,7 +481,7 @@ fn pgamma_raw(x: f64, alph: f64, lower_tail: bool, log_p: bool) -> f64 {
         };
     }
 
-    if alph == INFINITY {
+    if alph == ML_POSINF {
         return if lower_tail {
             if log_p {
                 0.0
@@ -490,7 +489,7 @@ fn pgamma_raw(x: f64, alph: f64, lower_tail: bool, log_p: bool) -> f64 {
                 1.0
             }
         } else if log_p {
-            NEG_INFINITY
+            ML_NEGINF
         } else {
             0.0
         };
@@ -515,7 +514,7 @@ fn pgamma_raw(x: f64, alph: f64, lower_tail: bool, log_p: bool) -> f64 {
         }
     } else if alph - 1.0 < x && alph < 0.8 * (x + 50.0) {
         let sum = if alph < 1.0 {
-            if x * EPSILON > 1.0 - alph {
+            if x * ML_DBL_EPSILON > 1.0 - alph {
                 1.0 // To avoid division by zero
             } else {
                 let f = pd_lower_cf(alph, x - (alph - 1.0)) * x / alph;

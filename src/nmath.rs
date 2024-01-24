@@ -1,7 +1,10 @@
-use std::f64::{consts::LN_2, INFINITY, NAN, NEG_INFINITY};
+use std::f64::{consts::LN_2, EPSILON, INFINITY, MAX, MIN, NAN, NEG_INFINITY};
 
 pub const ML_POSINF: f64 = INFINITY;
 pub const ML_NEGINF: f64 = NEG_INFINITY;
+pub const ML_DBL_MAX: f64 = MAX;
+pub const ML_DBL_MIN: f64 = MIN;
+pub const ML_DBL_EPSILON: f64 = EPSILON;
 
 pub fn ml_warn_return_nan() -> f64 {
     println!("argument out of domain");
