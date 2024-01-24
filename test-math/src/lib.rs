@@ -48,5 +48,6 @@ mod test_math {
     fn test_qnorm() {
         assert_eq!(qnorm(0.0, 0.5, 1.0, true, false), unsafe { c::qnorm5(0.0, 0.5, 1.0, 1, 0) });
         assert_eq!(qnorm(0.4, 0.5, 1.0, true, false), unsafe { c::qnorm5(0.4, 0.5, 1.0, 1, 0) });
+        assert_eq!(qnorm(0.4, 0.5, 1.0, false, false), unsafe { c::qnorm5(0.4, 0.5, 1.0, 0, 0) });
     }
 }
