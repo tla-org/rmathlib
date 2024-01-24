@@ -79,19 +79,25 @@ pub fn r_dt_civ(p: f64, lower_tail: bool, log_p: bool) -> f64 {
 
 /// Calculate the boundaries exactly for q*() functions.
 /// Often left = ML_NEGINF, and very often right = ML_POSINF;
-/// 
+///
 /// R_Q_P01_boundaries(p, left, right)  :<==>
-/// 
+///
 /// R_Q_P01_check(p);
 /// if (p == R_DT_0) return left;
 /// if (p == R_DT_1) return right;
-/// 
+///
 /// the following implementation should be more efficient (less tests):
-/// 
+///
 /// This was originally a macro, but it is now a function.
 /// At the caller site, if the return value is not None, then return the
 /// result immediately.
-pub fn r_q_p01_boundaries(p: f64, left: f64, right: f64, lower_tail: bool, log_p: bool) -> Option<f64> {
+pub fn r_q_p01_boundaries(
+    p: f64,
+    left: f64,
+    right: f64,
+    lower_tail: bool,
+    log_p: bool,
+) -> Option<f64> {
     if log_p {
         if p > 0.0 {
             ml_warn_return_nan();
