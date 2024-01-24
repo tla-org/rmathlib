@@ -5,11 +5,7 @@ use std::f64::{
 
 use log::warn;
 
-use crate::{nmath::M_LN_SQRT_2PI, sinpi};
-
-extern "C" {
-    fn chebyshev_eval(x: f64, coeffs: &[f64], degree: usize) -> f64;
-}
+use crate::{chebyshev_eval, nmath::M_LN_SQRT_2PI, sinpi};
 
 /// Chebyshev coefficients for gamma function
 const GAMCS: [f64; 42] = [
@@ -95,7 +91,7 @@ pub fn gammafn(x: f64) -> f64 {
         }
         let y = x - n as f64;
         n -= 1;
-        let mut value = unsafe { chebyshev_eval(y * 2.0 - 1.0, &GAMCS, GAMCS.len()) } + 0.9375;
+        let mut value = chebyshev_eval(y * 2.0 - 1.0, &GAMCS, GAMCS.len()) + 0.9375;
 
         if n == 0 {
             return value;

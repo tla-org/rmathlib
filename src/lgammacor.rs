@@ -1,10 +1,7 @@
+use log::warn;
 use std::f64::NAN;
 
-use log::warn;
-
-extern "C" {
-    fn chebyshev_eval(x: f64, coeffs: &[f64], degree: usize) -> f64;
-}
+use crate::chebyshev_eval;
 
 const ALGMCS: [f64; 15] = [
     0.1666389480451863247205729650822e+0,
@@ -53,7 +50,7 @@ pub fn lgammacor(x: f64) -> f64 {
         // Allow to underflow
     } else if x < XBIG {
         let tmp = 10.0 / x;
-        return unsafe { chebyshev_eval(tmp * tmp * 2.0 - 1.0, &ALGMCS, NALGM) } / x;
+        return chebyshev_eval(tmp * tmp * 2.0 - 1.0, &ALGMCS, NALGM) / x;
     }
     1.0 / (x * 12.0)
 }

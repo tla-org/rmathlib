@@ -1,4 +1,5 @@
 //! A Rust port of R's C Library of Special Functions.
+mod chebyshev;
 mod cospi;
 mod dpq;
 mod gamma;
@@ -10,6 +11,7 @@ mod pnorm;
 mod qnorm;
 mod rmath;
 
+pub use chebyshev::*;
 pub use cospi::*;
 pub use gamma::*;
 pub use lgamma::*;
