@@ -46,7 +46,7 @@ pub fn chebyshev_eval(x: f64, a: &[f64], n: usize) -> f64 {
         return NAN;
     }
 
-    if x < -1.1 || x > 1.1 {
+    if !(-1.1..=1.1).contains(&x) {
         warn!("chebyshev_eval: Domain warning - x out of bounds");
         return NAN;
     }

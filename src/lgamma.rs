@@ -1,12 +1,12 @@
-use std::f64::{consts::LN_2, INFINITY, NAN};
+use std::f64::{INFINITY, NAN};
 
 use log::warn;
 
 use crate::{gammafn, lgammacor, sinpi, M_LN_SQRT_2PI};
 
 /// Machine dependent constants for IEEE double precision
-const XMAX: f64 = 2.5327372760800758e+305;
-const DXREL: f64 = 1.490116119384765625e-8;
+const XMAX: f64 = 2.532_737_276_080_075_8e305;
+const DXREL: f64 = 1.490_116_119_384_765_6e-8;
 
 /// The function lgammafn computes log|gamma(x)|.  The function
 /// lgammafn_sign in addition assigns the sign of the gamma function
@@ -64,7 +64,7 @@ fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64 {
     if x > 0.0 {
         // Positive x
         if x > 1e17 {
-            return x * (x.ln() - 1.0);
+            x * (x.ln() - 1.0)
         } else if x > 4934720.0 {
             return M_LN_SQRT_2PI + (x - 0.5) * x.ln() - x;
         } else {
@@ -88,6 +88,6 @@ fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64 {
             warn!("** should NEVER happen! *** [lgamma.rs: Neg.int, y={y}]");
             return NAN; // Placeholder for warning
         }
-        return ans;
+        ans
     }
 }
