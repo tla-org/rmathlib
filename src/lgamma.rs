@@ -28,7 +28,7 @@ pub fn lgammafn(x: f64) -> f64 {
 ///
 /// This function computes the logarithm of the absolute value of the gamma function of x
 /// and also sets the sign of the gamma function in `sgn`.
-fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64 {
+pub fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64 {
     if let Some(sgn) = sgn {
         *sgn = 1;
         if x < 0.0 && ((-x).floor() % 2.0) == 0.0 {
