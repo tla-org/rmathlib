@@ -1,7 +1,6 @@
 use log::warn;
-use std::f64::NAN;
 
-use crate::chebyshev_eval;
+use crate::{chebyshev_eval, ML_NAN};
 
 const ALGMCS: [f64; 15] = [
     1.666_389_480_451_863_4e-1,
@@ -44,7 +43,7 @@ const XMAX: f64 = 3.745194030963158e306;
 pub fn lgammacor(x: f64) -> f64 {
     if x < 10.0 {
         warn!("lgammacor: Domain warning");
-        return NAN;
+        return ML_NAN;
     } else if x >= XMAX {
         warn!("lgammacor: Underflow warning");
         // Allow to underflow

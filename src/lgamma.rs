@@ -1,8 +1,8 @@
-use std::f64::{INFINITY, NAN};
+use std::f64::INFINITY;
 
 use log::warn;
 
-use crate::{gammafn, lgammacor, sinpi, M_LN_SQRT_2PI};
+use crate::{gammafn, lgammacor, sinpi, ML_NAN, M_LN_SQRT_2PI};
 
 /// Machine dependent constants for IEEE double precision
 const XMAX: f64 = 2.532_737_276_080_075_8e305;
@@ -39,7 +39,7 @@ fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64 {
     }
 
     if x.is_nan() {
-        return NAN;
+        return ML_NAN;
     }
 
     if x <= 0.0 && x == x.trunc() {
@@ -76,7 +76,7 @@ fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64 {
 
         if sinpiy == 0.0 {
             // Handle error: Negative integer argument
-            return NAN;
+            return ML_NAN;
         }
 
         let ans = M_LN_SQRT_2PI + (x - 0.5) * y.ln() - x - sinpiy.ln() - lgammacor(y);
@@ -86,7 +86,7 @@ fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64 {
             // Warning: answer less than half precision
             // because the argument is too near a negative integer
             warn!("** should NEVER happen! *** [lgamma.rs: Neg.int, y={y}]");
-            return NAN; // Placeholder for warning
+            return ML_NAN; // Placeholder for warning
         }
         ans
     }

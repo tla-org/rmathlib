@@ -22,7 +22,7 @@ use libm::*;
 /// ACM Transactions on Mathematical Software. 19, 22-32.
 pub fn pnorm(mut x: f64, mu: f64, sigma: f64, lower_tail: bool, log_p: bool) -> f64 {
     let mut p: f64;
-    let mut cp: f64 = f64::NAN;
+    let mut cp: f64 = ML_NAN;
 
     if x.is_nan() || mu.is_nan() || sigma.is_nan() {
         return x + mu + sigma;

@@ -1,11 +1,11 @@
 use std::f64::{
     consts::{LN_2, PI},
-    INFINITY, NAN,
+    INFINITY,
 };
 
 use log::warn;
 
-use crate::{chebyshev_eval, nmath::M_LN_SQRT_2PI, sinpi};
+use crate::{chebyshev_eval, nmath::M_LN_SQRT_2PI, sinpi, ML_NAN};
 
 /// Chebyshev coefficients for gamma function
 const GAMCS: [f64; 42] = [
@@ -74,12 +74,12 @@ const DXREL: f64 = 1.490_116_119_384_765_6e-8;
 /// MM specialized the case of  n!  for n < 50 - for even better precision
 pub fn gammafn(x: f64) -> f64 {
     if x.is_nan() {
-        return NAN;
+        return ML_NAN;
     }
 
     if x == 0.0 || (x < 0.0 && x == x.round()) {
         warn!("gammafn: Domain warning");
-        return NAN;
+        return ML_NAN;
     }
 
     let y = x.abs();
@@ -99,7 +99,7 @@ pub fn gammafn(x: f64) -> f64 {
         if n < 0 {
             if x < -0.5 && ((x - (x - 0.5).round()) / x).abs() < DXREL {
                 warn!("gammafn: Precision warning");
-                return NAN;
+                return ML_NAN;
             }
             if y < XSML {
                 warn!("gammafn: Range warning");
@@ -137,7 +137,7 @@ pub fn gammafn(x: f64) -> f64 {
         } else {
             if ((x - (x - 0.5).round()) / x).abs() < DXREL {
                 warn!("gammafn: Precision warning");
-                return NAN;
+                return ML_NAN;
             }
             let sinpiy = sinpi(y);
             if sinpiy == 0.0 {

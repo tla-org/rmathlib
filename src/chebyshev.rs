@@ -17,7 +17,8 @@
 //! Adapted from R. Broucke, Algorithm 446, CACM., 16, 254 (1973).
 
 use log::warn;
-use std::f64::NAN;
+
+use crate::ML_NAN;
 
 /// `chebyshev_init` determines the number of terms for the
 /// double precision orthogonal series `dos` needed to insure
@@ -43,12 +44,12 @@ pub fn chebyshev_init(dos: &[f64], eta: f64) -> Option<usize> {
 pub fn chebyshev_eval(x: f64, a: &[f64], n: usize) -> f64 {
     if n < 1 || n > a.len() || n > 1000 {
         warn!("chebyshev_eval: Domain warning - invalid n");
-        return NAN;
+        return ML_NAN;
     }
 
     if !(-1.1..=1.1).contains(&x) {
         warn!("chebyshev_eval: Domain warning - x out of bounds");
-        return NAN;
+        return ML_NAN;
     }
 
     let twox = x * 2.0;

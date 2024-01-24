@@ -2,12 +2,12 @@ use lazy_static::lazy_static;
 use libm::lgamma;
 use log::warn;
 use std::f64::consts::LN_2;
-use std::f64::{EPSILON, INFINITY, MAX, MIN, NAN, NEG_INFINITY};
+use std::f64::{EPSILON, INFINITY, MAX, MIN, NEG_INFINITY};
 use std::ops::Neg;
 
 use crate::dpq::{r_dt_0, r_dt_1};
 use crate::lgamma::lgammafn;
-use crate::r_log1_exp;
+use crate::{r_log1_exp, ML_NAN};
 
 extern "C" {
     // FIXME: port C function
@@ -30,11 +30,11 @@ extern "C" {
 pub fn pgamma(x: f64, alph: f64, scale: f64, lower_tail: bool, log_p: bool) -> f64 {
     // Handling special cases
     if x.is_nan() || alph.is_nan() || scale.is_nan() {
-        return NAN;
+        return ML_NAN;
     }
 
     if alph <= 0.0 || scale <= 0.0 {
-        return NAN; // Undefined for non-positive alpha or scale
+        return ML_NAN; // Undefined for non-positive alpha or scale
     }
 
     let x = x / scale;
