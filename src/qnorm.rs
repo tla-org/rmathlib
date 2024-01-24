@@ -8,7 +8,7 @@ use crate::rmath::*;
 /// The algorithm AS 241 of Wichura is used,
 ///     and has been improved for the very extreme tail (and log_p=TRUE)
 ///
-/// REFERENCE
+/// ## REFERENCE
 ///
 /// Wichura, M.J. (1988).
 /// Algorithm AS 241: The Percentage Points of the Normal Distribution.
