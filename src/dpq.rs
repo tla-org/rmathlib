@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 
 use crate::nmath::*;
-use libm::*;
+use libm::expm1;
 
 pub fn r_d__0(log_p: bool) -> f64 {
     if log_p {
