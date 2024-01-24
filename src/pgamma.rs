@@ -5,10 +5,11 @@ use std::f64::{EPSILON, INFINITY, MAX, MIN, NAN, NEG_INFINITY};
 use std::ops::Neg;
 
 use crate::dpq::{r_dt_0, r_dt_1};
+use crate::lgamma::lgammafn;
+
 extern "C" {
     pub fn lgamma(x: f64) -> f64;
     pub fn dpois_raw(x: f64, lambda: f64, give_log: bool) -> f64;
-    pub fn lgammafn(x: f64) -> f64;
     pub fn pnorm5(x: f64, mu: f64, sigma: f64, lower_tail: bool, log_p: bool) -> f64;
     pub fn dnorm(x: f64, mu: f64, sigma: f64, log_p: bool) -> f64;
     pub fn R_Log1_Exp(x: f64) -> f64;

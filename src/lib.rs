@@ -9,6 +9,7 @@ mod qnorm;
 mod rmath;
 
 pub use cospi::*;
+pub use lgamma::*;
 pub use pgamma::*;
 pub use pnorm::*;
 pub use qnorm::*;
