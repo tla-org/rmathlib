@@ -2,11 +2,7 @@ use std::f64::{consts::LN_2, INFINITY, NAN};
 
 use log::warn;
 
-use crate::{gammafn, sinpi};
-
-extern "C" {
-    pub fn lgammacor(x: f64) -> f64;
-}
+use crate::{gammafn, lgammacor, sinpi};
 
 /// Machine dependent constants for IEEE double precision
 const XMAX: f64 = 2.5327372760800758e+305;
