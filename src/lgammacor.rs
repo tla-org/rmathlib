@@ -1,6 +1,4 @@
-use log::warn;
-
-use crate::{chebyshev_eval, ML_NAN};
+use crate::{chebyshev_eval, ml_warn_return_nan};
 
 const ALGMCS: [f64; 15] = [
     1.666_389_480_451_863_4e-1,
@@ -42,10 +40,9 @@ const XMAX: f64 = 3.745194030963158e306;
 /// is faster and cleaner, but is only defined "fast" for half integers.
 pub fn lgammacor(x: f64) -> f64 {
     if x < 10.0 {
-        warn!("lgammacor: Domain warning");
-        return ML_NAN;
+        return ml_warn_return_nan();
     } else if x >= XMAX {
-        warn!("lgammacor: Underflow warning");
+        println!("lgammacor: Underflow warning");
         // Allow to underflow
     } else if x < XBIG {
         let tmp = 10.0 / x;

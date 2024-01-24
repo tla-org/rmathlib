@@ -1,7 +1,5 @@
 use std::f64::INFINITY;
 
-use log::warn;
-
 use crate::{gammafn, lgammacor, sinpi, ML_NAN, M_LN_SQRT_2PI};
 
 /// Machine dependent constants for IEEE double precision
@@ -85,7 +83,7 @@ fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64 {
         if ((x - x.trunc() - 0.5) * ans / x).abs() < DXREL {
             // Warning: answer less than half precision
             // because the argument is too near a negative integer
-            warn!("** should NEVER happen! *** [lgamma.rs: Neg.int, y={y}]");
+            println!("** should NEVER happen! *** [lgamma.rs: Neg.int, y={y}]");
             return ML_NAN; // Placeholder for warning
         }
         ans

@@ -16,9 +16,7 @@
 //! Based on the Fortran routine dcsevl by W. Fullerton.
 //! Adapted from R. Broucke, Algorithm 446, CACM., 16, 254 (1973).
 
-use log::warn;
-
-use crate::ML_NAN;
+use crate::ml_warn_return_nan;
 
 /// `chebyshev_init` determines the number of terms for the
 /// double precision orthogonal series `dos` needed to insure
@@ -43,13 +41,11 @@ pub fn chebyshev_init(dos: &[f64], eta: f64) -> Option<usize> {
 /// `a` at `x`.
 pub fn chebyshev_eval(x: f64, a: &[f64], n: usize) -> f64 {
     if n < 1 || n > a.len() || n > 1000 {
-        warn!("chebyshev_eval: Domain warning - invalid n");
-        return ML_NAN;
+        return ml_warn_return_nan();
     }
 
     if !(-1.1..=1.1).contains(&x) {
-        warn!("chebyshev_eval: Domain warning - x out of bounds");
-        return ML_NAN;
+        return ml_warn_return_nan();
     }
 
     let twox = x * 2.0;

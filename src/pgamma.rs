@@ -1,6 +1,4 @@
-use lazy_static::lazy_static;
 use libm::lgamma;
-use log::warn;
 use std::f64::consts::LN_2;
 use std::f64::{EPSILON, INFINITY, MAX, MIN, NEG_INFINITY};
 use std::ops::Neg;
@@ -58,12 +56,6 @@ pub fn pgamma(x: f64, alph: f64, scale: f64, lower_tail: bool, log_p: bool) -> f
 
 const SQR: fn(f64) -> f64 = |x| x * x;
 
-lazy_static! {
-    /// Scalefactor:= (2^32)^8 = 2^256 = 1.157921e+77
-    static ref SCALEFACTOR: f64 = SQR(SQR(SQR(4294967296.0))); // (2^32)^8
-    // static ref SCALEFACTOR: f64 = 4294967296.0f64.powi(24); // (2^32)^8 = 2^256
-}
-
 /// If |x| > |k| * M_cutoff,  then  log\[ exp(-x) * k^x \] =~= -x
 const M_CUTOFF: f64 = LN_2 * MAX / MIN; // 3.196577e18
 
@@ -71,6 +63,10 @@ const M_CUTOFF: f64 = LN_2 * MAX / MIN; // 3.196577e18
 /// 1/i + x/(i+d) + x^2/(i+2*d) + x^3/(i+3*d) + ... = sum_{k=0}^Inf x^k/(i+k*d)
 /// auxiliary in log1pmx() and lgamma1p()
 fn logcf(x: f64, i: f64, d: f64, eps: f64) -> f64 {
+    // Scalefactor:= (2^32)^8 = 2^256 = 1.157921e+77
+    #![allow(non_snake_case)]
+    let SCALEFACTOR: f64 = SQR(SQR(SQR(4294967296.0))); // (2^32)^8
+
     let mut c1 = 2.0 * d;
     let mut c2 = i + d;
     let mut c4 = c2 + d;
@@ -94,16 +90,16 @@ fn logcf(x: f64, i: f64, d: f64, eps: f64) -> f64 {
         a2 = c4 * a1 - c3 * a2;
         b2 = c4 * b1 - c3 * b2;
 
-        if b2.abs() > *SCALEFACTOR {
-            a1 /= *SCALEFACTOR;
-            b1 /= *SCALEFACTOR;
-            a2 /= *SCALEFACTOR;
-            b2 /= *SCALEFACTOR;
-        } else if b2.abs() < 1.0 / *SCALEFACTOR {
-            a1 *= *SCALEFACTOR;
-            b1 *= *SCALEFACTOR;
-            a2 *= *SCALEFACTOR;
-            b2 *= *SCALEFACTOR;
+        if b2.abs() > SCALEFACTOR {
+            a1 /= SCALEFACTOR;
+            b1 /= SCALEFACTOR;
+            a2 /= SCALEFACTOR;
+            b2 /= SCALEFACTOR;
+        } else if b2.abs() < 1.0 / SCALEFACTOR {
+            a1 *= SCALEFACTOR;
+            b1 *= SCALEFACTOR;
+            a2 *= SCALEFACTOR;
+            b2 *= SCALEFACTOR;
         }
     }
 
@@ -351,7 +347,11 @@ fn pd_lower_series(lambda: f64, y: f64) -> f64 {
 
 /// Continued fraction for calculation of scaled lower-tail F distribution.
 fn pd_lower_cf(y: f64, d: f64) -> f64 {
+    // Scalefactor:= (2^32)^8 = 2^256 = 1.157921e+77
+    #![allow(non_snake_case)]
+    let SCALEFACTOR: f64 = SQR(SQR(SQR(4294967296.0))); // (2^32)^8
     const MAX_IT: u32 = 200000;
+
     let mut f: f64 = 0.0;
     let mut i = 0;
     let mut of = -1.0; // Initialization far away
@@ -377,16 +377,16 @@ fn pd_lower_cf(y: f64, d: f64) -> f64 {
         a2 = c4 * a1 + c3 * a2;
         b2 = c4 * b1 + c3 * b2;
 
-        if b2.abs() > *SCALEFACTOR {
-            a1 /= *SCALEFACTOR;
-            b1 /= *SCALEFACTOR;
-            a2 /= *SCALEFACTOR;
-            b2 /= *SCALEFACTOR;
-        } else if b2.abs() < 1.0 / *SCALEFACTOR {
-            a1 *= *SCALEFACTOR;
-            b1 *= *SCALEFACTOR;
-            a2 *= *SCALEFACTOR;
-            b2 *= *SCALEFACTOR;
+        if b2.abs() > SCALEFACTOR {
+            a1 /= SCALEFACTOR;
+            b1 /= SCALEFACTOR;
+            a2 /= SCALEFACTOR;
+            b2 /= SCALEFACTOR;
+        } else if b2.abs() < 1.0 / SCALEFACTOR {
+            a1 *= SCALEFACTOR;
+            b1 *= SCALEFACTOR;
+            a2 *= SCALEFACTOR;
+            b2 *= SCALEFACTOR;
         }
 
         if b2 != 0.0 {
@@ -398,7 +398,7 @@ fn pd_lower_cf(y: f64, d: f64) -> f64 {
         }
     }
 
-    warn!("Non-convergence in pd_lower_cf after {MAX_IT} iterations.");
+    println!("Non-convergence in pd_lower_cf after {MAX_IT} iterations.");
     f // Returning the last computed value of `f` as a fallback.
 }
 

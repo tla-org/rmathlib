@@ -3,9 +3,7 @@ use std::f64::{
     INFINITY,
 };
 
-use log::warn;
-
-use crate::{chebyshev_eval, nmath::M_LN_SQRT_2PI, sinpi, ML_NAN};
+use crate::{chebyshev_eval, ml_warn_return_nan, nmath::M_LN_SQRT_2PI, sinpi, ML_NAN};
 
 /// Chebyshev coefficients for gamma function
 const GAMCS: [f64; 42] = [
@@ -78,8 +76,7 @@ pub fn gammafn(x: f64) -> f64 {
     }
 
     if x == 0.0 || (x < 0.0 && x == x.round()) {
-        warn!("gammafn: Domain warning");
-        return ML_NAN;
+        return ml_warn_return_nan();
     }
 
     let y = x.abs();
@@ -98,11 +95,10 @@ pub fn gammafn(x: f64) -> f64 {
         }
         if n < 0 {
             if x < -0.5 && ((x - (x - 0.5).round()) / x).abs() < DXREL {
-                warn!("gammafn: Precision warning");
-                return ML_NAN;
+                return ml_warn_return_nan();
             }
             if y < XSML {
-                warn!("gammafn: Range warning");
+                println!("gammafn: Range warning");
                 return if x > 0.0 { INFINITY } else { -INFINITY };
             }
             n = -n;
@@ -136,12 +132,11 @@ pub fn gammafn(x: f64) -> f64 {
             value
         } else {
             if ((x - (x - 0.5).round()) / x).abs() < DXREL {
-                warn!("gammafn: Precision warning");
-                return ML_NAN;
+                return ml_warn_return_nan();
             }
             let sinpiy = sinpi(y);
             if sinpiy == 0.0 {
-                warn!("gammafn: Range warning - Negative integer arg - overflow");
+                println!("gammafn: Range warning - Negative integer arg - overflow");
                 return INFINITY;
             }
             -PI / (y * sinpiy * value)
