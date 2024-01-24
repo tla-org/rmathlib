@@ -65,7 +65,7 @@ const DXREL: f64 = 1.490_116_119_384_765_6e-8;
 ///
 /// This function is a translation into C of a Fortran subroutine
 /// by W. Fullerton of Los Alamos Scientific Laboratory.
-/// (e.g. http://www.netlib.org/slatec/fnlib/gamma.f)
+/// (e.g. <http://www.netlib.org/slatec/fnlib/gamma.f>)
 ///
 /// The accuracy of this routine compares (very) favourably
 /// with those of the Sun Microsystems portable mathematical

@@ -64,7 +64,7 @@ lazy_static! {
     // static ref SCALEFACTOR: f64 = 4294967296.0f64.powi(24); // (2^32)^8 = 2^256
 }
 
-/// If |x| > |k| * M_cutoff,  then  log[ exp(-x) * k^x ] =~= -x
+/// If |x| > |k| * M_cutoff,  then  log\[ exp(-x) * k^x \] =~= -x
 const M_CUTOFF: f64 = LN_2 * MAX / MIN; // 3.196577e18
 
 /// Continued fraction for calculation of
@@ -213,7 +213,7 @@ pub fn logspace_sub(logx: f64, logy: f64) -> f64 {
 }
 
 /// Compute the log of a sum from logs of terms, i.e.,
-/// log(sum_i exp(logx[i])) in a way that avoids overflows.
+/// log(sum_i exp(logx\[i\])) in a way that avoids overflows.
 pub fn logspace_sum(logx: &[f64]) -> f64 {
     match logx.len() {
         0 => NEG_INFINITY, // log(0) for empty input
