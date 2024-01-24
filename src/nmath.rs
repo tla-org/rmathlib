@@ -1,3 +1,6 @@
+pub const ML_POSINF: f64 = f64::INFINITY;
+pub const ML_NEGINF: f64 = f64::NEG_INFINITY;
+
 pub fn ml_warn_return_nan() -> f64 {
     println!("argument out of domain");
     f64::NAN

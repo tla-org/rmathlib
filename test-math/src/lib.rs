@@ -42,4 +42,9 @@ mod test_math {
             c::pnorm5(123.0, 0.2, 0.34, false, true)
         });
     }
+
+    #[test]
+    fn test_qnorm() {
+        
+    }
 }
