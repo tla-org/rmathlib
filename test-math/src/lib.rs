@@ -14,9 +14,10 @@ mod test_math {
             pub fn lgammafn(x: f64) -> f64;
             pub fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64;
             pub fn gammafn(x: f64) -> f64;
-            pub fn lgammacor(x: f64) -> f64;
-            pub fn chebyshev_init(dos: *mut f64, nos: i32, eta: f64) -> i32;
-            pub fn chebyshev_eval(x: f64, a: *mut f64, n: i32) -> f64;
+            // pub fn lgammacor(x: f64) -> f64; // FIXME: Linking in CC broken
+            // pub fn chebyshev_init(dos: *mut f64, nos: i32, eta: f64) -> i32; // FIXME: Linking in CC broken
+            // pub fn chebyshev_eval(x: f64, a: *mut f64, n: i32) -> f64; // FIXME: Linking in CC broken
+            pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64;
         }
     }
 
@@ -152,4 +153,26 @@ mod test_math {
     //         c::chebyshev_eval(0.6, [].as_mut_ptr(), 2)
     //     });
     // }
+
+    #[test]
+    fn test_dnorm4() {
+        assert_eq!(dnorm4(0.0, 0.0, 1.0, false), unsafe {
+            c::dnorm4(0.0, 0.0, 1.0, false)
+        });
+        assert_eq!(dnorm4(0.0, 0.0, 1.0, true), unsafe {
+            c::dnorm4(0.0, 0.0, 1.0, true)
+        });
+        assert_eq!(dnorm4(1.0, 0.0, 1.0, false), unsafe {
+            c::dnorm4(1.0, 0.0, 1.0, false)
+        });
+        assert_eq!(dnorm4(1.0, 0.0, 1.0, true), unsafe {
+            c::dnorm4(1.0, 0.0, 1.0, true)
+        });
+        assert_eq!(dnorm4(-1.0, 0.0, 1.0, false), unsafe {
+            c::dnorm4(-1.0, 0.0, 1.0, false)
+        });
+        assert_eq!(dnorm4(-1.0, 0.0, 1.0, true), unsafe {
+            c::dnorm4(-1.0, 0.0, 1.0, true)
+        });
+    }
 }

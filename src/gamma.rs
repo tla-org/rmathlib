@@ -1,9 +1,9 @@
-use std::f64::{
-    consts::{LN_2, PI},
-    INFINITY,
+use crate::{
+    chebyshev_eval, ml_warn_return_nan,
+    nmath::M_LN_SQRT_2PI,
+    rmath::{ML_LN2, M_PI},
+    sinpi, ML_NAN, ML_NEGINF, ML_POSINF,
 };
-
-use crate::{chebyshev_eval, ml_warn_return_nan, nmath::M_LN_SQRT_2PI, sinpi, ML_NAN};
 
 /// Chebyshev coefficients for gamma function
 const GAMCS: [f64; 42] = [
@@ -99,7 +99,7 @@ pub fn gammafn(x: f64) -> f64 {
             }
             if y < XSML {
                 println!("gammafn: Range warning");
-                return if x > 0.0 { INFINITY } else { -INFINITY };
+                return if x > 0.0 { ML_POSINF } else { ML_NEGINF };
             }
             n = -n;
             for i in 0..n {
@@ -114,7 +114,7 @@ pub fn gammafn(x: f64) -> f64 {
         }
     } else {
         if x > XMAX {
-            return INFINITY;
+            return ML_POSINF;
         }
         if x < XMIN {
             return 0.0;
@@ -126,7 +126,7 @@ pub fn gammafn(x: f64) -> f64 {
                 value *= i as f64;
             }
         } else {
-            value = ((y - 0.5) * y.ln() - y + LN_2 + M_LN_SQRT_2PI).exp();
+            value = ((y - 0.5) * y.ln() - y + ML_LN2 + M_LN_SQRT_2PI).exp();
         }
         if x > 0.0 {
             value
@@ -137,9 +137,9 @@ pub fn gammafn(x: f64) -> f64 {
             let sinpiy = sinpi(y);
             if sinpiy == 0.0 {
                 println!("gammafn: Range warning - Negative integer arg - overflow");
-                return INFINITY;
+                return ML_POSINF;
             }
-            -PI / (y * sinpiy * value)
+            -M_PI / (y * sinpiy * value)
         }
     }
 }

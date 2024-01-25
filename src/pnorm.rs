@@ -1,3 +1,6 @@
+use std::f64::EPSILON;
+use std::f64::MIN_POSITIVE;
+
 use crate::dpq::*;
 use crate::nmath::*;
 use crate::rmath::*;
@@ -159,7 +162,7 @@ fn pnorm_both(x: f64, cum: &mut f64, ccum: &mut f64, i_tail: i32, log_p: bool) {
 
     let xsq: f64;
 
-    let _min = ML_DBL_MAX;
+    let _min = MIN_POSITIVE;
 
     let mut _i: i32;
 
@@ -169,7 +172,7 @@ fn pnorm_both(x: f64, cum: &mut f64, ccum: &mut f64, i_tail: i32, log_p: bool) {
         return;
     }
 
-    let eps: f64 = ML_DBL_EPSILON * 0.5;
+    let eps: f64 = EPSILON * 0.5;
 
     let lower: bool = i_tail != 1;
     let upper: bool = i_tail != 0;

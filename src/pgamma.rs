@@ -1,11 +1,12 @@
 use libm::lgamma;
-use std::f64::consts::LN_2;
+use std::f64::{EPSILON, MAX, MIN};
 use std::ops::Neg;
 
 use crate::dpq::{r_dt_0, r_dt_1};
 use crate::lgamma::lgammafn;
 use crate::pnorm5;
-use crate::{r_log1_exp, ML_DBL_EPSILON, ML_DBL_MAX, ML_DBL_MIN, ML_NAN, ML_NEGINF, ML_POSINF};
+use crate::rmath::ML_LN2;
+use crate::{r_log1_exp, ML_NAN, ML_NEGINF, ML_POSINF};
 
 extern "C" {
     // FIXME: port C function
@@ -55,7 +56,7 @@ pub fn pgamma(x: f64, alph: f64, scale: f64, lower_tail: bool, log_p: bool) -> f
 const SQR: fn(f64) -> f64 = |x| x * x;
 
 /// If |x| > |k| * M_cutoff,  then  log\[ exp(-x) * k^x \] =~= -x
-const M_CUTOFF: f64 = LN_2 * ML_DBL_MAX / ML_DBL_MIN; // 3.196577e18
+const M_CUTOFF: f64 = ML_LN2 * MAX / MIN; // 3.196577e18
 
 /// Continued fraction for calculation of
 /// 1/i + x/(i+d) + x^2/(i+2*d) + x^3/(i+3*d) + ... = sum_{k=0}^Inf x^k/(i+k*d)
@@ -267,7 +268,7 @@ fn pgamma_smallx(x: f64, alph: f64, lower_tail: bool, log_p: bool) -> f64 {
         term = c / (alph + n);
         sum += term;
 
-        if term.abs() <= ML_DBL_EPSILON * sum.abs() {
+        if term.abs() <= EPSILON * sum.abs() {
             break;
         }
     }
@@ -309,7 +310,7 @@ fn pd_upper_series(x: f64, y: f64, log_p: bool) -> f64 {
     let mut sum = term;
     let mut y = y;
 
-    while term > sum * ML_DBL_EPSILON {
+    while term > sum * EPSILON {
         y += 1.0;
         term *= x / y;
         sum += term;
@@ -328,7 +329,7 @@ fn pd_lower_series(lambda: f64, y: f64) -> f64 {
     let mut sum = 0.0;
     let mut y = y;
 
-    while y >= 1.0 && term > sum * ML_DBL_EPSILON {
+    while y >= 1.0 && term > sum * EPSILON {
         term *= y / lambda;
         sum += term;
         y -= 1.0;
@@ -389,7 +390,7 @@ fn pd_lower_cf(y: f64, d: f64) -> f64 {
 
         if b2 != 0.0 {
             f = a2 / b2;
-            if (f - of).abs() <= ML_DBL_EPSILON * f.abs() {
+            if (f - of).abs() <= EPSILON * f.abs() {
                 return f;
             }
             of = f;
@@ -513,7 +514,7 @@ fn pgamma_raw(x: f64, alph: f64, lower_tail: bool, log_p: bool) -> f64 {
         }
     } else if alph - 1.0 < x && alph < 0.8 * (x + 50.0) {
         let sum = if alph < 1.0 {
-            if x * ML_DBL_EPSILON > 1.0 - alph {
+            if x * EPSILON > 1.0 - alph {
                 1.0 // To avoid division by zero
             } else {
                 let f = pd_lower_cf(alph, x - (alph - 1.0)) * x / alph;
