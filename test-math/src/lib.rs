@@ -18,6 +18,7 @@ mod test_math {
             // pub fn chebyshev_init(dos: *mut f64, nos: i32, eta: f64) -> i32; // FIXME: Linking in CC broken
             // pub fn chebyshev_eval(x: f64, a: *mut f64, n: i32) -> f64; // FIXME: Linking in CC broken
             pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64;
+            pub fn stirlerr(n: f64) -> f64;
         }
     }
 
@@ -174,5 +175,13 @@ mod test_math {
         assert_eq!(dnorm4(-1.0, 0.0, 1.0, true), unsafe {
             c::dnorm4(-1.0, 0.0, 1.0, true)
         });
+    }
+
+    #[test]
+    fn test_stilerr() {
+        assert_eq!(stirlerr(1.0), unsafe { c::stirlerr(1.0) });
+        assert_eq!(stirlerr(2.0), unsafe { c::stirlerr(2.0) });
+        assert_eq!(stirlerr(25.0), unsafe { c::stirlerr(25.0) });
+        assert_eq!(stirlerr(50.0), unsafe { c::stirlerr(50.0) });
     }
 }

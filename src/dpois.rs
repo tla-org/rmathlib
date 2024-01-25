@@ -1,6 +1,6 @@
 use std::f64::MIN;
 
-use crate::{lgammafn, ml_warn_return_nan, r_d_nonint_check, r_forceint, rmath::M_PI};
+use crate::{lgammafn, ml_warn_return_nan, r_d_nonint_check, r_forceint, rmath::M_PI, stirlerr};
 
 #[allow(non_upper_case_globals)]
 const x_LRG: f64 = 2.86111748575702815380240589208115399625e+307; // = 2^1023 / pi
@@ -32,7 +32,6 @@ pub fn dpois_raw(x: f64, lambda: f64, give_log: bool) -> f64 {
 
     // TODO: implement ebd0
     let (yh, yl) = ebd0(x, lambda);
-    // TODO: implement stirlerr
     let yl = yl + stirlerr(x);
     let lrg_x = x >= x_LRG;
 
