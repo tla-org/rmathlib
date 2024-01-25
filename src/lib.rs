@@ -2,6 +2,7 @@
 mod chebyshev;
 mod cospi;
 mod dnorm;
+mod dpois;
 mod dpq;
 mod gamma;
 mod lgamma;
@@ -16,6 +17,7 @@ mod rmath;
 pub use chebyshev::*;
 pub use cospi::*;
 pub use dnorm::*;
+pub use dpois::*;
 pub use gamma::*;
 pub use lgamma::*;
 pub use lgammacor::*;

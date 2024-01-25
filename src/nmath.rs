@@ -1,6 +1,6 @@
 use std::f64::{INFINITY, NAN, NEG_INFINITY};
 
-use crate::rmath::ML_LN2;
+use crate::{dpq::r_d__0, rmath::ML_LN2};
 
 pub const ML_POSINF: f64 = INFINITY;
 pub const ML_NEGINF: f64 = NEG_INFINITY;
@@ -27,7 +27,18 @@ pub fn r_log1_exp(x: f64) -> f64 {
         (-x.exp()).ln_1p()
     }
 }
+fn r_nonint(x: f64) -> bool {
+    let nearest_int = x.round();
+    (x - nearest_int).abs() > 1e-7 * f64::max(1.0, x.abs())
+}
 
 pub fn r_forceint(x: f64) -> f64 {
     x.round()
+}
+
+pub fn r_d_nonint_check(x: f64, give_log: bool) -> f64 {
+    if r_nonint(x) {
+        println!("non-integer x = {x}");
+    }
+    r_d__0(give_log)
 }

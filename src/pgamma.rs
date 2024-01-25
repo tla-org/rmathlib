@@ -4,16 +4,9 @@ use std::ops::Neg;
 
 use crate::dpq::{r_dt_0, r_dt_1};
 use crate::lgamma::lgammafn;
-use crate::pnorm5;
 use crate::rmath::ML_LN2;
+use crate::{dnorm4, dpois_raw, pnorm5};
 use crate::{r_log1_exp, ML_NAN, ML_NEGINF, ML_POSINF};
-
-extern "C" {
-    // FIXME: port C function
-    pub fn dpois_raw(x: f64, lambda: f64, give_log: bool) -> f64;
-    // FIXME: port C function
-    pub fn dnorm(x: f64, mu: f64, sigma: f64, log_p: bool) -> f64;
-}
 
 /// This function computes the distribution function for the
 /// gamma distribution with shape parameter alph and scale parameter
@@ -234,8 +227,7 @@ fn dpois_wrap(x_plus_1: f64, lambda: f64, give_log: bool) -> f64 {
             0.0
         }
     } else if x_plus_1 > 1.0 {
-        // FIXME: port C function
-        unsafe { dpois_raw(x_plus_1 - 1.0, lambda, give_log) }
+        dpois_raw(x_plus_1 - 1.0, lambda, give_log)
     } else if lambda > (x_plus_1 - 1.0).abs() * M_CUTOFF {
         let res = -lambda - lgammafn(x_plus_1);
         if give_log {
@@ -448,15 +440,12 @@ fn ppois_asymp(x: f64, lambda: f64, lower_tail: bool, log_p: bool) -> f64 {
         .0;
 
     let f = res12 / elfb_term;
-    // FIXME: port C function
     let np = pnorm5(s2pt, 0.0, 1.0, !lower_tail, log_p);
 
     if log_p {
-        // FIXME: port C function
-        np + (1.0 + f * unsafe { dnorm(s2pt, 0.0, 1.0, log_p).exp() }).ln()
+        np + (1.0 + f * dnorm4(s2pt, 0.0, 1.0, log_p).exp()).ln()
     } else {
-        // FIXME: port C function
-        np + f * unsafe { dnorm(s2pt, 0.0, 1.0, log_p) }
+        np + f * dnorm4(s2pt, 0.0, 1.0, log_p)
     }
 }
 
