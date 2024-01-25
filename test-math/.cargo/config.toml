@@ -1,2 +1,0 @@
-[target.'cfg(all())']
-rustflags = ["-C", "link-arg=-fuse-ld=lld"]
