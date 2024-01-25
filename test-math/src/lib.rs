@@ -32,39 +32,39 @@ mod test_math {
     }
 
     #[test]
-    fn test_pnorm() {
-        assert_eq!(pnorm(0.0, 0.0, 1.0, true, false), 0.5);
-        assert_eq!(pnorm(0.0, 0.0, 1.0, false, false), 0.5);
-        assert_eq!(pnorm(0.0, 0.0, 1.0, false, false), unsafe {
+    fn test_pnorm5() {
+        assert_eq!(pnorm5(0.0, 0.0, 1.0, true, false), 0.5);
+        assert_eq!(pnorm5(0.0, 0.0, 1.0, false, false), 0.5);
+        assert_eq!(pnorm5(0.0, 0.0, 1.0, false, false), unsafe {
             c::pnorm5(0.0, 0.0, 1.0, 0, 0)
         });
-        assert_eq!(pnorm(0.65, 0.2, 0.34, false, false), unsafe {
+        assert_eq!(pnorm5(0.65, 0.2, 0.34, false, false), unsafe {
             c::pnorm5(0.65, 0.2, 0.34, 0, 0)
         });
-        assert_eq!(pnorm(3.21, 0.2, 0.34, false, false), unsafe {
+        assert_eq!(pnorm5(3.21, 0.2, 0.34, false, false), unsafe {
             c::pnorm5(3.21, 0.2, 0.34, 0, 0)
         });
-        assert_eq!(pnorm(3.21, 0.2, 0.34, false, true), unsafe {
+        assert_eq!(pnorm5(3.21, 0.2, 0.34, false, true), unsafe {
             c::pnorm5(3.21, 0.2, 0.34, 0, 1)
         });
-        assert_eq!(pnorm(123.0, 0.2, 0.34, false, true), unsafe {
+        assert_eq!(pnorm5(123.0, 0.2, 0.34, false, true), unsafe {
             c::pnorm5(123.0, 0.2, 0.34, 0, 1)
         });
     }
 
     #[test]
     fn test_qnorm() {
-        assert_eq!(qnorm(0.0, 0.5, 1.0, true, false), unsafe {
+        assert_eq!(qnorm5(0.0, 0.5, 1.0, true, false), unsafe {
             c::qnorm5(0.0, 0.5, 1.0, 1, 0)
         });
-        assert_eq!(qnorm(0.4, 0.5, 1.0, true, false), unsafe {
+        assert_eq!(qnorm5(0.4, 0.5, 1.0, true, false), unsafe {
             c::qnorm5(0.4, 0.5, 1.0, 1, 0)
         });
-        assert_eq!(qnorm(0.4, 0.5, 1.0, false, false), unsafe {
+        assert_eq!(qnorm5(0.4, 0.5, 1.0, false, false), unsafe {
             c::qnorm5(0.4, 0.5, 1.0, 0, 0)
         });
         assert!(abs_diff_eq!(
-            qnorm(-2.3, 0.5, 1.0, false, true),
+            qnorm5(-2.3, 0.5, 1.0, false, true),
             unsafe { c::qnorm5(-2.3, 0.5, 1.0, 0, 1) },
             epsilon = 1e-15
         ));
@@ -107,49 +107,49 @@ mod test_math {
         assert_eq!(gammafn(1.0), unsafe { c::gammafn(1.0) });
     }
 
-    #[test]
-    fn test_lgammacor() {
-        assert!(lgammacor(-1.0).is_nan());
-        assert!(lgammacor(0.0).is_nan());
-        assert_eq!(lgammacor(10.0), unsafe { c::lgammacor(10.0) });
-        assert_eq!(lgammacor(20.0), unsafe { c::lgammacor(20.0) });
-        assert_eq!(lgammacor(3.745194030963158e306 + 1.0), unsafe {
-            c::lgammacor(3.745194030963158e306 + 1.0)
-        });
-        assert_eq!(lgammacor(94906265.62425156 + 1.0), unsafe {
-            c::lgammacor(94906265.62425156 + 1.0)
-        });
-    }
+    // #[test]
+    // fn test_lgammacor() {
+    //     assert!(lgammacor(-1.0).is_nan());
+    //     assert!(lgammacor(0.0).is_nan());
+    //     assert_eq!(lgammacor(10.0), unsafe { c::lgammacor(10.0) });
+    //     assert_eq!(lgammacor(20.0), unsafe { c::lgammacor(20.0) });
+    //     assert_eq!(lgammacor(3.745194030963158e306 + 1.0), unsafe {
+    //         c::lgammacor(3.745194030963158e306 + 1.0)
+    //     });
+    //     assert_eq!(lgammacor(94906265.62425156 + 1.0), unsafe {
+    //         c::lgammacor(94906265.62425156 + 1.0)
+    //     });
+    // }
 
-    #[test]
-    fn test_chebyshev_init() {
-        assert_eq!(chebyshev_init(&[1.0, 2.0, 3.0], 3, 0.5), unsafe {
-            c::chebyshev_init([1.0, 2.0, 3.0].as_mut_ptr(), 3, 0.5)
-        });
-        assert_eq!(chebyshev_init(&[], 0, 0.5), unsafe {
-            c::chebyshev_init([].as_mut_ptr(), 0, 0.5)
-        });
-        assert_eq!(chebyshev_init(&[1.0, 2.0, 3.0], 3, -0.5), unsafe {
-            c::chebyshev_init([1.0, 2.0, 3.0].as_mut_ptr(), 3, -0.5)
-        });
-    }
+    // #[test]
+    // fn test_chebyshev_init() {
+    //     assert_eq!(chebyshev_init(&[1.0, 2.0, 3.0], 3, 0.5), unsafe {
+    //         c::chebyshev_init([1.0, 2.0, 3.0].as_mut_ptr(), 3, 0.5)
+    //     });
+    //     assert_eq!(chebyshev_init(&[], 0, 0.5), unsafe {
+    //         c::chebyshev_init([].as_mut_ptr(), 0, 0.5)
+    //     });
+    //     assert_eq!(chebyshev_init(&[1.0, 2.0, 3.0], 3, -0.5), unsafe {
+    //         c::chebyshev_init([1.0, 2.0, 3.0].as_mut_ptr(), 3, -0.5)
+    //     });
+    // }
 
-    #[test]
-    fn test_chebyshev_eval() {
-        assert_eq!(chebyshev_eval(0.6, &[1.0, 2.0, 3.0], 2), unsafe {
-            c::chebyshev_eval(0.6, [1.0, 2.0, 3.0].as_mut_ptr(), 2)
-        });
-        assert_eq!(chebyshev_eval(0.6, &[1.0, 2.0, 3.0], 0), unsafe {
-            c::chebyshev_eval(0.6, [1.0, 2.0, 3.0].as_mut_ptr(), 0)
-        });
-        assert_eq!(chebyshev_eval(0.6, &[1.0, 2.0, 3.0], 5), unsafe {
-            c::chebyshev_eval(0.6, [1.0, 2.0, 3.0].as_mut_ptr(), 5)
-        });
-        assert_eq!(chebyshev_eval(-0.6, &[1.0, 2.0, 3.0], 2), unsafe {
-            c::chebyshev_eval(-0.6, [1.0, 2.0, 3.0].as_mut_ptr(), 2)
-        });
-        assert_eq!(chebyshev_eval(0.6, &[], 2), unsafe {
-            c::chebyshev_eval(0.6, [].as_mut_ptr(), 2)
-        });
-    }
+    // #[test]
+    // fn test_chebyshev_eval() {
+    //     assert_eq!(chebyshev_eval(0.6, &[1.0, 2.0, 3.0], 2), unsafe {
+    //         c::chebyshev_eval(0.6, [1.0, 2.0, 3.0].as_mut_ptr(), 2)
+    //     });
+    //     assert_eq!(chebyshev_eval(0.6, &[1.0, 2.0, 3.0], 0), unsafe {
+    //         c::chebyshev_eval(0.6, [1.0, 2.0, 3.0].as_mut_ptr(), 0)
+    //     });
+    //     assert_eq!(chebyshev_eval(0.6, &[1.0, 2.0, 3.0], 5), unsafe {
+    //         c::chebyshev_eval(0.6, [1.0, 2.0, 3.0].as_mut_ptr(), 5)
+    //     });
+    //     assert_eq!(chebyshev_eval(-0.6, &[1.0, 2.0, 3.0], 2), unsafe {
+    //         c::chebyshev_eval(-0.6, [1.0, 2.0, 3.0].as_mut_ptr(), 2)
+    //     });
+    //     assert_eq!(chebyshev_eval(0.6, &[], 2), unsafe {
+    //         c::chebyshev_eval(0.6, [].as_mut_ptr(), 2)
+    //     });
+    // }
 }

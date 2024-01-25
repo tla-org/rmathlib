@@ -4,13 +4,12 @@ use std::ops::Neg;
 
 use crate::dpq::{r_dt_0, r_dt_1};
 use crate::lgamma::lgammafn;
+use crate::pnorm5;
 use crate::{r_log1_exp, ML_DBL_EPSILON, ML_DBL_MAX, ML_DBL_MIN, ML_NAN, ML_NEGINF, ML_POSINF};
 
 extern "C" {
     // FIXME: port C function
     pub fn dpois_raw(x: f64, lambda: f64, give_log: bool) -> f64;
-    // FIXME: port C function
-    pub fn pnorm5(x: f64, mu: f64, sigma: f64, lower_tail: bool, log_p: bool) -> f64;
     // FIXME: port C function
     pub fn dnorm(x: f64, mu: f64, sigma: f64, log_p: bool) -> f64;
 }
@@ -449,7 +448,7 @@ fn ppois_asymp(x: f64, lambda: f64, lower_tail: bool, log_p: bool) -> f64 {
 
     let f = res12 / elfb_term;
     // FIXME: port C function
-    let np = unsafe { pnorm5(s2pt, 0.0, 1.0, !lower_tail, log_p) };
+    let np = pnorm5(s2pt, 0.0, 1.0, !lower_tail, log_p);
 
     if log_p {
         // FIXME: port C function
