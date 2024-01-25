@@ -23,7 +23,7 @@ use libm::*;
 /// ALGORITHM 715: SPECFUN - A Portable FORTRAN Package of
 /// Special Function Routines and Test Drivers".
 /// ACM Transactions on Mathematical Software. 19, 22-32.
-pub fn pnorm5(mut x: f64, mu: f64, sigma: f64, lower_tail: bool, log_p: bool) -> f64 {
+pub fn pnorm5(x: f64, mu: f64, sigma: f64, lower_tail: bool, log_p: bool) -> f64 {
     let mut p: f64;
     let mut cp: f64 = ML_NAN;
 
@@ -53,7 +53,7 @@ pub fn pnorm5(mut x: f64, mu: f64, sigma: f64, lower_tail: bool, log_p: bool) ->
             r_dt_1(lower_tail, log_p)
         };
     }
-    x = p;
+    let x = p;
 
     let i_tail = if lower_tail { 0 } else { 1 };
     pnorm_both(x, &mut p, &mut cp, i_tail, log_p);

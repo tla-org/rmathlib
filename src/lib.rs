@@ -24,6 +24,7 @@ pub use lgamma::*;
 pub use lgammacor::*;
 pub use libc::*;
 pub use nmath::*;
+pub use rmath::pnorm;
 // pub use pgamma::*;
 pub use pnorm::*;
 pub use qnorm::*;
