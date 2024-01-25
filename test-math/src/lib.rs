@@ -15,8 +15,8 @@ mod test_math {
             pub fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64;
             pub fn gammafn(x: f64) -> f64;
             pub fn lgammacor(x: f64) -> f64;
-            pub fn chebyshev_init(dos: *mut f64, eta: f64) -> usize;
-            pub fn chebyshev_eval(x: f64, a: *mut f64, n: usize) -> f64;
+            pub fn chebyshev_init(dos: *mut f64, nos: i32, eta: f64) -> i32;
+            pub fn chebyshev_eval(x: f64, a: *mut f64, n: i32) -> f64;
         }
     }
 
@@ -123,14 +123,14 @@ mod test_math {
 
     #[test]
     fn test_chebyshev_init() {
-        assert_eq!(chebyshev_init(&[1.0, 2.0, 3.0], 0.5).unwrap(), unsafe {
-            c::chebyshev_init([1.0, 2.0, 3.0].as_mut_ptr(), 0.5)
+        assert_eq!(chebyshev_init(&[1.0, 2.0, 3.0], 3, 0.5), unsafe {
+            c::chebyshev_init([1.0, 2.0, 3.0].as_mut_ptr(), 3, 0.5)
         });
-        assert_eq!(chebyshev_init(&[], 0.5).unwrap(), unsafe {
-            c::chebyshev_init([].as_mut_ptr(), 0.5)
+        assert_eq!(chebyshev_init(&[], 0, 0.5), unsafe {
+            c::chebyshev_init([].as_mut_ptr(), 0, 0.5)
         });
-        assert_eq!(chebyshev_init(&[1.0, 2.0, 3.0], -0.5).unwrap(), unsafe {
-            c::chebyshev_init([1.0, 2.0, 3.0].as_mut_ptr(), -0.5)
+        assert_eq!(chebyshev_init(&[1.0, 2.0, 3.0], 3, -0.5), unsafe {
+            c::chebyshev_init([1.0, 2.0, 3.0].as_mut_ptr(), 3, -0.5)
         });
     }
 

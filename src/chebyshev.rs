@@ -22,19 +22,19 @@ use crate::ml_warn_return_nan;
 /// double precision orthogonal series `dos` needed to insure
 /// the error is no larger than `eta`.  Ordinarily eta will be
 /// chosen to be one-tenth machine precision.
-pub fn chebyshev_init(dos: &[f64], eta: f64) -> Option<usize> {
-    if dos.is_empty() {
-        return None;
+pub fn chebyshev_init(dos: &[f64], nos: i32, eta: f64) -> i32 {
+    if nos < 1 {
+        return 0;
     }
 
     let mut err = 0.0;
     for (i, &d) in dos.iter().enumerate().rev() {
         err += d.abs();
         if err > eta {
-            return Some(i);
+            return i as i32;
         }
     }
-    Some(0)
+    0
 }
 
 /// `chebyshev_eval` evaluates the n-term Chebyshev series
