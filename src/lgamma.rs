@@ -1,8 +1,8 @@
 use std::f64::INFINITY;
 
-use crate::nmath::*;
 use crate::gammafn;
 use crate::lgammacor;
+use crate::nmath::*;
 use crate::sinpi;
 
 /// Machine dependent constants for IEEE double precision

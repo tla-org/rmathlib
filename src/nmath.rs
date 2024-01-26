@@ -1,4 +1,6 @@
-use std::f64::{INFINITY, NAN, NEG_INFINITY};
+use std::f64::INFINITY;
+use std::f64::NAN;
+use std::f64::NEG_INFINITY;
 
 use crate::dpq::r_d__0;
 use crate::rmath::ML_LN2;
