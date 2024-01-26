@@ -1,4 +1,6 @@
-use std::f64::{MANTISSA_DIGITS, MAX, MIN_EXP};
+use std::f64::MANTISSA_DIGITS;
+use std::f64::MAX;
+use std::f64::MIN_EXP;
 
 use libm::ldexp;
 
