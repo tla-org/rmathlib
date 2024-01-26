@@ -14,7 +14,7 @@ mod test_math {
             pub fn lgammafn(x: f64) -> f64;
             pub fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64;
             pub fn gammafn(x: f64) -> f64;
-            // pub fn lgammacor(x: f64) -> f64; // FIXME: Linking in CC broken
+            pub fn Rf_lgammacor(x: f64) -> f64; // FIXME: Linking in CC broken
             // pub fn chebyshev_init(dos: *mut f64, nos: i32, eta: f64) -> i32; // FIXME: Linking in CC broken
             // pub fn chebyshev_eval(x: f64, a: *mut f64, n: i32) -> f64; // FIXME: Linking in CC broken
             pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64;
@@ -109,19 +109,19 @@ mod test_math {
         assert_eq!(gammafn(1.0), unsafe { c::gammafn(1.0) });
     }
 
-    // #[test]
-    // fn test_lgammacor() {
-    //     assert!(lgammacor(-1.0).is_nan());
-    //     assert!(lgammacor(0.0).is_nan());
-    //     assert_eq!(lgammacor(10.0), unsafe { c::lgammacor(10.0) });
-    //     assert_eq!(lgammacor(20.0), unsafe { c::lgammacor(20.0) });
-    //     assert_eq!(lgammacor(3.745194030963158e306 + 1.0), unsafe {
-    //         c::lgammacor(3.745194030963158e306 + 1.0)
-    //     });
-    //     assert_eq!(lgammacor(94906265.62425156 + 1.0), unsafe {
-    //         c::lgammacor(94906265.62425156 + 1.0)
-    //     });
-    // }
+    #[test]
+    fn test_lgammacor() {
+        assert!(lgammacor(-1.0).is_nan());
+        assert!(lgammacor(0.0).is_nan());
+        assert_eq!(lgammacor(10.0), unsafe { c::Rf_lgammacor(10.0) });
+        assert_eq!(lgammacor(20.0), unsafe { c::Rf_lgammacor(20.0) });
+        assert_eq!(lgammacor(3.745194030963158e306 + 1.0), unsafe {
+            c::Rf_lgammacor(3.745194030963158e306 + 1.0)
+        });
+        assert_eq!(lgammacor(94906265.62425156 + 1.0), unsafe {
+            c::Rf_lgammacor(94906265.62425156 + 1.0)
+        });
+    }
 
     // #[test]
     // fn test_chebyshev_init() {
