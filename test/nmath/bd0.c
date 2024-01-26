@@ -220,7 +220,7 @@ static const float bd0_scale[128 + 1][4] = {
 };
 
 float foo() {
-    return bd0_scale[0][0];
+    return bd0_scale[0][1];
 }
 
 /*
