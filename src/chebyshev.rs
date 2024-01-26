@@ -11,9 +11,9 @@
 //!
 //! ## NOTES
 //!
-//! These routines are translations into C of Fortran routines
-//! by W. Fullerton of Los Alamos Scientific Laboratory.
-//! Based on the Fortran routine dcsevl by W. Fullerton.
+//! These routines are translations into Rust by R. Huijzer and J. Storopoli
+//! from C translations of Fortran routines by W. Fullerton of Los Alamos
+//! Scientific Laboratory. Based on the Fortran routine dcsevl by W. Fullerton.
 //! Adapted from R. Broucke, Algorithm 446, CACM., 16, 254 (1973).
 
 use crate::nmath::*;
