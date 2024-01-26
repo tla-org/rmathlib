@@ -75,10 +75,6 @@ double attribute_hidden bd0(double x, double np)
     return(x*log(x/np)+np-x);
 }
 
-static const float FOO = +0x1.62e430p-1;
-
-float foo() { return FOO; }
-
 // ebd0(): R Bugzilla PR#15628 -- proposed accuracy improvement by Morten Welinder
 
 /*
@@ -223,6 +219,9 @@ static const float bd0_scale[128 + 1][4] = {
 	{ 0, 0, 0, 0 } /* log(1024/1024) = log(1) = 0 */
 };
 
+float foo() {
+    return bd0_scale[0][0];
+}
 
 /*
  * Compute x * log (x / M) + (M - x)

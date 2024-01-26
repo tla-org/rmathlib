@@ -10,8 +10,7 @@ pub const M_PI: f64 = PI;
 pub const M_SQRT2: f64 = SQRT_2;
 pub const M_SQRT_32: f64 = 5.656_854_249_492_381;
 pub const M_1_SQRT_2PI: f64 = 0.398_942_280_401_432_7; // 1/sqrt(2pi)
-pub const M_LN2: f64 = 0.693147180559945309417232121458; // ln(2)
-pub const ML_LN2: f64 = LN_2;
+pub const M_LN2: f64 = LN_2;
 
 pub fn dnorm(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64 {
     dnorm4(x, mu, sigma, give_log)

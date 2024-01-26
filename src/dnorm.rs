@@ -43,7 +43,7 @@ pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64 {
     if x < 5.0 {
         M_1_SQRT_2PI * (-0.5 * x * x).exp() / sigma
     } else {
-        let bound = (-2.0 * ML_LN2 * (MIN_EXP as f64 + 1.0 - MANTISSA_DIGITS as f64)).sqrt();
+        let bound = (-2.0 * M_LN2 * (MIN_EXP as f64 + 1.0 - MANTISSA_DIGITS as f64)).sqrt();
         if x > bound {
             0.0
         } else {
