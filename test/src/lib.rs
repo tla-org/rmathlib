@@ -18,6 +18,7 @@ mod test_math {
             pub fn Rf_chebyshev_eval(x: f64, a: *mut f64, n: i32) -> f64;
             pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64;
             pub fn Rf_stirlerr(n: f64) -> f64;
+            pub fn Rf_i1mach(i: i32) -> i32;
         }
     }
 
@@ -169,10 +170,30 @@ mod test_math {
     }
 
     #[test]
-    fn test_stilerr() {
+    fn test_stirlerr() {
         assert_eq!(stirlerr(1.0), unsafe { c::Rf_stirlerr(1.0) });
         assert_eq!(stirlerr(2.0), unsafe { c::Rf_stirlerr(2.0) });
         assert_eq!(stirlerr(25.0), unsafe { c::Rf_stirlerr(25.0) });
         assert_eq!(stirlerr(50.0), unsafe { c::Rf_stirlerr(50.0) });
+    }
+
+    #[test]
+    fn test_i1mach() {
+        assert_eq!(rf_i1mach(1), unsafe { c::Rf_i1mach(1) });
+        assert_eq!(rf_i1mach(2), unsafe { c::Rf_i1mach(2) });
+        assert_eq!(rf_i1mach(3), unsafe { c::Rf_i1mach(3) });
+        assert_eq!(rf_i1mach(4), unsafe { c::Rf_i1mach(4) });
+        assert_eq!(rf_i1mach(5), unsafe { c::Rf_i1mach(5) });
+        assert_eq!(rf_i1mach(6), unsafe { c::Rf_i1mach(6) });
+        assert_eq!(rf_i1mach(7), unsafe { c::Rf_i1mach(7) });
+        assert_eq!(rf_i1mach(8), unsafe { c::Rf_i1mach(8) });
+        assert_eq!(rf_i1mach(9), unsafe { c::Rf_i1mach(9) });
+        assert_eq!(rf_i1mach(10), unsafe { c::Rf_i1mach(10) });
+        assert_eq!(rf_i1mach(11), unsafe { c::Rf_i1mach(11) });
+        assert_eq!(rf_i1mach(12), unsafe { c::Rf_i1mach(12) });
+        assert_eq!(rf_i1mach(13), unsafe { c::Rf_i1mach(13) });
+        assert_eq!(rf_i1mach(14), unsafe { c::Rf_i1mach(14) });
+        assert_eq!(rf_i1mach(15), unsafe { c::Rf_i1mach(15) });
+        assert_eq!(rf_i1mach(16), unsafe { c::Rf_i1mach(16) });
     }
 }
