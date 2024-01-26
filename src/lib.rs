@@ -21,8 +21,8 @@ mod stirlerr;
 
 // Use only explicit exports and no wildcard exports to avoid accidentally
 // exporting symbols that should not be exported.
-pub use chebyshev::chebyshev_init;
 pub use chebyshev::chebyshev_eval;
+pub use chebyshev::chebyshev_init;
 pub use cospi::cospi;
 pub use cospi::sinpi;
 pub use cospi::tanpi;
@@ -36,3 +36,8 @@ pub use rmath::pnorm;
 pub use rmath::qnorm;
 // pub use pgamma::*;
 pub use stirlerr::stirlerr;
+
+// TODO: Remove these exports later; once they are used by lgamma.
+pub use nmath::r_d_nonint_check;
+pub use nmath::r_log1_exp;
+pub use nmath::r_nonint;
