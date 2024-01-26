@@ -3,8 +3,8 @@
 // Avoid converting `if n < 1 || n > 1000` to `if !(1..=1000).contains(&n)`.
 #![allow(clippy::manual_range_contains)]
 
-mod chebyshev;
 mod bd0;
+mod chebyshev;
 mod cospi;
 mod dnorm;
 // mod dpois;
