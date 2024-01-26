@@ -5,6 +5,7 @@
 
 mod bd0;
 mod chebyshev;
+mod pgamma;
 mod cospi;
 mod dnorm;
 // mod dpois;
