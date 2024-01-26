@@ -5,20 +5,21 @@ mod test_math {
 
     mod c {
         extern "C" {
+            pub fn Rf_bd0(x: f64, np: f64) -> f64;
+            pub fn Rf_chebyshev_eval(x: f64, a: *mut f64, n: i32) -> f64;
+            pub fn Rf_chebyshev_init(dos: *mut f64, nos: i32, eta: f64) -> i32;
+            pub fn Rf_i1mach(i: i32) -> i32;
+            pub fn Rf_lgammacor(x: f64) -> f64;
+            pub fn Rf_stirlerr(n: f64) -> f64;
             pub fn cospi(x: f64) -> f64;
-            pub fn sinpi(x: f64) -> f64;
-            pub fn tanpi(x: f64) -> f64;
-            pub fn pnorm5(x: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
-            pub fn qnorm5(p: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
+            pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64;
+            pub fn gammafn(x: f64) -> f64;
             pub fn lgammafn(x: f64) -> f64;
             pub fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64;
-            pub fn gammafn(x: f64) -> f64;
-            pub fn Rf_lgammacor(x: f64) -> f64;
-            pub fn Rf_chebyshev_init(dos: *mut f64, nos: i32, eta: f64) -> i32;
-            pub fn Rf_chebyshev_eval(x: f64, a: *mut f64, n: i32) -> f64;
-            pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64;
-            pub fn Rf_stirlerr(n: f64) -> f64;
-            pub fn Rf_i1mach(i: i32) -> i32;
+            pub fn pnorm5(x: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
+            pub fn qnorm5(p: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
+            pub fn sinpi(x: f64) -> f64;
+            pub fn tanpi(x: f64) -> f64;
         }
     }
 
@@ -195,5 +196,11 @@ mod test_math {
         assert_eq!(rf_i1mach(14), unsafe { c::Rf_i1mach(14) });
         assert_eq!(rf_i1mach(15), unsafe { c::Rf_i1mach(15) });
         assert_eq!(rf_i1mach(16), unsafe { c::Rf_i1mach(16) });
+    }
+
+    #[test]
+    fn test_bd0() {
+        assert_eq!(bd0(5.0, 1.0), unsafe { c::Rf_bd0(5.0, 1.0) });
+        assert_eq!(bd0(4.1, 2.0), unsafe { c::Rf_bd0(4.1, 2.0) });
     }
 }

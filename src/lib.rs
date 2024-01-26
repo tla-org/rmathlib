@@ -4,6 +4,7 @@
 #![allow(clippy::manual_range_contains)]
 
 mod chebyshev;
+mod bd0;
 mod cospi;
 mod dnorm;
 // mod dpois;
@@ -22,21 +23,22 @@ mod stirlerr;
 
 // Use only explicit exports and no wildcard exports to avoid accidentally
 // exporting symbols that should not be exported.
+pub use bd0::bd0;
 pub use chebyshev::chebyshev_eval;
 pub use chebyshev::chebyshev_init;
 pub use cospi::cospi;
+// pub use dpois::*;
+// pub use pgamma::*;
 pub use cospi::sinpi;
 pub use cospi::tanpi;
-// pub use dpois::*;
 pub use gamma::gammafn;
+pub use i1mach::rf_i1mach;
 pub use lgamma::lgammafn;
 pub use lgamma::lgammafn_sign;
 pub use lgammacor::lgammacor;
 pub use rmath::dnorm;
 pub use rmath::pnorm;
 pub use rmath::qnorm;
-// pub use pgamma::*;
-pub use i1mach::rf_i1mach;
 pub use stirlerr::stirlerr;
 
 // TODO: Remove these exports later; once they are used by lgamma.
