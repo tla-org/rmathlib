@@ -30,13 +30,13 @@ jobs:
       - name: Cargo clippy
         run: |
           cargo clippy --all-targets --all-features -- -D warnings
-          cd test-math/
+          cd test/
           cargo clippy --all-targets --all-features -- -D warnings
 
       - name: Cargo fmt
         run: |
           cargo fmt --all --check
-          cd test-math/
+          cd test/
           cargo fmt --all --check
 
   check-docs:
@@ -65,5 +65,5 @@ jobs:
       - name: Cargo test
         run: |
           cargo test
-          cd test-math/
+          cd test/
           cargo test
