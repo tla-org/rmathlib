@@ -1,4 +1,5 @@
 use crate::pnorm::pnorm5;
+use crate::qnorm::qnorm5;
 
 use std::f64::consts::{LN_2, PI, SQRT_2};
 
@@ -11,4 +12,8 @@ pub const ML_LN2: f64 = LN_2;
 
 pub fn pnorm(x: f64, mu: f64, sigma: f64, lower_tail: bool, log_p: bool) -> f64 {
     pnorm5(x, mu, sigma, lower_tail, log_p)
+}
+
+pub fn qnorm(p: f64, mu: f64, sigma: f64, lower_tail: bool, log_p: bool) -> f64 {
+    qnorm5(p, mu, sigma, lower_tail, log_p)
 }

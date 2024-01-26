@@ -56,17 +56,17 @@ mod test_math {
 
     #[test]
     fn test_qnorm() {
-        assert_eq!(qnorm5(0.0, 0.5, 1.0, true, false), unsafe {
+        assert_eq!(qnorm(0.0, 0.5, 1.0, true, false), unsafe {
             c::qnorm5(0.0, 0.5, 1.0, 1, 0)
         });
-        assert_eq!(qnorm5(0.4, 0.5, 1.0, true, false), unsafe {
+        assert_eq!(qnorm(0.4, 0.5, 1.0, true, false), unsafe {
             c::qnorm5(0.4, 0.5, 1.0, 1, 0)
         });
-        assert_eq!(qnorm5(0.4, 0.5, 1.0, false, false), unsafe {
+        assert_eq!(qnorm(0.4, 0.5, 1.0, false, false), unsafe {
             c::qnorm5(0.4, 0.5, 1.0, 0, 0)
         });
         assert!(abs_diff_eq!(
-            qnorm5(-2.3, 0.5, 1.0, false, true),
+            qnorm(-2.3, 0.5, 1.0, false, true),
             unsafe { c::qnorm5(-2.3, 0.5, 1.0, 0, 1) },
             epsilon = 1e-15
         ));
