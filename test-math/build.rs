@@ -41,5 +41,5 @@ fn main() {
         .define("MATHLIB_STANDALONE", "1")
         .include("nmath")
         .include("nmath/R_ext")
-        .compile("dnt");
+        .compile("nmath");
 }

@@ -1,3 +1,6 @@
+use std::f64::EPSILON;
+use std::f64::MIN_POSITIVE;
+
 use crate::dpq::*;
 use crate::nmath::*;
 use crate::rmath::*;
@@ -20,9 +23,9 @@ use libm::*;
 /// ALGORITHM 715: SPECFUN - A Portable FORTRAN Package of
 /// Special Function Routines and Test Drivers".
 /// ACM Transactions on Mathematical Software. 19, 22-32.
-pub fn pnorm(mut x: f64, mu: f64, sigma: f64, lower_tail: bool, log_p: bool) -> f64 {
+pub fn pnorm5(x: f64, mu: f64, sigma: f64, lower_tail: bool, log_p: bool) -> f64 {
     let mut p: f64;
-    let mut cp: f64 = f64::NAN;
+    let mut cp: f64 = ML_NAN;
 
     if x.is_nan() || mu.is_nan() || sigma.is_nan() {
         return x + mu + sigma;
@@ -50,7 +53,7 @@ pub fn pnorm(mut x: f64, mu: f64, sigma: f64, lower_tail: bool, log_p: bool) -> 
             r_dt_1(lower_tail, log_p)
         };
     }
-    x = p;
+    let x = p;
 
     let i_tail = if lower_tail { 0 } else { 1 };
     pnorm_both(x, &mut p, &mut cp, i_tail, log_p);
@@ -159,7 +162,7 @@ fn pnorm_both(x: f64, cum: &mut f64, ccum: &mut f64, i_tail: i32, log_p: bool) {
 
     let xsq: f64;
 
-    let _min = f64::MIN_POSITIVE;
+    let _min = MIN_POSITIVE;
 
     let mut _i: i32;
 
@@ -169,7 +172,7 @@ fn pnorm_both(x: f64, cum: &mut f64, ccum: &mut f64, i_tail: i32, log_p: bool) {
         return;
     }
 
-    let eps: f64 = f64::EPSILON * 0.5;
+    let eps: f64 = EPSILON * 0.5;
 
     let lower: bool = i_tail != 1;
     let upper: bool = i_tail != 0;
