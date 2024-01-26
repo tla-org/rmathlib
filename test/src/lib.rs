@@ -239,9 +239,7 @@ mod test_math {
         let mut c_yh: f64 = 0.0;
         let mut c_yl: f64 = 0.0;
         ebd0(1.1, 2.2, &mut yh, &mut yl);
-        unsafe {
-            c::Rf_ebd0(1.1, 2.2, &mut c_yh, &mut c_yl)
-        };
+        unsafe { c::Rf_ebd0(1.1, 2.2, &mut c_yh, &mut c_yl) };
         // assert_eq!(yh, c_yh);
     }
 }
