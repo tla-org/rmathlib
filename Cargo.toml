@@ -23,3 +23,7 @@ repository = "https://github.com/poweranalyses-org/rmathlib"
 
 [dependencies]
 libm = "0.2"
+
+[features]
+default = ["std"]
+std = []

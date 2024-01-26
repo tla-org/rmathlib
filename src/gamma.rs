@@ -96,6 +96,7 @@ pub fn gammafn(x: f64) -> f64 {
                 return ml_warn_return_nan();
             }
             if y < XSML {
+                #[cfg(feature = "std")]
                 println!("gammafn: Range warning");
                 return if x > 0.0 { ML_POSINF } else { ML_NEGINF };
             }
@@ -134,6 +135,7 @@ pub fn gammafn(x: f64) -> f64 {
             }
             let sinpiy = sinpi(y);
             if sinpiy == 0.0 {
+                #[cfg(feature = "std")]
                 println!("gammafn: Range warning - Negative integer arg - overflow");
                 return ML_POSINF;
             }

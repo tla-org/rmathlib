@@ -9,6 +9,7 @@ pub const ML_POSINF: f64 = INFINITY;
 pub const ML_NEGINF: f64 = NEG_INFINITY;
 
 pub fn ml_warn_return_nan() -> f64 {
+    #[cfg(feature = "std")]
     println!("argument out of domain");
     ML_NAN
 }
@@ -42,6 +43,7 @@ pub fn r_forceint(x: f64) -> f64 {
 
 pub fn r_d_nonint_check(x: f64, give_log: bool) -> f64 {
     if r_nonint(x) {
+        #[cfg(feature = "std")]
         println!("non-integer x = {x}");
     }
     r_d__0(give_log)

@@ -43,6 +43,7 @@ pub fn lgammacor(x: f64) -> f64 {
     if x < 10.0 {
         return ml_warn_return_nan();
     } else if x >= XMAX {
+        #[cfg(feature = "std")]
         println!("lgammacor: Underflow warning");
         // Allow to underflow
     } else if x < XBIG {
