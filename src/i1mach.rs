@@ -1,5 +1,7 @@
+use core::f32;
+use core::f64;
+use core::i32;
 use core::mem::size_of;
-use core::{f32, f64, i32};
 use std::os::raw::c_int;
 
 // Assuming CHAR_BIT is 8. Adjust as needed for your platform.
