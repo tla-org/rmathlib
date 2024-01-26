@@ -22,6 +22,7 @@
 //! https://www.R-project.org/Licenses/
 
 use crate::libc::*;
+use crate::pgamma::log1pmx;
 use crate::nmath::*;
 use crate::rmath::*;
 use libm::frexp;
@@ -673,10 +674,6 @@ pub fn ebd0(x: f64, m: f64, yh: &mut f64, yl: &mut f64) {
     // rounding errors.
     //
 
-    // TODO log1pmx is defined in pgamma.
-    fn log1pmx(x: f64) -> f64 {
-        x
-    }
     add1(-x * log1pmx((m * fg - x) / x), yh, yl);
     if fg == 1.0 {
         return;

@@ -90,7 +90,7 @@ fn logcf(x: f64, i: f64, d: f64, eps: f64) -> f64 {
 }
 
 /// Accurately calculates log(1+x)-x, particularly for small x.
-fn log1pmx(x: f64) -> f64 {
+pub fn log1pmx(x: f64) -> f64 {
     let min_log_1_value = -0.79149064;
 
     if x > 1.0 || x < min_log_1_value {
