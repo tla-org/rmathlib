@@ -1,4 +1,5 @@
-use crate::{chebyshev_eval, ml_warn_return_nan};
+use crate::chebyshev_eval;
+use crate::nmath::*;
 
 const ALGMCS: [f64; 15] = [
     1.666_389_480_451_863_4e-1,
