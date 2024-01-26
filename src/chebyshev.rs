@@ -56,7 +56,6 @@ pub fn chebyshev_eval(x: f64, a: &[f64], n: i32) -> f64 {
     for i in 1..=n {
         b2 = b1;
         b1 = b0;
-        print!("{n}, {i}, {}\n", (n-i) as usize);
         b0 = twox * b1 - b2 + a[(n - i) as usize];
     }
 

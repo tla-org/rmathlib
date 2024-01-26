@@ -142,10 +142,9 @@ mod test_math {
             c::Rf_chebyshev_eval(0.6, [1.0, 2.0, 3.0].as_mut_ptr(), 2)
         });
         assert!(chebyshev_eval(0.6, &[1.0, 2.0, 3.0], 0).is_nan());
-        assert_eq!(
-            chebyshev_eval(0.6, &[1.0, 2.0, 3.0], 2),
-            unsafe { c::Rf_chebyshev_eval(0.6, [1.0, 2.0, 3.0].as_mut_ptr(), 2) }
-        );
+        assert_eq!(chebyshev_eval(0.6, &[1.0, 2.0, 3.0], 2), unsafe {
+            c::Rf_chebyshev_eval(0.6, [1.0, 2.0, 3.0].as_mut_ptr(), 2)
+        });
     }
 
     #[test]
