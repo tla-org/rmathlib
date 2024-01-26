@@ -14,6 +14,7 @@ mod lgammacor;
 mod libc;
 mod nmath;
 // mod pgamma;
+mod i1mach;
 mod pnorm;
 mod qnorm;
 mod rmath;
@@ -35,6 +36,7 @@ pub use rmath::dnorm;
 pub use rmath::pnorm;
 pub use rmath::qnorm;
 // pub use pgamma::*;
+pub use i1mach::rf_i1mach;
 pub use stirlerr::stirlerr;
 
 // TODO: Remove these exports later; once they are used by lgamma.
