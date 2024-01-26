@@ -1,6 +1,7 @@
 use std::f64::{INFINITY, NAN, NEG_INFINITY};
 
-use crate::{dpq::r_d__0, rmath::ML_LN2};
+use crate::dpq::r_d__0;
+use crate::rmath::ML_LN2;
 
 pub const ML_POSINF: f64 = INFINITY;
 pub const ML_NEGINF: f64 = NEG_INFINITY;
