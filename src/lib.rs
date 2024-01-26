@@ -42,7 +42,6 @@ pub use rmath::dnorm;
 pub use rmath::pnorm;
 pub use rmath::qnorm;
 // pub use pgamma::*;
-pub use i1mach::rf_i1mach;
 pub use lbeta::lbeta;
 pub use stirlerr::stirlerr;
 
