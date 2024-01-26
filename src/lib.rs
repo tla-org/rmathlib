@@ -19,16 +19,20 @@ mod qnorm;
 mod rmath;
 mod stirlerr;
 
-pub use chebyshev::*;
-pub use cospi::*;
+// Use only explicit exports and no wildcard exports to avoid accidentally
+// exporting symbols that should not be exported.
+pub use chebyshev::chebyshev_init;
+pub use chebyshev::chebyshev_eval;
+pub use cospi::cospi;
+pub use cospi::sinpi;
+pub use cospi::tanpi;
 // pub use dpois::*;
-pub use gamma::*;
-pub use lgamma::*;
-pub use lgammacor::*;
-pub use libc::*;
-pub use nmath::*;
+pub use gamma::gammafn;
+pub use lgamma::lgammafn;
+pub use lgamma::lgammafn_sign;
+pub use lgammacor::lgammacor;
 pub use rmath::dnorm;
 pub use rmath::pnorm;
 pub use rmath::qnorm;
 // pub use pgamma::*;
-pub use stirlerr::*;
+pub use stirlerr::stirlerr;

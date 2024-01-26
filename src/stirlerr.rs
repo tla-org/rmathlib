@@ -1,4 +1,5 @@
-use crate::{lgammafn, M_LN_SQRT_2PI};
+use crate::lgamma::*;
+use crate::nmath::*;
 
 const S0: f64 = 0.083_333_333_333_333_33; /* 1/12 */
 const S1: f64 = 0.002_777_777_777_777_778; /* 1/360 */
