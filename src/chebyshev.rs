@@ -16,7 +16,7 @@
 //! Based on the Fortran routine dcsevl by W. Fullerton.
 //! Adapted from R. Broucke, Algorithm 446, CACM., 16, 254 (1973).
 
-use crate::ml_warn_return_nan;
+use crate::nmath::*;
 
 /// `chebyshev_init` determines the number of terms for the
 /// double precision orthogonal series `dos` needed to insure
