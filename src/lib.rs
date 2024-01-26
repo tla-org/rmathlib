@@ -21,13 +21,13 @@ mod stirlerr;
 
 pub use chebyshev::*;
 pub use cospi::*;
-pub use dnorm::*;
 // pub use dpois::*;
 pub use gamma::*;
 pub use lgamma::*;
 pub use lgammacor::*;
 pub use libc::*;
 pub use nmath::*;
+pub use rmath::dnorm;
 pub use rmath::pnorm;
 pub use rmath::qnorm;
 // pub use pgamma::*;
