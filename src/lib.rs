@@ -24,6 +24,7 @@ mod stirlerr;
 // Use only explicit exports and no wildcard exports to avoid accidentally
 // exporting symbols that should not be exported.
 pub use bd0::bd0;
+pub use bd0::ebd0;
 pub use chebyshev::chebyshev_eval;
 pub use chebyshev::chebyshev_init;
 pub use cospi::cospi;

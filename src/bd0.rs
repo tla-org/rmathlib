@@ -25,6 +25,7 @@ use crate::libc::*;
 use crate::nmath::*;
 use crate::rmath::*;
 use libm::frexp;
+use libm::ldexp;
 
 /// Calculates a stable deviance part using a method that reduces relative error
 ///
@@ -873,7 +874,16 @@ const bd0_scale: [[f32; 4]; 129] = [
     [0.0, 0.0, 0.0, 0.0], /* log(1024/1024) = log(1) = 0 */
 ];
 
-fn ebd0(x: f64, m: f64, yh: &mut f64, yl: &mut f64) {
+fn add1(d_: f64, yh: &mut f64, yl: &mut f64) {
+    let d = d_;
+    let d1 = (d + 0.5).floor();
+    let d2 = d - d1;  // In [-0.5, 0.5)
+
+    *yh += d1;
+    *yl += d2;
+}
+
+pub fn ebd0(x: f64, m: f64, yh: &mut f64, yl: &mut f64) {
     let sb: i32 = 10;
     let s: f64 = (1u32 << sb) as f64;
     let n: i32 = 128;
@@ -897,6 +907,7 @@ fn ebd0(x: f64, m: f64, yh: &mut f64, yl: &mut f64) {
         return;
     }
     
+    // NB: m/x overflow handled above; underflow should be handled by fg = Inf.
     let (r, e) = frexp(m / x);
     
     // Prevent later overflow.
@@ -904,6 +915,57 @@ fn ebd0(x: f64, m: f64, yh: &mut f64, yl: &mut f64) {
         *yh = ML_POSINF;
         return;
     }
+
+    let i: i32 = ((r - 0.5) * (2 * n) as f64 + 0.5).floor() as i32;
+    // Now, 0 <= i <= n.
+    let f: f64 = (s / (0.5 + i as f64 / (2.0 * n as f64) + 0.5)).floor();
+    let fg: f64 = ldexp(f, -(e + sb)); // ldexp(f, E) := f * 2^E.
+    if fg == ML_POSINF {
+        *yh = fg;
+        return;
+    }
+
+    // We now have (M * fg / x) close to 1.  */
+
+	// 
+	// We need to compute this:
+	// (x/M)^x * exp(M-x) =
+	// (M/x)^-x * exp(M-x) =
+	// (M*fg/x)^-x * (fg)^x * exp(M-x) =
+	// (M*fg/x)^-x * (fg)^x * exp(M*fg-x) * exp(M-M*fg)
+	// 
+	// In log terms:
+	// log((x/M)^x * exp(M-x)) =
+	// log((M*fg/x)^-x * (fg)^x * exp(M*fg-x) * exp(M-M*fg)) =
+	// log((M*fg/x)^-x * exp(M*fg-x)) + x*log(fg) + (M-M*fg) =
+	// -x*log1pmx((M*fg-x)/x) + x*log(fg) + M - M*fg =
+	// 
+	// Note, that fg has at most 10 bits.  If M and x are suitably
+	// "nice" -- such as being integers or half-integers -- then
+	// we can compute M*fg as well as x * bd0_scale[.][.] without
+	// rounding errors.
+	// 
+
+    // TODO log1pmx is defined in pgamma.
+    fn log1pmx(x: f64) -> f64 {
+        return x;
+    }
+    add1(-x * log1pmx((m * fg - x) / x), yh, yl);
+    if fg == 1.0 {
+        return;
+    }
+    for j in 0..4 {
+        add1(x * bd0_scale[i as usize][j] as f64, yh, yl);
+        add1(-x * bd0_scale[0][j] as f64, yh, yl);
+    }
+    if !r_finite(*yh) {
+        *yh = ML_POSINF;
+        *yl = 0.0;
+        return;
+    }
+    add1(m, yh, yl);
+    add1(-m * fg, yh, yl);
+    return;
 }
 
 

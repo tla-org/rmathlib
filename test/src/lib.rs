@@ -11,6 +11,7 @@ mod test_math {
             pub fn Rf_i1mach(i: i32) -> i32;
             pub fn Rf_lgammacor(x: f64) -> f64;
             pub fn Rf_stirlerr(n: f64) -> f64;
+            pub fn Rf_ebd0(x: f64, np: f64, yh: *mut f64, yl: *mut f64) -> i32;
             pub fn cospi(x: f64) -> f64;
             pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64;
             pub fn gammafn(x: f64) -> f64;
@@ -208,5 +209,14 @@ mod test_math {
     #[test]
     fn test_ebd0() {
         assert_eq!(foo(), unsafe { c::foo() });
+        let mut yh: f64 = 0.0;
+        let mut yl: f64 = 0.0;
+        let mut c_yh: f64 = 0.0;
+        let mut c_yl: f64 = 0.0;
+        ebd0(1.1, 2.2, &mut yh, &mut yl);
+        unsafe {
+            c::Rf_ebd0(1.1, 2.2, &mut c_yh, &mut c_yl)
+        };
+        assert_eq!(yh, c_yh);
     }
 }
