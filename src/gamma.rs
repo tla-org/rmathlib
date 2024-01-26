@@ -88,7 +88,7 @@ pub fn gammafn(x: f64) -> f64 {
         }
         let y = x - n as f64;
         n -= 1;
-        let mut value = chebyshev_eval(y * 2.0 - 1.0, &GAMCS, GAMCS.len()) + 0.9375;
+        let mut value = chebyshev_eval(y * 2.0 - 1.0, &GAMCS, GAMCS.len() as i32) + 0.9375;
 
         if n == 0 {
             return value;

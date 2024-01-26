@@ -46,7 +46,7 @@ pub fn lgammacor(x: f64) -> f64 {
         // Allow to underflow
     } else if x < XBIG {
         let tmp = 10.0 / x;
-        return chebyshev_eval(tmp * tmp * 2.0 - 1.0, &ALGMCS, NALGM) / x;
+        return chebyshev_eval(tmp * tmp * 2.0 - 1.0, &ALGMCS, NALGM as i32) / x;
     }
     1.0 / (x * 12.0)
 }

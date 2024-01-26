@@ -39,22 +39,25 @@ pub fn chebyshev_init(dos: &[f64], nos: i32, eta: f64) -> i32 {
 
 /// `chebyshev_eval` evaluates the n-term Chebyshev series
 /// `a` at `x`.
-pub fn chebyshev_eval(x: f64, a: &[f64], n: usize) -> f64 {
-    if n < 1 || n > a.len() || n > 1000 {
+pub fn chebyshev_eval(x: f64, a: &[f64], n: i32) -> f64 {
+    if n < 1 || n > 1000 {
         return ml_warn_return_nan();
     }
 
-    if !(-1.1..=1.1).contains(&x) {
+    if x < -1.1 || x > 1.1 {
         return ml_warn_return_nan();
     }
 
     let twox = x * 2.0;
-    let (mut b2, mut b1, mut b0) = (0.0, 0.0, 0.0);
+    let mut b0 = 0.0;
+    let mut b1 = 0.0;
+    let mut b2 = 0.0;
 
-    for &coeff in a.iter().take(n).rev() {
+    for i in 1..=n {
         b2 = b1;
         b1 = b0;
-        b0 = twox * b1 - b2 + coeff;
+        print!("{n}, {i}, {}\n", (n-i) as usize);
+        b0 = twox * b1 - b2 + a[(n - i) as usize];
     }
 
     (b0 - b2) * 0.5
