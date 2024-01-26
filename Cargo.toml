@@ -20,6 +20,5 @@ keywords = [
 ]
 repository = "https://github.com/poweranalyses-org/rmathlib"
 
-
 [dependencies]
 libm = "0.2"

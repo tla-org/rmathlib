@@ -45,3 +45,5 @@ pub use stirlerr::stirlerr;
 pub use nmath::r_d_nonint_check;
 pub use nmath::r_log1_exp;
 pub use nmath::r_nonint;
+
+pub use bd0::foo;

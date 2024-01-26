@@ -20,6 +20,7 @@ mod test_math {
             pub fn qnorm5(p: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn sinpi(x: f64) -> f64;
             pub fn tanpi(x: f64) -> f64;
+            pub fn foo() -> f32;
         }
     }
 
@@ -202,5 +203,10 @@ mod test_math {
     fn test_bd0() {
         assert_eq!(bd0(5.0, 1.0), unsafe { c::Rf_bd0(5.0, 1.0) });
         assert_eq!(bd0(4.1, 2.0), unsafe { c::Rf_bd0(4.1, 2.0) });
+    }
+
+    #[test]
+    fn test_ebd0() {
+        assert_eq!(foo(), unsafe { c::foo() });
     }
 }

@@ -75,6 +75,9 @@ double attribute_hidden bd0(double x, double np)
     return(x*log(x/np)+np-x);
 }
 
+static const float FOO = +0x1.62e430p-1;
+
+float foo() { return FOO; }
 
 // ebd0(): R Bugzilla PR#15628 -- proposed accuracy improvement by Morten Welinder
 
