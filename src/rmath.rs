@@ -2,7 +2,9 @@ use crate::dnorm::dnorm4;
 use crate::pnorm::pnorm5;
 use crate::qnorm::qnorm5;
 
-use std::f64::consts::{LN_2, PI, SQRT_2};
+use std::f64::consts::LN_2;
+use std::f64::consts::PI;
+use std::f64::consts::SQRT_2;
 
 pub const M_PI: f64 = PI;
 pub const M_SQRT2: f64 = SQRT_2;

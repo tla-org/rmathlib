@@ -11,47 +11,7 @@ on:
   workflow_dispatch: null
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Stable Rust
-        uses: dtolnay/rust-toolchain@v1
-        with:
-          components: 'clippy, rustfmt'
-          toolchain: 'stable'
-
-      - name: Rust cache
-        uses: Swatinem/rust-cache@v2
-
-      - name: Cargo clippy
-        run: |
-          cargo clippy --all-targets --all-features -- -D warnings
-          cd test-math/
-          cargo clippy --all-targets --all-features -- -D warnings
-
-      - name: Cargo fmt
-        run: |
-          cargo fmt --all --check
-          cd test-math/
-          cargo fmt --all --check
-
-  check-docs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-      - name: cargo doc
-        env:
-          RUSTDOCFLAGS: "-D rustdoc::all -A rustdoc::private-doc-tests"
-        run: cargo doc --all-features --no-deps
-
-  test-versions:
-    needs: check
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -62,8 +22,60 @@ jobs:
         with:
           toolchain: ${{ matrix.rust }}
       - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: 'test-${{ matrix.rust }}'
       - name: Cargo test
         run: |
           cargo test
-          cd test-math/
+          cd test/
           cargo test
+
+  check-format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Stable Rust
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          components: 'clippy, rustfmt'
+          toolchain: 'nightly'
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: 'check-format'
+
+      - name: Cargo clippy
+        run: |
+          cargo clippy --all-targets --all-features -- -D warnings
+          cd test/
+          cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Cargo fmt
+        run: |
+          # Only available on nightly, unfortunately.
+          # Ensures each import has its own `use` statement.
+          # This makes it easier to quickly modify the imports in editors.
+          echo 'imports_granularity = "Item"' > rustfmt.toml
+          cargo fmt --all --check
+
+          cp rustfmt.toml test/
+          cd test/
+          cargo fmt --all --check
+
+  check-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: 'check-docs'
+      - name: cargo doc
+        env:
+          RUSTDOCFLAGS: "-D rustdoc::all -A rustdoc::private-doc-tests"
+        run: cargo doc --all-features --no-deps
+

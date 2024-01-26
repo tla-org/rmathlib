@@ -1,12 +1,11 @@
-use std::f64::{MANTISSA_DIGITS, MAX, MIN_EXP};
+use std::f64::MANTISSA_DIGITS;
+use std::f64::MAX;
+use std::f64::MIN_EXP;
 
 use libm::ldexp;
 
-use crate::{
-    r_forceint,
-    rmath::{ML_LN2, M_1_SQRT_2PI},
-    ML_NAN, ML_POSINF, M_LN_SQRT_2PI,
-};
+use crate::nmath::*;
+use crate::rmath::*;
 
 /// Compute the density of the normal distribution.
 pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64 {
