@@ -1,6 +1,7 @@
 use std::f64::INFINITY;
 
-use crate::{gammafn, lgammacor, sinpi, ML_NAN, M_LN_SQRT_2PI};
+use crate::nmath::*;
+use crate::{gammafn, lgammacor, sinpi};
 
 /// Machine dependent constants for IEEE double precision
 const XMAX: f64 = 2.532_737_276_080_075_8e305;

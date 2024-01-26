@@ -27,7 +27,8 @@ pub fn r_log1_exp(x: f64) -> f64 {
         (-x.exp()).ln_1p()
     }
 }
-fn r_nonint(x: f64) -> bool {
+
+pub fn r_nonint(x: f64) -> bool {
     let nearest_int = x.round();
     (x - nearest_int).abs() > 1e-7 * f64::max(1.0, x.abs())
 }

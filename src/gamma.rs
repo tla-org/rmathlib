@@ -1,9 +1,7 @@
-use crate::{
-    chebyshev_eval, ml_warn_return_nan,
-    nmath::M_LN_SQRT_2PI,
-    rmath::{ML_LN2, M_PI},
-    sinpi, ML_NAN, ML_NEGINF, ML_POSINF,
-};
+use crate::chebyshev::*;
+use crate::nmath::*;
+use crate::rmath::*;
+use crate::sinpi;
 
 /// Chebyshev coefficients for gamma function
 const GAMCS: [f64; 42] = [
