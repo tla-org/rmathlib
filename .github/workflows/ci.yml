@@ -22,7 +22,7 @@ jobs:
         toolchain: ['1.46', 'stable', 'beta']
     steps:
       - uses: actions/checkout@v4
-      - run: rustup default {{ matrix.toolchain }}
+      - run: rustup default ${{ matrix.toolchain }}
       - name: Cargo test
         run: |
           cargo test
