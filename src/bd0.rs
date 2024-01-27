@@ -644,7 +644,7 @@ pub fn ebd0(x: f64, m: f64) -> (f64, f64) {
     // Prevent later overflow.
     if (M_LN2 * (-e as f64)) > 1.0 + DBL_MAX / x {
         yh = ML_POSINF;
-        return (yh, yl)
+        return (yh, yl);
     }
 
     let i: i32 = ((r - 0.5) * (2 * n) as f64 + 0.5).floor() as i32;

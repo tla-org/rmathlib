@@ -23,9 +23,9 @@
 //!  #include <Rmath.h>
 //!
 //!  double pgamma (double x, double alph, double scale,
-//!  	       int lower_tail, int log_p)
+//!     int lower_tail, int log_p)
 //!
-//!  double log1pmx	(double x)
+//!  double log1pmx (double x)
 //!  double lgamma1p (double a)
 //!
 //!  double logspace_add (double logx, double logy)
@@ -37,7 +37,7 @@
 //!
 //!  This function computes the distribution function for the
 //!  gamma distribution with shape parameter alph and scale parameter
-//!  scale.	This is also known as the incomplete gamma function.
+//!  scale. This is also known as the incomplete gamma function.
 //!  See Abramowitz and Stegun (6.5.1) for example.
 //!
 //!  NOTES
