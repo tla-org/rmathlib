@@ -30,11 +30,11 @@ pub use bd0::ebd0;
 pub use chebyshev::chebyshev_eval;
 pub use chebyshev::chebyshev_init;
 pub use cospi::cospi;
-// pub use dpois::*;
 pub use cospi::sinpi;
 pub use cospi::tanpi;
 pub use gamma::gammafn;
 pub use i1mach::rf_i1mach;
+pub use lbeta::lbeta;
 pub use lgamma::lgammafn;
 pub use lgamma::lgammafn_sign;
 pub use lgammacor::lgammacor;
@@ -42,8 +42,6 @@ pub use pgamma::log1pmx;
 pub use rmath::dnorm;
 pub use rmath::pnorm;
 pub use rmath::qnorm;
-// pub use pgamma::*;
-pub use lbeta::lbeta;
 pub use stirlerr::stirlerr;
 
 // TODO: Remove these exports later; once they are used by lgamma.

@@ -82,6 +82,36 @@ fn fpser(a: f64, b: f64, x: f64, eps: f64, log_p: bool) -> f64 {
     return 0.0;
 }
 
+/// Power SERies expansion for evaluating I_x(a, b) when b <= 1 or b*x <= 0.7.
+/// `eps` is the tolerance used.
+/// Note: if `log_p` is true, then also use it if `(b < 40 & lambda > 650)`.
+fn bpser(a: f64, b: f64, x: f64, eps: f64, log_p: bool) -> f64 {
+    let mut i: i32;
+    let mut m: i32;
+    let mut ans: f64;
+    let mut c: f64;
+    let mut t: f64;
+    let mut u: f64;
+    let mut z: f64;
+    let mut a0: f64;
+    let mut b0: f64;
+    let mut apb: f64;
+
+    if x == 0.0 {
+        return r_d__0(log_p);
+    }
+
+    // Compute the factor x^a / (a*Beta(a, b)).
+    a0 = min(a, b);
+    if a0 >= 1.0 {
+        // TODO: Implement betaln.
+        // z = a * log(x) - betaln(a, b);
+    }
+
+    // TODO
+    return 0.0;
+}
+
 fn l_end(do_swap: bool, w: &mut f64, w1: &mut f64) {
     if do_swap {
         let tmp = *w;
@@ -89,6 +119,14 @@ fn l_end(do_swap: bool, w: &mut f64, w1: &mut f64) {
         *w1 = tmp;
     }
 }
+
+fn l_w_bpser(do_swap: bool, a0: f64, b0: f64, x0: f64, eps: f64, log_p: bool, w: &mut f64, w1: &mut f64) -> (f64, f64) {
+    *w = bpser(a0, b0, x0, eps, log_p);
+    *w1 = if log_p { r_log1_exp(*w) } else { 0.5 - *w + 0.5 };
+    l_end(do_swap, w, w1);
+    return (*w, *w1);
+}
+
 
 /// Calculates the Incomplete Beta Function I_x(a, b)
 ///
@@ -251,12 +289,92 @@ pub fn bratio(a: f64, b: f64, x: f64, y: f64, log_p: bool) -> (f64, f64, i32) {
             l_end(do_swap, &mut w, &mut w1);
             return (w, w1, ierr);
         }
+
+        let did_bup: bool = false;
+        if max(a0, b0) > 1.0 {
+            if b0 <= 1.0 {
+                // TODO: implement bpser.
+            }
+        }
+
     }
 
     return (0.0, 0.0, 0);
 }
 
+/// Evaluates ln(gamma(1 + a)) for -0.2 <= a <= 1.25.
+fn gamln1(a: f64) -> f64 {
+    let w: f64;
+    if a < 0.6 {
+        let p0: f64 = 0.577215664901533;
+        let p1: f64 = 0.844203922187225;
+        let p2: f64 = -0.168860593646662;
+        let p3: f64 = -0.780427615533591;
+        let p4: f64 = -0.402055799310489;
+        let p5: f64 = -0.0673562214325671;
+        let p6: f64 = -0.00271935708322958;
+        let q1: f64 = 2.88743195473681;
+        let q2: f64 = 3.12755088914843;
+        let q3: f64 = 1.56875193295039;
+        let q4: f64 = 0.361951990101499;
+        let q5: f64 = 0.0325038868253937;
+        let q6: f64 = 6.67465618796164e-4;
+        w = ((((((p6 * a + p5)* a + p4)* a + p3)* a + p2)* a + p1)* a + p0) /
+            ((((((q6 * a + q5)* a + q4)* a + q3)* a + q2)* a + q1)* a + 1.0);
+        return -(a) * w;
+    } else { // 0.6 <= a <= 1.25.
+        let r0: f64 = 0.422784335098467;
+        let r1: f64 = 0.848044614534529;
+        let r2: f64 = 0.565221050691933;
+        let r3: f64 = 0.156513060486551;
+        let r4: f64 = 0.017050248402265;
+        let r5: f64 = 4.97958207639485e-4;
+        let s1: f64 = 1.24313399877507;
+        let s2: f64 = 0.548042109832463;
+        let s3: f64 = 0.10155218743983;
+        let s4: f64 = 0.00713309612391;
+        let s5: f64 = 1.16165475989616e-4;
+        let x: f64 = a - 0.5 - 0.5;
+        w = (((((r5 * x + r4) * x + r3) * x + r2) * x + r1) * x + r0) /
+            (((((s5 * x + s4) * x + s3) * x + s2) * x + s1) * x + 1.0);
+        return x * w;
+    }
+}
 
+/// Evaluates ln(gamma(a)) for positive a.
+///
+/// Written by Alfred H. Morris.
+/// Naval Surface Warfare Center.
+/// Dahlgren, Virginia.
+pub fn gamln(a: f64) -> f64 {
+    let d: f64 = 0.418938533204673; // d == 0.5*(LN(2*PI) - 1)
+    let c0: f64 = 0.0833333333333333;
+    let c1: f64 = -0.002277777777760991;
+    let c2: f64 = 7.9365066682539e-4;
+    let c3: f64 = -5.9520293135187e-4;
+    let c4: f64 = 8.37308034031215e-4;
+    let c5: f64 = -0.00165322962780713;
+
+    if a <= 0.8 {
+        return gamln1(a) - log(a);
+    } else if a <= 2.25 {
+        return gamln1(a - 0.5 - 0.5);
+    } else if a < 10.0 {
+        let n: i32 = (a - 1.25) as i32;
+        let mut t = a;
+        let mut w = 1.0;
+        for _ in 1..=n {
+            t += -1.0;
+            w *= t;
+        }
+        return gamln1(t - 1.0) + log(w);
+    } else {
+        // a >= 10.
+        let t = 1.0 / (a * a);
+        let w = (((((c5 * t + c4) * t + c3) * t + c2) * t + c1) * t + c0) / a;
+        return d + w + (a - 0.5) * (log(a) - 1.0);
+    }
+}
 
 
 
