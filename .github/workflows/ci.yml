@@ -16,9 +16,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 1.43 is our lower bound because that is when f64::EPSILON
+        # Version should be at least 1.43 because that is when f64::EPSILON
         # was introduced, which libm depends on.
-        # 1.43 was unable to update registry.
+        # Next, anything lower than 1.46 was unable to update registry.
         toolchain: ['1.46', 'stable', 'beta']
     steps:
       - uses: actions/checkout@v4
