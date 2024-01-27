@@ -31,7 +31,7 @@ pub use chebyshev::chebyshev_eval;
 pub use chebyshev::chebyshev_init;
 pub use cospi::cospi;
 // pub use dpois::*;
-// pub use pgamma::*;
+pub use pgamma::log1pmx;
 pub use cospi::sinpi;
 pub use cospi::tanpi;
 pub use gamma::gammafn;

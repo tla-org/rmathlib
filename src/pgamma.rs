@@ -48,6 +48,8 @@
 use libm::log1p;
 
 /// Continued fraction for calculation of 1/i + x/(i+d) + x^2/(i+2*d) + x^3/(i+3*d) + ... = sum_{k=0}^Inf x^k/(i+k*d)
+///
+/// `eps` denotes the relative tolerance.
 fn logcf(x: f64, i: f64, d: f64, eps: f64) -> f64 {
     let mut c1: f64 = 2.0 * d;
     let mut c2: f64 = i + d;
