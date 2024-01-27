@@ -636,7 +636,7 @@ pub fn ebd0(x: f64, m: f64) -> (f64, f64) {
         return (yh, yl);
     }
 
-    if m/x == ML_POSINF {
+    if m / x == ML_POSINF {
         yh = m;
         return (yh, yl);
     }
