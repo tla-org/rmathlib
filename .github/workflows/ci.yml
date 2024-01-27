@@ -19,12 +19,10 @@ jobs:
         # 1.43 is our lower bound because that is when f64::EPSILON
         # was introduced, which libm depends on.
         # 1.43 was unable to update registry.
-        rust: ['1.43', 'stable', 'beta']
+        toolchain: ['1.46', 'stable', 'beta']
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ matrix.rust }}
+      - run: rustup default {{ matrix.toolchain }}
       - name: Cargo test
         run: |
           cargo test
