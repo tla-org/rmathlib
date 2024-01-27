@@ -3,7 +3,9 @@ name = "rmathlib"
 description = "A Rust Port of R's C Library of Special Functions"
 version = "1.0.0"
 include = ["src/", "LICENSE", "README.md"]
-edition = "2021"
+# libm also targets the 2018 edition.
+# Allows support for Rust 1.31.0 upwards.
+edition = "2018"
 authors = [
   "Rik Huijzer <github@huijzer.xyz>",
   "Jose Storopoli <jose@storopoli.io>",
