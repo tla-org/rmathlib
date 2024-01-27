@@ -5,8 +5,10 @@ mod test_math {
 
     mod c {
         extern "C" {
+            pub fn Rf_bd0(x: f64, np: f64) -> f64;
             pub fn Rf_chebyshev_eval(x: f64, a: *mut f64, n: i32) -> f64;
             pub fn Rf_chebyshev_init(dos: *mut f64, nos: i32, eta: f64) -> i32;
+            pub fn Rf_ebd0(x: f64, M: f64, yh: *mut f64, yl: *mut f64);
             pub fn Rf_i1mach(i: i32) -> i32;
             pub fn Rf_lgammacor(x: f64) -> f64;
             pub fn Rf_stirlerr(n: f64) -> f64;
@@ -14,6 +16,7 @@ mod test_math {
             pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64;
             pub fn gammafn(x: f64) -> f64;
             pub fn lbeta(a: f64, b: f64) -> f64;
+            pub fn log1pmx(x: f64) -> f64;
             pub fn lgammafn(x: f64) -> f64;
             pub fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64;
             pub fn pnorm5(x: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
@@ -21,6 +24,14 @@ mod test_math {
             pub fn sinpi(x: f64) -> f64;
             pub fn tanpi(x: f64) -> f64;
         }
+    }
+
+    #[test]
+    fn test_bd0() {
+        // if: 9.0-8.9 < 0.1*(9.0+8.9) = 0.1 < 1.79
+        assert_eq!(bd0(9.0, 8.9), unsafe { c::Rf_bd0(9.0, 8.9) });
+        // else: ((5.0-1.0).abs !< 0.1*(5.0+1.0)) = 4.0 !< 0.6
+        assert_eq!(bd0(5.0, 1.0), unsafe { c::Rf_bd0(5.0, 1.0) });
     }
 
     #[test]
@@ -45,6 +56,25 @@ mod test_math {
         assert_eq!(chebyshev_init(&[1.0, 2.0, 3.0], 3, -0.5), unsafe {
             c::Rf_chebyshev_init([1.0, 2.0, 3.0].as_mut_ptr(), 3, -0.5)
         });
+    }
+
+    fn test_ebd0_helper(x: f64, m: f64) {
+        let mut c_yh: f64 = f64::NAN;
+        let mut c_yl: f64 = f64::NAN;
+        let (yh, yl) = ebd0(x, m);
+        unsafe { c::Rf_ebd0(x, m, &mut c_yh, &mut c_yl) };
+        assert_eq!(yh, c_yh, "yh with x={x:?}, m={m:?}", x = x, m = m);
+        assert_eq!(yl, c_yl, "yl with x={x:?}, m={m:?}", x = x, m = m);
+    }
+
+    #[test]
+    fn test_ebd0() {
+        test_ebd0_helper(1.0, 1.0);
+        test_ebd0_helper(1.0, 1.0);
+        test_ebd0_helper(0.0, 1.0);
+        test_ebd0_helper(1.0, 0.0);
+        test_ebd0_helper(3.0, 0.5);
+        test_ebd0_helper(10.2, 5.45);
     }
 
     #[test]
@@ -168,6 +198,17 @@ mod test_math {
         assert_eq!(lgammafn_sign(1.0, Some(&mut 1)), unsafe {
             c::lgammafn_sign(1.0, Some(&mut 1))
         });
+    }
+
+    #[test]
+    fn test_log1pmx() {
+        assert_eq!(log1pmx(0.0), unsafe { c::log1pmx(0.0) });
+        assert_eq!(log1pmx(1.1), unsafe { c::log1pmx(1.1) });
+        assert!(log1pmx(-1.23).is_nan());
+        assert_eq!(log1pmx(1e-3), unsafe { c::log1pmx(1e-3) });
+        // Test logcf via log1pmx.
+        assert_eq!(log1pmx(0.91), unsafe { c::log1pmx(0.91) });
+        assert_eq!(log1pmx(0.81), unsafe { c::log1pmx(0.81) });
     }
 
     #[test]

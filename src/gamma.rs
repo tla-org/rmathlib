@@ -124,7 +124,7 @@ pub fn gammafn(x: f64) -> f64 {
                 value *= i as f64;
             }
         } else {
-            value = ((y - 0.5) * y.ln() - y + ML_LN2 + M_LN_SQRT_2PI).exp();
+            value = ((y - 0.5) * y.ln() - y + M_LN2 + M_LN_SQRT_2PI).exp();
         }
         if x > 0.0 {
             value
