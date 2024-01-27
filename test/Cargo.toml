@@ -1,7 +1,9 @@
 [package]
 name = "test-rmathlib"
 description = "A test crate which is for comparing C and Rust code and should not be published."
-edition = "2021"
+edition = "2018"
+# Required for old Rust versions.
+version = "1.0.0"
 
 [build-dependencies]
 cc = "1.0"

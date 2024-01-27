@@ -42,7 +42,7 @@ pub fn r_forceint(x: f64) -> f64 {
 
 pub fn r_d_nonint_check(x: f64, give_log: bool) -> f64 {
     if r_nonint(x) {
-        println!("non-integer x = {x}");
+        println!("non-integer x = {}", x);
     }
     r_d__0(give_log)
 }

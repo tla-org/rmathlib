@@ -20,12 +20,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Stable Rust
-        uses: dtolnay/rust-toolchain@v1
-        with:
-          toolchain: 'stable'
+      - name: Install Rust
+        run: |
+          rustup update stable
+          rustup default stable
 
-      - name: Rust cache
+      - name: Cache
         uses: Swatinem/rust-cache@v2
 
       - name: Build docs
