@@ -235,8 +235,10 @@ mod test_math {
 
     #[test]
     fn test_bd0() {
+        // if: 9.0-8.9 < 0.1*(9.0+8.9) = 0.1 < 1.79
+        assert_eq!(bd0(9.0, 8.9), unsafe { c::Rf_bd0(9.0, 8.9) });
+        // else: ((5.0-1.0).abs !< 0.1*(5.0+1.0)) = 4.0 !< 0.6
         assert_eq!(bd0(5.0, 1.0), unsafe { c::Rf_bd0(5.0, 1.0) });
-        assert_eq!(bd0(4.1, 2.0), unsafe { c::Rf_bd0(4.1, 2.0) });
     }
 
     #[test]
