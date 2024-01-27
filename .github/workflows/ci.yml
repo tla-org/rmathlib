@@ -19,7 +19,7 @@ jobs:
         # 1.43 is our lower bound because that is when f64::EPSILON
         # was introduced, which libm depends on.
         # 1.43 was unable to update registry.
-        toolchain: ['1.48', 'stable', 'beta']
+        toolchain: ['1.49', 'stable', 'beta']
     steps:
       - uses: actions/checkout@v4
       - run: rustup default ${{ matrix.toolchain }}
