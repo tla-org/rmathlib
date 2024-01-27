@@ -73,6 +73,7 @@ static double
 logcf (double x, double i, double d,
        double eps /* ~ relative tolerance */)
 {
+
     double c1 = 2 * d;
     double c2 = i + d;
     double c4 = c2 + d;

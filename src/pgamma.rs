@@ -47,6 +47,8 @@
 
 use libm::log1p;
 
+const SCALEFACTOR: f64 = 1.157921e+77;
+
 /// Continued fraction for calculation of 1/i + x/(i+d) + x^2/(i+2*d) + x^3/(i+3*d) + ... = sum_{k=0}^Inf x^k/(i+k*d)
 ///
 /// `eps` denotes the relative tolerance.
@@ -74,18 +76,16 @@ fn logcf(x: f64, i: f64, d: f64, eps: f64) -> f64 {
         a2 = c4 * a1 - c3 * a2;
         b2 = c4 * b1 - c3 * b2;
 
-        let scalefactor: f64 = f64::powf(2.0, 256.0);
-
-        if b2.abs() > scalefactor {
-            a1 /= scalefactor;
-            b1 /= scalefactor;
-            a2 /= scalefactor;
-            b2 /= scalefactor;
-        } else if b2.abs() < 1.0 / scalefactor {
-            a1 *= scalefactor;
-            b1 *= scalefactor;
-            a2 *= scalefactor;
-            b2 *= scalefactor;
+        if b2.abs() > SCALEFACTOR {
+            a1 /= SCALEFACTOR;
+            b1 /= SCALEFACTOR;
+            a2 /= SCALEFACTOR;
+            b2 /= SCALEFACTOR;
+        } else if b2.abs() < 1.0 / SCALEFACTOR {
+            a1 *= SCALEFACTOR;
+            b1 *= SCALEFACTOR;
+            a2 *= SCALEFACTOR;
+            b2 *= SCALEFACTOR;
         }
     }
     a2 / b2

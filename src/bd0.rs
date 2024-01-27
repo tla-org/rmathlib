@@ -695,7 +695,6 @@ pub fn ebd0(x: f64, m: f64) -> (f64, f64) {
         }
     }
     add1(m, &mut yh, &mut yl);
-    println!(" 3. after add1(m): yl,yh={yl:?},{yh:?}");
     add1(-m * fg, &mut yh, &mut yl);
     (yh, yl)
 }
