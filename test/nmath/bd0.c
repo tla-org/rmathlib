@@ -45,6 +45,8 @@
  */
 #include "nmath.h"
 
+#include <stdio.h>
+
 double attribute_hidden bd0(double x, double np)
 {
     if(!R_FINITE(x) || !R_FINITE(np) || np == 0.0) ML_WARN_return_NAN;
@@ -260,8 +262,11 @@ void attribute_hidden ebd0(double x, double M, double *yh, double *yl)
 	double f = floor (S / (0.5 + i / (2.0 * N)) + 0.5);
 	double fg = ldexp (f, -(e + Sb)); // ldexp(f, E) := f * 2^E
 
+    double tmp = 1.2;
+    printf("from c: x=%g\n", x);
+
 #ifdef DEBUG_bd0
-	REprintf("ebd0(x=%g, M=%g): M/x = (r=%.15g) * 2^(e=%d); i=%d,\n  f=%g, fg=f*2^-(e+%d)=%g\n",
+	printf("ebd0(x=%g, M=%g): M/x = (r=%.15g) * 2^(e=%d); i=%d,\n  f=%g, fg=f*2^-(e+%d)=%g\n",
 		 x, M, r,e, i, f, Sb, fg);
 	if (fg == ML_POSINF) {
 	    REprintf(" --> fg = +Inf --> return( +Inf )\n");
@@ -270,9 +275,6 @@ void attribute_hidden ebd0(double x, double M, double *yh, double *yl)
 	REprintf("     bd0_sc[0][0..3]= ("); for(int j=0; j < 4; j++) REprintf("%g ", bd0_scale[0][j]); REprintf(")\n");
 	REprintf("i -> bd0_sc[i][0..3]= ("); for(int j=0; j < 4; j++) REprintf("%g ", bd0_scale[i][j]); REprintf(")\n");
 	REprintf( "  small(?)  (M*fg-x)/x = (M*fg)/x - 1 = %.16g\n", (M*fg-x)/x);
-
-    *yh = x;
-    return;
 #else
 	if (fg == ML_POSINF) {
 	    *yh = fg; return;
