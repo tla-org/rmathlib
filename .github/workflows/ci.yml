@@ -14,14 +14,22 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        rust: [stable, beta]
+        # Version should be at least 1.43 because that is when f64::EPSILON
+        # was introduced, which libm depends on.
+        # Next, anything lower than 1.46 was unable to update the registry in
+        # GitHub Actions.
+        toolchain: ['1.46', 'stable', 'beta']
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ matrix.rust }}
-      - uses: Swatinem/rust-cache@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Rust
+        run: |
+          rustup update ${{ matrix.toolchain }}
+          rustup default ${{ matrix.toolchain }}
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
         with:
           prefix-key: 'test-${{ matrix.rust }}'
       - name: Cargo test
@@ -37,13 +45,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Stable Rust
-        uses: dtolnay/rust-toolchain@v1
-        with:
-          components: 'clippy, rustfmt'
-          toolchain: 'nightly'
+      - name: Install Rust
+        run: |
+          rustup update nightly
+          rustup default nightly
+          rustup component add clippy
+          rustup component add rustfmt
 
-      - name: Rust cache
+      - name: Cache
         uses: Swatinem/rust-cache@v2
         with:
           prefix-key: 'check-format'
@@ -66,16 +75,38 @@ jobs:
           cd test/
           cargo fmt --all --check
 
-  check-docs:
+  docs:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        run: |
+          rustup update stable
+          rustup default stable
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
         with:
-          prefix-key: 'check-docs'
-      - name: cargo doc
+          prefix-key: 'docs'
+
+      - name: Build docs
         env:
           RUSTDOCFLAGS: "-D rustdoc::all -A rustdoc::private-doc-tests"
-        run: cargo doc --all-features --no-deps
+        run: |
+          cargo doc --all --no-deps
+          echo '<meta http-equiv="refresh" content="0; url=rmathlib">' > target/doc/index.html
 
+      # Not using actions/deploy-pages because it crashes for some reason.
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          cname: 'rmathlib.poweranalyses.org'
+          force_orphan: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: './target/doc'

@@ -1,0 +1,272 @@
+//! Based on C translation of ACM TOMS 708
+//! Please do not change this, e.g. to use R's versions of the
+//! ancillary routines, without investigating the error analysis as we
+//! do need very high relative accuracy.  This version has about
+//! 14 digits accuracy.
+
+use crate::libc::*;
+use libm::log1p;
+use crate::rmath::*;
+use crate::d1mach::d1mach;
+use crate::i1mach::i1mach;
+use crate::dpq::*;
+
+/// Calculates the function exp(x) - 1
+fn rexpm1(x: f64) -> f64 {
+    let p1: f64 = 9.14041914819518e-10;
+    let p2: f64 = 0.0238082361044469;
+    let q1: f64 = -0.499999999085958;
+    let q2: f64 = 0.107141568980644;
+    let q3: f64 = -0.0119041179760821;
+    let q4: f64 = 5.95130811860248e-4;
+
+    if x.abs() <= 0.15 {
+        return x * (((p2 * x + p1) * x + 1.) /
+            ((((q4 * x + q3) * x + q2) * x + q1) * x + 1.));
+    } else { /* |x| > 0.15 : */
+        let w: f64 = exp(x);
+        if x > 0.0 {
+            return w * (0.5 - 1. / w + 0.5);
+        } else {
+            return w - 0.5 - 0.5;
+        }
+    }
+}
+
+fn r_log1_exp(x: f64) -> f64 {
+    if x > -M_LN2 {
+        log(-rexpm1(x))
+    } else {
+        log1p(-exp(x))
+    }
+}
+
+fn exparg(l: i32) -> f64 {
+    // --------------------------------------------------------------------
+    // If l = 0 then  exparg(l) = The largest positive W for which
+    // exp(W) can be computed. With 0.99999 fuzz  ==> exparg(0) = 709.7756 nowadays.
+
+    // Iff l = 1 (nonzero) then  exparg(l) = the largest negative W for
+    // which the computed value of exp(W) is nonzero.
+    // With 0.99999 fuzz ==> exparg(1) = -709.0825 nowadays.
+
+    // Note: only an approximate value for exparg(L) is needed.
+    // -------------------------------------------------------------------- */
+    let lnb: f64 = 0.69314718055995;
+    let m: i32 = if l == 0 { i1mach(16) } else { i1mach(15) - 1 };
+    m as f64 * lnb * 0.99999
+}
+
+/// Evaluates I (A, B) for `b < min(eps, eps * a)` and `x <= 0.5`.
+fn fpser(a: f64, b: f64, x: f64, eps: f64, log_p: bool) -> f64 {
+    let mut ans: f64;
+    let mut c: f64;
+    let mut s: f64;
+    let mut t: f64;
+    let mut an: f64;
+    let mut tol: f64;
+
+    if log_p {
+        ans = a * log(x);
+    } else if a > eps * 0.001 {
+        t = a * log(x);
+        if t < exparg(1) {
+            // exp(t) would underflow.
+            return 0.0;
+        }
+        ans = exp(t);
+    } else {
+        ans = 1.0;
+    }
+
+    return 0.0;
+}
+
+fn l_end(do_swap: bool, w: &mut f64, w1: &mut f64) {
+    if do_swap {
+        let tmp = *w;
+        *w = *w1;
+        *w1 = tmp;
+    }
+}
+
+/// Calculates the Incomplete Beta Function I_x(a, b)
+///
+/// ALGORITHM 708, COLLECTED ALGORITHMS FROM ACM.
+/// This work published in  Transactions On Mathematical Software,
+/// vol. 18, no. 3, September 1992, pp. 360-373.
+pub fn bratio(a: f64, b: f64, x: f64, y: f64, log_p: bool) -> (f64, f64, i32) {
+    // -----------------------------------------------------------------------
+    // 
+    //        Evaluation of the Incomplete Beta function I_x(a,b)
+    // 
+    //  	       --------------------
+    // 
+    //     It is assumed that a and b are nonnegative, and that x <= 1
+    //     and y = 1 - x.  Bratio assigns w and w1 the values
+    // 
+    //  		w  = I_x(a,b)
+    //  		w1 = 1 - I_x(a,b)
+    // 
+    //     ierr is a variable that reports the status of the results.
+    //     If no input errors are detected then ierr is set to 0 and
+    //     w and w1 are computed. otherwise, if an error is detected,
+    //     then w and w1 are assigned the value 0 and ierr is set to
+    //     one of the following values ...
+    // 
+    //    ierr = 1  if a or b is negative
+    //    ierr = 2  if a = b = 0
+    //    ierr = 3  if x < 0 or x > 1
+    //    ierr = 4  if y < 0 or y > 1
+    //    ierr = 5  if x + y != 1
+    //    ierr = 6  if x = a = 0
+    //    ierr = 7  if y = b = 0
+    //    ierr = 8	(not used currently)
+    //    ierr = 9  NaN in a, b, x, or y
+    //    ierr = 10     (not used currently)
+    //    ierr = 11  bgrat() error code 1 [+ warning in bgrat()]
+    //    ierr = 12  bgrat() error code 2   (no warning here)
+    //    ierr = 13  bgrat() error code 3   (no warning here)
+    //    ierr = 14  bgrat() error code 4 [+ WARNING in bgrat()]
+    // 
+    // 
+    // --------------------
+    //     Written by Alfred H. Morris, Jr.
+    //    Naval Surface Warfare Center
+    //    Dahlgren, Virginia
+    //     Revised ... Nov 1991
+    // ----------------------------------------------------------------------
+
+    let do_swap: bool;
+    let n: i32 = 0;
+    let mut ierr: i32 = 0;
+    let z: f64;
+    let a0: f64;
+    let b0: f64;
+    let x0: f64;
+    let y0: f64;
+    let lambda: f64;
+
+    // eps is a machine dependent constant: the smallest
+    // floating point number for which 1.0 + eps > 1.0
+    // NOTE: for almost all purposes it is replaced by 1e-15 (~= 4.5 times larger) below */
+    let mut eps: f64 = 2.0 * d1mach(3); // == DBL_EPSILON (in R, Rmath)
+
+    let mut w: f64 = r_d__0(log_p);
+    let mut w1: f64 = r_d__0(log_p);
+
+    if x.is_nan() || y.is_nan() || a.is_nan() || b.is_nan() {
+        ierr = 9;
+        return (w, w1, ierr);
+    }
+    if a < 0.0 || b < 0.0 {
+        ierr = 1;
+        return (w, w1, ierr);
+    }
+    if a == 0.0 && b == 0.0 {
+        ierr = 2;
+        return (w, w1, ierr);
+    }
+    if x < 0.0 || x > 1.0 {
+        ierr = 3;
+        return (w, w1, ierr);
+    }
+    if y < 0.0 || y > 1.0 {
+        ierr = 4;
+        return (w, w1, ierr);
+    }
+
+    // Check that `y == 1 - x`.
+    z = x + y - 0.5 - 0.5;
+
+    if z.abs() > eps * 3.0 {
+        ierr = 5;
+        return (w, w1, ierr);
+    }
+
+    ierr = 0;
+    if x == 0.0 {
+        if a == 0.0 {
+            ierr = 6;
+            return (w, w1, ierr);
+        }
+    }
+    if y == 0.0 {
+        if b == 0.0 {
+            ierr = 7;
+            return (w, w1, ierr);
+        }
+    }
+    if a == 0.0 {
+        w = r_d__1(log_p);
+        w1 = r_d__0(log_p);
+        return (w, w1, ierr);
+    }
+    if b == 0.0 {
+        w = r_d__0(log_p);
+        w1 = r_d__1(log_p);
+        return (w, w1, ierr);
+    }
+
+    eps = max(eps, 1e-15);
+
+    let a_lt_b: bool = a < b;
+    if (/* max(a, b) */ if a_lt_b { b } else { a }) < eps * 0.001 {
+        // Procedure for a and b < 0.001 * eps.
+        // w = a / (a + b) and w1 = b / (a + b).
+        if log_p {
+            if a_lt_b {
+                w = log1p(-a / (a + b)); // Notably if a << b.
+                w1 = log(a / (a + b));
+            } else {
+                w = log(b / (a + b));
+                w1 = log1p(-b / (a + b));
+            }
+        } else {
+            w = b / (a + b);
+            w1 = a / (a + b);
+        }
+        return (w, w1, ierr);
+    }
+
+    if min(a, b) <= 1.0 {
+        // a <= 1 or b <= 1.
+        do_swap = x > 0.5;
+        if do_swap {
+            a0 = b;
+            x0 = y;
+            b0 = a;
+            y0 = x;
+        } else {
+            a0 = a;
+            x0 = x;
+            b0 = b;
+            y0 = y;
+        }
+        // Now have `x0 <= 1/2 < y0` (still `x0 + y0 == 1`).
+
+        if b0 < min(eps, eps * a0) {
+            w = fpser(a0, b0, x0, eps, log_p);
+            w1 = if log_p { r_log1_exp(w) } else { 0.5 - w + 0.5 };
+            l_end(do_swap, &mut w, &mut w1);
+            return (w, w1, ierr);
+        }
+    }
+
+    return (0.0, 0.0, 0);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

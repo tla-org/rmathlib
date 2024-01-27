@@ -86,7 +86,7 @@ pub fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64 {
         if ((x - x.trunc() - 0.5) * ans / x).abs() < DXREL {
             // Warning: answer less than half precision
             // because the argument is too near a negative integer
-            println!("** should NEVER happen! *** [lgamma.rs: Neg.int, y={y}]");
+            println!("** should NEVER happen! *** [lgamma.rs: Neg.int, y={}]", y);
             return ML_NAN; // Placeholder for warning
         }
         ans

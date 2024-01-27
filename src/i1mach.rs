@@ -28,3 +28,8 @@ pub fn rf_i1mach(i: i32) -> i32 {
         _ => 0,
     }
 }
+
+// TODO fix this in-line with dnorm.
+pub fn i1mach(i: i32) -> i32 {
+    rf_i1mach(i)
+}
