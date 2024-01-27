@@ -5,9 +5,9 @@
 
 mod bd0;
 mod chebyshev;
-mod pgamma;
 mod cospi;
 mod dnorm;
+mod pgamma;
 // mod dpois;
 mod dpq;
 mod gamma;
@@ -31,7 +31,6 @@ pub use chebyshev::chebyshev_eval;
 pub use chebyshev::chebyshev_init;
 pub use cospi::cospi;
 // pub use dpois::*;
-pub use pgamma::log1pmx;
 pub use cospi::sinpi;
 pub use cospi::tanpi;
 pub use gamma::gammafn;
@@ -39,6 +38,7 @@ pub use i1mach::rf_i1mach;
 pub use lgamma::lgammafn;
 pub use lgamma::lgammafn_sign;
 pub use lgammacor::lgammacor;
+pub use pgamma::log1pmx;
 pub use rmath::dnorm;
 pub use rmath::pnorm;
 pub use rmath::qnorm;

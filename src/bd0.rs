@@ -22,8 +22,8 @@
 //! https://www.R-project.org/Licenses/
 
 use crate::libc::*;
-use crate::pgamma::log1pmx;
 use crate::nmath::*;
+use crate::pgamma::log1pmx;
 use crate::rmath::*;
 use libm::frexp;
 use libm::ldexp;
