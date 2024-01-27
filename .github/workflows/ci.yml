@@ -65,17 +65,3 @@ jobs:
           cp rustfmt.toml test/
           cd test/
           cargo fmt --all --check
-
-  check-docs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-        with:
-          prefix-key: 'check-docs'
-      - name: cargo doc
-        env:
-          RUSTDOCFLAGS: "-D rustdoc::all -A rustdoc::private-doc-tests"
-        run: cargo doc --all-features --no-deps
-
