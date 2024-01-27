@@ -219,10 +219,6 @@ static const float bd0_scale[128 + 1][4] = {
 	{ 0, 0, 0, 0 } /* log(1024/1024) = log(1) = 0 */
 };
 
-float foo() {
-    return bd0_scale[0][1];
-}
-
 /*
  * Compute x * log (x / M) + (M - x)
  * aka -x * log1pmx ((M - x) / x)

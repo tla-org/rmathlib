@@ -601,10 +601,6 @@ const BD0_SCALE: [[f32; 4]; 129] = [
     [0.0, 0.0, 0.0, 0.0],                                        /* log(1024/1024) = log(1) = 0 */
 ];
 
-pub fn foo() -> f32 {
-    BD0_SCALE[0][1]
-}
-
 fn add1(d_: f64, yh: &mut f64, yl: &mut f64) {
     let d = d_;
     let d1 = (d + 0.5).floor();

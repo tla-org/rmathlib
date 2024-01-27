@@ -23,7 +23,6 @@ mod test_math {
             pub fn qnorm5(p: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn sinpi(x: f64) -> f64;
             pub fn tanpi(x: f64) -> f64;
-            pub fn foo() -> f32;
         }
     }
 
@@ -242,7 +241,6 @@ mod test_math {
 
     #[test]
     fn test_ebd0() {
-        assert_eq!(foo(), unsafe { c::foo() });
         let mut yh: f64 = f64::NAN;
         let mut yl: f64 = f64::NAN;
         let mut c_yh: f64 = f64::NAN;
