@@ -1,8 +1,6 @@
 //! Based on C translation of ACM TOMS 708
-//! Please do not change this, e.g. to use R's versions of the
-//! ancillary routines, without investigating the error analysis as we
-//! do need very high relative accuracy.  This version has about
-//! 14 digits accuracy.
+//!
+//! These routines provide very high relative accuracy; about 14 digits.
 
 use crate::libc::*;
 use libm::log1p;

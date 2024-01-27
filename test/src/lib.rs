@@ -9,7 +9,6 @@ mod test_math {
             pub fn Rf_chebyshev_eval(x: f64, a: *mut f64, n: i32) -> f64;
             pub fn Rf_chebyshev_init(dos: *mut f64, nos: i32, eta: f64) -> i32;
             pub fn Rf_ebd0(x: f64, M: f64, yh: *mut f64, yl: *mut f64);
-            pub fn gamln(a: f64) -> f64;
             pub fn Rf_i1mach(i: i32) -> i32;
             pub fn Rf_lgammacor(x: f64) -> f64;
             pub fn Rf_stirlerr(n: f64) -> f64;
