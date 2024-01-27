@@ -655,9 +655,6 @@ pub fn ebd0(x: f64, m: f64) -> (f64, f64) {
     let f: f64 = (s / (0.5 + (i as f64) / (2.0 * (n as f64))) + 0.5).floor();
     let fg: f64 = ldexp(f, -(e + sb)); // ldexp(f, E) := f * 2^E.
 
-    println!("ebd0(x={x:?}, m={m:?}): m/x = (r={r:.15} * 2^(e={e}); i={i:?},");
-    println!("  f={f:?}, fg=f*2^-(e+{sb:?}={fg:?})");
-
     if fg == ML_POSINF {
         yh = fg;
         return (yh, yl);

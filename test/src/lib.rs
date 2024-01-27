@@ -2,7 +2,6 @@
 mod test_math {
     use approx::abs_diff_eq;
     use rmathlib::*;
-    use rmathlib::libm::frexp;
 
     mod c {
         extern "C" {
@@ -14,7 +13,6 @@ mod test_math {
             pub fn Rf_lgammacor(x: f64) -> f64;
             pub fn Rf_stirlerr(n: f64) -> f64;
             pub fn cospi(x: f64) -> f64;
-            pub fn foo(x: f64) -> f64;
             pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64;
             pub fn gammafn(x: f64) -> f64;
             pub fn lbeta(a: f64, b: f64) -> f64;
@@ -26,6 +24,14 @@ mod test_math {
             pub fn sinpi(x: f64) -> f64;
             pub fn tanpi(x: f64) -> f64;
         }
+    }
+
+    #[test]
+    fn test_bd0() {
+        // if: 9.0-8.9 < 0.1*(9.0+8.9) = 0.1 < 1.79
+        assert_eq!(bd0(9.0, 8.9), unsafe { c::Rf_bd0(9.0, 8.9) });
+        // else: ((5.0-1.0).abs !< 0.1*(5.0+1.0)) = 4.0 !< 0.6
+        assert_eq!(bd0(5.0, 1.0), unsafe { c::Rf_bd0(5.0, 1.0) });
     }
 
     #[test]
@@ -50,6 +56,24 @@ mod test_math {
         assert_eq!(chebyshev_init(&[1.0, 2.0, 3.0], 3, -0.5), unsafe {
             c::Rf_chebyshev_init([1.0, 2.0, 3.0].as_mut_ptr(), 3, -0.5)
         });
+    }
+
+    fn test_ebd0_helper(x: f64, m: f64) {
+        let mut c_yh: f64 = f64::NAN;
+        let mut c_yl: f64 = f64::NAN;
+        let (yh, yl) = ebd0(x, m);
+        unsafe { c::Rf_ebd0(x, m, &mut c_yh, &mut c_yl) };
+        assert_eq!(yh, c_yh, "yh with x={x:?}, m={m:?}");
+        assert_eq!(yl, c_yl, "yl with x={x:?}, m={m:?}");
+    }
+
+    #[test]
+    fn test_ebd0() {
+        test_ebd0_helper(1.0, 1.0);
+        test_ebd0_helper(1.0, 1.0);
+        test_ebd0_helper(0.0, 1.0);
+        test_ebd0_helper(1.0, 0.0);
+        test_ebd0_helper(3.0, 0.5);
     }
 
     #[test]
@@ -234,45 +258,4 @@ mod test_math {
         assert_eq!(tanpi(0.25), unsafe { c::tanpi(0.25) });
         assert_eq!(tanpi(0.234), unsafe { c::tanpi(0.234) });
     }
-
-    #[test]
-    fn test_bd0() {
-        // if: 9.0-8.9 < 0.1*(9.0+8.9) = 0.1 < 1.79
-        assert_eq!(bd0(9.0, 8.9), unsafe { c::Rf_bd0(9.0, 8.9) });
-        // else: ((5.0-1.0).abs !< 0.1*(5.0+1.0)) = 4.0 !< 0.6
-        assert_eq!(bd0(5.0, 1.0), unsafe { c::Rf_bd0(5.0, 1.0) });
-    }
-
-    fn test_ebd0_helper(x: f64, m: f64) {
-        let mut c_yh: f64 = f64::NAN;
-        let mut c_yl: f64 = f64::NAN;
-        let (yh, yl) = ebd0(x, m);
-        unsafe { c::Rf_ebd0(x, m, &mut c_yh, &mut c_yl) };
-        assert_eq!(yh, c_yh, "yh with x={x:?}, m={m:?}");
-        assert_eq!(yl, c_yl, "yl with x={x:?}, m={m:?}");
-    }
-
-    #[test]
-    fn test_ebd0() {
-        test_ebd0_helper(1.0, 1.0);
-        test_ebd0_helper(3.0, 0.5);
-        let mut c_yh: f64 = f64::NAN;
-        let mut c_yl: f64 = f64::NAN;
-        let x: f64 = 3.0;
-        let m: f64 = 0.5;
-        let (yh, yl) = ebd0(x, m);
-        unsafe { c::Rf_ebd0(x, m, &mut c_yh as *mut f64, &mut c_yl as *mut f64) };
-        assert_eq!(yh, c_yh, "yh with x={x:?}, m={m:?}");
-    }
-
-    // fn test_ebd0() {
-    //     test_ebd0_helper(1.0, 1.0);
-    //     test_ebd0_helper(0.0, 1.0);
-    //     test_ebd0_helper(1.0, 0.0);
-    //     // m/x == ML_POSINF
-    //     test_ebd0_helper(std::f64::MIN_POSITIVE, std::f64::MAX);
-    //     test_ebd0_helper(3.0, 0.5);
-    //     let (r, e) = frexp(4.0);
-    //     assert_eq!(r, unsafe { c::foo(4.0) });
-    // }
 }

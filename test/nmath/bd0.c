@@ -45,8 +45,6 @@
  */
 #include "nmath.h"
 
-#include <stdio.h>
-
 double attribute_hidden bd0(double x, double np)
 {
     if(!R_FINITE(x) || !R_FINITE(np) || np == 0.0) ML_WARN_return_NAN;
@@ -76,6 +74,7 @@ double attribute_hidden bd0(double x, double np)
     /* else:  | x - np |  is not too small */
     return(x*log(x/np)+np-x);
 }
+
 
 // ebd0(): R Bugzilla PR#15628 -- proposed accuracy improvement by Morten Welinder
 
@@ -221,14 +220,6 @@ static const float bd0_scale[128 + 1][4] = {
 	{ 0, 0, 0, 0 } /* log(1024/1024) = log(1) = 0 */
 };
 
-double foo(double x)
-{
-    int e;
-    return frexp(x, &e);
-}
-
-// TODO: Remove
-#define DEBUG_bd0
 
 /*
  * Compute x * log (x / M) + (M - x)
@@ -253,7 +244,7 @@ void attribute_hidden ebd0(double x, double M, double *yh, double *yl)
 	int e;
 	// NB: M/x overflow handled above; underflow should be handled by fg = Inf
 	double r = frexp (M / x, &e); // => r in  [0.5, 1) and 'e' (int) such that  M/x = r * 2^e
- 
+
 	// prevent later overflow
 	if (M_LN2 * ((double) -e)  > 1. + DBL_MAX / x) { *yh = ML_POSINF; return; }
 
@@ -261,12 +252,8 @@ void attribute_hidden ebd0(double x, double M, double *yh, double *yl)
 	// now,  0 <= i <= N
 	double f = floor (S / (0.5 + i / (2.0 * N)) + 0.5);
 	double fg = ldexp (f, -(e + Sb)); // ldexp(f, E) := f * 2^E
-
-    double tmp = 1.2;
-    printf("from c: x=%g\n", x);
-
 #ifdef DEBUG_bd0
-	printf("ebd0(x=%g, M=%g): M/x = (r=%.15g) * 2^(e=%d); i=%d,\n  f=%g, fg=f*2^-(e+%d)=%g\n",
+	REprintf("ebd0(x=%g, M=%g): M/x = (r=%.15g) * 2^(e=%d); i=%d,\n  f=%g, fg=f*2^-(e+%d)=%g\n",
 		 x, M, r,e, i, f, Sb, fg);
 	if (fg == ML_POSINF) {
 	    REprintf(" --> fg = +Inf --> return( +Inf )\n");
