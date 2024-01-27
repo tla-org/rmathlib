@@ -6,10 +6,12 @@ A Rust port of [R's C Library of Special Functions](https://cran.r-project.org/d
 
 Some benefits of this port over the native C code are:
 
-- Enable statistics support using native (safe) Rust code.
-- Enable statistics support for the `wasm32-unknown-unknown` target (avoiding emscripten).
-- The functions are more clearly documented with the help of `cargo doc`.
-- The code is easier to read and inspect thanks to `cargo fmt` and follow definition in IDE's.
+- The Rust code is more safe.
+- Support `wasm32-unknown-unknown` target (avoiding emscripten).
+- Clearer documentation with the help of `cargo doc`.
+- Easier to read thanks to `cargo fmt`.
+- Enables go to definition.
+- More clarity about the used compiler and supported Rust versions.
 
 ## Developer Notes
 
