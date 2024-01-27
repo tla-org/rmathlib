@@ -18,7 +18,7 @@ jobs:
       matrix:
         # 1.43 is our lower bound because that is when f64::EPSILON
         # was introduced, which libm depends on.
-        rust: ['1.43', 'stable', 'beta']
+        rust: ['1.44', 'stable', 'beta']
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
