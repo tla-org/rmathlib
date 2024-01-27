@@ -610,26 +610,32 @@ fn add1(d_: f64, yh: &mut f64, yl: &mut f64) {
     *yl += d2;
 }
 
-pub fn ebd0(x: f64, m: f64, yh: &mut f64, yl: &mut f64) {
+/// Compute x * log (x / M) + (M - x) aka -x * log1pmx ((M - x) / x)
+///
+/// Returns `(yh, yl)`.
+///
+/// Unlike the C version, this function does not take mutable `yl` and `yh` arguments.
+/// This is to make the interface easier to use.
+pub fn ebd0(x: f64, m: f64) -> (f64, f64) {
     let sb: i32 = 10;
     let s: f64 = (1u32 << sb) as f64;
     let n: i32 = 128;
 
-    *yl = 0.0;
-    *yh = 0.0;
+    let mut yh = 0.0;
+    let mut yl = 0.0;
 
     if x == m {
-        return;
+        return (yh, yl);
     }
 
     if x == 0.0 {
-        *yh = m;
-        return;
+        yh = m;
+        return (yh, yl);
     }
 
     if m == 0.0 {
-        *yh = ML_POSINF;
-        return;
+        yh = ML_POSINF;
+        return (yh, yl);
     }
 
     // NB: m/x overflow handled above; underflow should be handled by fg = Inf.
@@ -637,8 +643,8 @@ pub fn ebd0(x: f64, m: f64, yh: &mut f64, yl: &mut f64) {
 
     // Prevent later overflow.
     if (M_LN2 * (-e as f64)) > 1.0 + DBL_MAX / x {
-        *yh = ML_POSINF;
-        return;
+        yh = ML_POSINF;
+        return (yh, yl)
     }
 
     let i: i32 = ((r - 0.5) * (2 * n) as f64 + 0.5).floor() as i32;
@@ -646,8 +652,8 @@ pub fn ebd0(x: f64, m: f64, yh: &mut f64, yl: &mut f64) {
     let f: f64 = (s / (0.5 + i as f64 / (2.0 * n as f64) + 0.5)).floor();
     let fg: f64 = ldexp(f, -(e + sb)); // ldexp(f, E) := f * 2^E.
     if fg == ML_POSINF {
-        *yh = fg;
-        return;
+        yh = fg;
+        return (yh, yl);
     }
 
     // We now have (M * fg / x) close to 1.  */
@@ -670,19 +676,20 @@ pub fn ebd0(x: f64, m: f64, yh: &mut f64, yl: &mut f64) {
     // rounding errors.
     //
 
-    add1(-x * log1pmx((m * fg - x) / x), yh, yl);
+    add1(-x * log1pmx((m * fg - x) / x), &mut yh, &mut yl);
     if fg == 1.0 {
-        return;
+        return (yl, yh);
     }
     for j in 0..4 {
-        add1(x * BD0_SCALE[i as usize][j] as f64, yh, yl);
-        add1(-x * BD0_SCALE[0][j] as f64, yh, yl);
+        add1(x * BD0_SCALE[i as usize][j] as f64, &mut yh, &mut yl);
+        add1(-x * BD0_SCALE[0][j] as f64, &mut yh, &mut yl);
     }
-    if !r_finite(*yh) {
-        *yh = ML_POSINF;
-        *yl = 0.0;
-        return;
+    if !r_finite(yh) {
+        yh = ML_POSINF;
+        yl = 0.0;
+        return (yh, yl);
     }
-    add1(m, yh, yl);
-    add1(-m * fg, yh, yl);
+    add1(m, &mut yh, &mut yl);
+    add1(-m * fg, &mut yh, &mut yl);
+    (yh, yl)
 }

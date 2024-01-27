@@ -241,14 +241,17 @@ mod test_math {
         assert_eq!(bd0(5.0, 1.0), unsafe { c::Rf_bd0(5.0, 1.0) });
     }
 
-    #[test]
-    fn test_ebd0() {
-        let mut yh: f64 = f64::NAN;
-        let mut yl: f64 = f64::NAN;
+    fn test_ebd0_helper(x: f64, m: f64) {
         let mut c_yh: f64 = f64::NAN;
         let mut c_yl: f64 = f64::NAN;
-        ebd0(1.1, 2.2, &mut yh, &mut yl);
-        unsafe { c::Rf_ebd0(1.1, 2.2, &mut c_yh, &mut c_yl) };
-        // assert_eq!(yh, c_yh);
+        let (yh, yl) = ebd0(x, m);
+        unsafe { c::Rf_ebd0(x, m, &mut c_yh, &mut c_yl) };
+        assert_eq!(yl, c_yl, "yl with x={x:?}, m={m:?}");
+        assert_eq!(yh, c_yh, "yh with x={x:?}, m={m:?}");
+    }
+
+    #[test]
+    fn test_ebd0() {
+        test_ebd0_helper(1.0, 1.0);
     }
 }
