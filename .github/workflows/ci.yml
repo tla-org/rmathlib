@@ -19,7 +19,7 @@ jobs:
         # 1.43 is our lower bound because that is when f64::EPSILON
         # was introduced, which libm depends on.
         # 1.43 was unable to update registry.
-        toolchain: ['1.49', 'stable', 'beta']
+        toolchain: ['1.50', 'stable', 'beta']
     steps:
       - uses: actions/checkout@v4
       - run: rustup default ${{ matrix.toolchain }}
@@ -36,13 +36,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Stable Rust
+      - name: Install Rust
         uses: dtolnay/rust-toolchain@v1
         with:
           components: 'clippy, rustfmt'
           toolchain: 'nightly'
 
-      - name: Rust cache
+      - name: Cache
         uses: Swatinem/rust-cache@v2
         with:
           prefix-key: 'check-format'
