@@ -601,11 +601,9 @@ const BD0_SCALE: [[f32; 4]; 129] = [
     [0.0, 0.0, 0.0, 0.0],                                        /* log(1024/1024) = log(1) = 0 */
 ];
 
-fn add1(d_: f64, yh: &mut f64, yl: &mut f64) {
-    let d = d_;
-    let d1 = (d + 0.5).floor();
-    let d2 = d - d1; // In [-0.5, 0.5)
-
+fn add1(d: f64, yh: &mut f64, yl: &mut f64) {
+    let d1: f64 = (d + 0.5).floor();
+    let d2: f64 = d - d1; // In [-0.5, 0.5).
     *yh += d1;
     *yl += d2;
 }
@@ -618,7 +616,7 @@ fn add1(d_: f64, yh: &mut f64, yl: &mut f64) {
 /// This is to make the interface easier to use.
 pub fn ebd0(x: f64, m: f64) -> (f64, f64) {
     let sb: i32 = 10;
-    let s: f64 = (1u32 << sb) as f64;
+    let s: f64 = 1024.0;
     let n: i32 = 128;
 
     let mut yh = 0.0;
@@ -644,18 +642,21 @@ pub fn ebd0(x: f64, m: f64) -> (f64, f64) {
     }
 
     // NB: m/x overflow handled above; underflow should be handled by fg = Inf.
-    let (r, e) = frexp(m / x);
+    let (r, e): (f64, i32) = frexp(m / x);
 
     // Prevent later overflow.
-    if (M_LN2 * (-e as f64)) > 1.0 + DBL_MAX / x {
+    if M_LN2 * (-e as f64) > 1.0 + DBL_MAX / x {
         yh = ML_POSINF;
         return (yh, yl);
     }
 
     let i: i32 = ((r - 0.5) * (2 * n) as f64 + 0.5).floor() as i32;
     // Now, 0 <= i <= n.
-    let f: f64 = (s / (0.5 + i as f64 / (2.0 * n as f64) + 0.5)).floor();
+    let f: f64 = (s / (0.5 + (i as f64) / (2.0 * n as f64) + 0.5)).floor();
     let fg: f64 = ldexp(f, -(e + sb)); // ldexp(f, E) := f * 2^E.
+
+    println!("ebd0(x={x:?}, m={m:?}): m/x = (r={r:.15} * 2^(e={e}); i={i:?},");
+
     if fg == ML_POSINF {
         yh = fg;
         return (yh, yl);
@@ -683,18 +684,20 @@ pub fn ebd0(x: f64, m: f64) -> (f64, f64) {
 
     add1(-x * log1pmx((m * fg - x) / x), &mut yh, &mut yl);
     if fg == 1.0 {
-        return (yl, yh);
+        return (yh, yl);
     }
     for j in 0..4 {
         add1(x * BD0_SCALE[i as usize][j] as f64, &mut yh, &mut yl);
-        add1(-x * BD0_SCALE[0][j] as f64, &mut yh, &mut yl);
-    }
-    if !r_finite(yh) {
-        yh = ML_POSINF;
-        yl = 0.0;
-        return (yh, yl);
+        // `e` at end prevents overflow in  ebd0(1e307, 1e300).
+        add1(-x * (BD0_SCALE[0][j] * e as f32) as f64, &mut yh, &mut yl);
+        if !r_finite(yh) {
+            yh = ML_POSINF;
+            yl = 0.0;
+            return (yh, yl);
+        }
     }
     add1(m, &mut yh, &mut yl);
+    println!(" 3. after add1(m): yl,yh={yl:?},{yh:?}");
     add1(-m * fg, &mut yh, &mut yl);
     (yh, yl)
 }

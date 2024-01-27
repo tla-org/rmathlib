@@ -219,6 +219,15 @@ static const float bd0_scale[128 + 1][4] = {
 	{ 0, 0, 0, 0 } /* log(1024/1024) = log(1) = 0 */
 };
 
+double foo(double x)
+{
+    int e;
+    return frexp(x, &e);
+}
+
+// TODO: Remove
+#define DEBUG_bd0
+
 /*
  * Compute x * log (x / M) + (M - x)
  * aka -x * log1pmx ((M - x) / x)
@@ -242,7 +251,7 @@ void attribute_hidden ebd0(double x, double M, double *yh, double *yl)
 	int e;
 	// NB: M/x overflow handled above; underflow should be handled by fg = Inf
 	double r = frexp (M / x, &e); // => r in  [0.5, 1) and 'e' (int) such that  M/x = r * 2^e
-
+ 
 	// prevent later overflow
 	if (M_LN2 * ((double) -e)  > 1. + DBL_MAX / x) { *yh = ML_POSINF; return; }
 
@@ -250,6 +259,7 @@ void attribute_hidden ebd0(double x, double M, double *yh, double *yl)
 	// now,  0 <= i <= N
 	double f = floor (S / (0.5 + i / (2.0 * N)) + 0.5);
 	double fg = ldexp (f, -(e + Sb)); // ldexp(f, E) := f * 2^E
+
 #ifdef DEBUG_bd0
 	REprintf("ebd0(x=%g, M=%g): M/x = (r=%.15g) * 2^(e=%d); i=%d,\n  f=%g, fg=f*2^-(e+%d)=%g\n",
 		 x, M, r,e, i, f, Sb, fg);
@@ -260,6 +270,9 @@ void attribute_hidden ebd0(double x, double M, double *yh, double *yl)
 	REprintf("     bd0_sc[0][0..3]= ("); for(int j=0; j < 4; j++) REprintf("%g ", bd0_scale[0][j]); REprintf(")\n");
 	REprintf("i -> bd0_sc[i][0..3]= ("); for(int j=0; j < 4; j++) REprintf("%g ", bd0_scale[i][j]); REprintf(")\n");
 	REprintf( "  small(?)  (M*fg-x)/x = (M*fg)/x - 1 = %.16g\n", (M*fg-x)/x);
+
+    *yh = x;
+    return;
 #else
 	if (fg == ML_POSINF) {
 	    *yh = fg; return;

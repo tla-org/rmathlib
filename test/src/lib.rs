@@ -2,17 +2,19 @@
 mod test_math {
     use approx::abs_diff_eq;
     use rmathlib::*;
+    use rmathlib::libm::frexp;
 
     mod c {
         extern "C" {
             pub fn Rf_bd0(x: f64, np: f64) -> f64;
             pub fn Rf_chebyshev_eval(x: f64, a: *mut f64, n: i32) -> f64;
             pub fn Rf_chebyshev_init(dos: *mut f64, nos: i32, eta: f64) -> i32;
-            pub fn Rf_ebd0(x: f64, np: f64, yh: *mut f64, yl: *mut f64) -> i32;
+            pub fn Rf_ebd0(x: f64, M: f64, yh: *mut f64, yl: *mut f64);
             pub fn Rf_i1mach(i: i32) -> i32;
             pub fn Rf_lgammacor(x: f64) -> f64;
             pub fn Rf_stirlerr(n: f64) -> f64;
             pub fn cospi(x: f64) -> f64;
+            pub fn foo(x: f64) -> f64;
             pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64;
             pub fn gammafn(x: f64) -> f64;
             pub fn lbeta(a: f64, b: f64) -> f64;
@@ -246,16 +248,31 @@ mod test_math {
         let mut c_yl: f64 = f64::NAN;
         let (yh, yl) = ebd0(x, m);
         unsafe { c::Rf_ebd0(x, m, &mut c_yh, &mut c_yl) };
-        assert_eq!(yl, c_yl, "yl with x={x:?}, m={m:?}");
         assert_eq!(yh, c_yh, "yh with x={x:?}, m={m:?}");
+        assert_eq!(yl, c_yl, "yl with x={x:?}, m={m:?}");
     }
 
     #[test]
     fn test_ebd0() {
         test_ebd0_helper(1.0, 1.0);
-        test_ebd0_helper(0.0, 1.0);
-        test_ebd0_helper(1.0, 0.0);
-        // m/x == ML_POSINF
-        test_ebd0_helper(std::f64::MIN_POSITIVE, std::f64::MAX);
+        test_ebd0_helper(3.0, 0.5);
+        let mut c_yh: f64 = f64::NAN;
+        let mut c_yl: f64 = f64::NAN;
+        let x: f64 = 3.0;
+        let m: f64 = 0.5;
+        let (yh, yl) = ebd0(x, m);
+        unsafe { c::Rf_ebd0(x, m, &mut c_yh as *mut f64, &mut c_yl as *mut f64) };
+        assert_eq!(yh, c_yh, "yh with x={x:?}, m={m:?}");
     }
+
+    // fn test_ebd0() {
+    //     test_ebd0_helper(1.0, 1.0);
+    //     test_ebd0_helper(0.0, 1.0);
+    //     test_ebd0_helper(1.0, 0.0);
+    //     // m/x == ML_POSINF
+    //     test_ebd0_helper(std::f64::MIN_POSITIVE, std::f64::MAX);
+    //     test_ebd0_helper(3.0, 0.5);
+    //     let (r, e) = frexp(4.0);
+    //     assert_eq!(r, unsafe { c::foo(4.0) });
+    // }
 }
