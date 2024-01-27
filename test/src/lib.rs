@@ -63,8 +63,8 @@ mod test_math {
         let mut c_yl: f64 = f64::NAN;
         let (yh, yl) = ebd0(x, m);
         unsafe { c::Rf_ebd0(x, m, &mut c_yh, &mut c_yl) };
-        assert_eq!(yh, c_yh, "yh with x={x:?}, m={m:?}", x=x, m=m);
-        assert_eq!(yl, c_yl, "yl with x={x:?}, m={m:?}", x=x, m=m);
+        assert_eq!(yh, c_yh, "yh with x={x:?}, m={m:?}", x = x, m = m);
+        assert_eq!(yl, c_yl, "yl with x={x:?}, m={m:?}", x = x, m = m);
     }
 
     #[test]
