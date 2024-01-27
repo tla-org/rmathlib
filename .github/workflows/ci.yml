@@ -110,3 +110,4 @@ jobs:
           force_orphan: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: './target/doc'
+
