@@ -19,7 +19,7 @@
 //!
 //! You should have received a copy of the GNU General Public License
 //! along with this program; if not, a copy is available at
-//! https://www.R-project.org/Licenses/
+//! <https://www.R-project.org/Licenses/>
 
 use crate::libc::*;
 use crate::nmath::*;
@@ -33,7 +33,7 @@ use libm::ldexp;
 /// Evaluates the "deviance part"
 /// bd0(x,M) :=  M * D0(x/M) = M*[ x/M * log(x/M) + 1 - (x/M) ] =
 ///           =  x * log(x/M) + M - x
-/// where M = E[X] = n*p (or = lambda), for x, M > 0
+/// where M = E\[X\] = n*p (or = lambda), for x, M > 0
 ///
 /// in a manner that should be stable (with small relative error)
 /// for all x and M=np. In particular for x/np close to 1, direct
