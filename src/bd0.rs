@@ -638,6 +638,11 @@ pub fn ebd0(x: f64, m: f64) -> (f64, f64) {
         return (yh, yl);
     }
 
+    if m/x == ML_POSINF {
+        yh = m;
+        return (yh, yl);
+    }
+
     // NB: m/x overflow handled above; underflow should be handled by fg = Inf.
     let (r, e) = frexp(m / x);
 

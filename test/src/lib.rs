@@ -253,5 +253,9 @@ mod test_math {
     #[test]
     fn test_ebd0() {
         test_ebd0_helper(1.0, 1.0);
+        test_ebd0_helper(0.0, 1.0);
+        test_ebd0_helper(1.0, 0.0);
+        // m/x == ML_POSINF
+        test_ebd0_helper(std::f64::MIN_POSITIVE, std::f64::MAX);
     }
 }
