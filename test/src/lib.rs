@@ -206,7 +206,7 @@ mod test_math {
         assert_eq!(log1pmx(1.1), unsafe { c::log1pmx(1.1) });
         assert!(log1pmx(-1.23).is_nan());
         assert_eq!(log1pmx(1e-3), unsafe { c::log1pmx(1e-3) });
-        // Test logcf.
+        // Test logcf via log1pmx.
         assert_eq!(log1pmx(0.91), unsafe { c::log1pmx(0.91) });
         assert_eq!(log1pmx(0.81), unsafe { c::log1pmx(0.81) });
     }

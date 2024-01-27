@@ -79,6 +79,8 @@ pub fn bd0(x: f64, np: f64) -> f64 {
 }
 
 #[allow(clippy::approx_constant)]
+// These numbers were converted from hexadecimal floating-point to decimal.
+// See description or commit message from PR 18 for details.
 const BD0_SCALE: [[f32; 4]; 129] = [
     [
         0.693_147_2,
