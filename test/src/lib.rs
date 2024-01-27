@@ -74,6 +74,7 @@ mod test_math {
         test_ebd0_helper(0.0, 1.0);
         test_ebd0_helper(1.0, 0.0);
         test_ebd0_helper(3.0, 0.5);
+        test_ebd0_helper(10.2, 5.45);
     }
 
     #[test]
