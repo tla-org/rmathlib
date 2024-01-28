@@ -1,6 +1,9 @@
-//! Based on C translation of ACM TOMS 708
+//! Based on C translation of ACM TOMS 708.
 //!
 //! These routines provide very high relative accuracy; about 14 digits.
+
+#![allow(dead_code)]
+#![allow(unused_variables)]
 
 use crate::libc::*;
 use libm::log1p;
@@ -8,143 +11,6 @@ use crate::rmath::*;
 use crate::d1mach::d1mach;
 use crate::i1mach::i1mach;
 use crate::dpq::*;
-
-/// Calculates the function exp(x) - 1
-fn rexpm1(x: f64) -> f64 {
-    let p1: f64 = 9.14041914819518e-10;
-    let p2: f64 = 0.0238082361044469;
-    let q1: f64 = -0.499999999085958;
-    let q2: f64 = 0.107141568980644;
-    let q3: f64 = -0.0119041179760821;
-    let q4: f64 = 5.95130811860248e-4;
-
-    if x.abs() <= 0.15 {
-        return x * (((p2 * x + p1) * x + 1.) /
-            ((((q4 * x + q3) * x + q2) * x + q1) * x + 1.));
-    } else { /* |x| > 0.15 : */
-        let w: f64 = exp(x);
-        if x > 0.0 {
-            return w * (0.5 - 1. / w + 0.5);
-        } else {
-            return w - 0.5 - 0.5;
-        }
-    }
-}
-
-// Computes ln(1 + 1).
-fn alnrel(a: f64) -> f64 {
-    if a.abs() > 0.375 {
-        return log(1.0 + a);
-    } else {
-        let p1: f64 = -1.29418923021993;
-        let p2: f64 = 0.405303492862024;
-        let p3: f64 = -0.0178874546012214;
-        let q1: f64 = -1.62752256355323;
-        let q2: f64 = 0.747811014037616;
-        let q3: f64 = -0.0845104217945565;
-        let t = a / (a + 2.0);
-        let t2 = t * t;
-        let w = (((p3 * t2 + p2) * t2 + p1) * t2 + 1.) /
-            (((q3 * t2 + q2) * t2 + q1) * t2 + 1.);
-        return t * 2. * w;
-    }
-
-}
-
-fn r_log1_exp(x: f64) -> f64 {
-    if x > -M_LN2 {
-        log(-rexpm1(x))
-    } else {
-        log1p(-exp(x))
-    }
-}
-
-fn exparg(l: i32) -> f64 {
-    // --------------------------------------------------------------------
-    // If l = 0 then  exparg(l) = The largest positive W for which
-    // exp(W) can be computed. With 0.99999 fuzz  ==> exparg(0) = 709.7756 nowadays.
-
-    // Iff l = 1 (nonzero) then  exparg(l) = the largest negative W for
-    // which the computed value of exp(W) is nonzero.
-    // With 0.99999 fuzz ==> exparg(1) = -709.0825 nowadays.
-
-    // Note: only an approximate value for exparg(L) is needed.
-    // -------------------------------------------------------------------- */
-    let lnb: f64 = 0.69314718055995;
-    let m: i32 = if l == 0 { i1mach(16) } else { i1mach(15) - 1 };
-    m as f64 * lnb * 0.99999
-}
-
-/// Evaluates I (A, B) for `b < min(eps, eps * a)` and `x <= 0.5`.
-fn fpser(a: f64, b: f64, x: f64, eps: f64, log_p: bool) -> f64 {
-    let mut ans: f64;
-    let mut c: f64;
-    let mut s: f64;
-    let mut t: f64;
-    let mut an: f64;
-    let mut tol: f64;
-
-    if log_p {
-        ans = a * log(x);
-    } else if a > eps * 0.001 {
-        t = a * log(x);
-        if t < exparg(1) {
-            // exp(t) would underflow.
-            return 0.0;
-        }
-        ans = exp(t);
-    } else {
-        ans = 1.0;
-    }
-
-    return 0.0;
-}
-
-/// Power SERies expansion for evaluating I_x(a, b) when b <= 1 or b*x <= 0.7.
-/// `eps` is the tolerance used.
-/// Note: if `log_p` is true, then also use it if `(b < 40 & lambda > 650)`.
-fn bpser(a: f64, b: f64, x: f64, eps: f64, log_p: bool) -> f64 {
-    let mut i: i32;
-    let mut m: i32;
-    let mut ans: f64;
-    let mut c: f64;
-    let mut t: f64;
-    let mut u: f64;
-    let mut z: f64;
-    let mut a0: f64;
-    let mut b0: f64;
-    let mut apb: f64;
-
-    if x == 0.0 {
-        return r_d__0(log_p);
-    }
-
-    // Compute the factor x^a / (a*Beta(a, b)).
-    a0 = min(a, b);
-    if a0 >= 1.0 {
-        // TODO: Implement betaln.
-        // z = a * log(x) - betaln(a, b);
-    }
-
-    // TODO
-    return 0.0;
-}
-
-fn l_end(do_swap: bool, w: &mut f64, w1: &mut f64) {
-    if do_swap {
-        let tmp = *w;
-        *w = *w1;
-        *w1 = tmp;
-    }
-}
-
-fn l_w_bpser(do_swap: bool, a0: f64, b0: f64, x0: f64, eps: f64, log_p: bool, w: &mut f64, w1: &mut f64) -> (f64, f64) {
-    *w = bpser(a0, b0, x0, eps, log_p);
-    *w1 = if log_p { r_log1_exp(*w) } else { 0.5 - *w + 0.5 };
-    l_end(do_swap, w, w1);
-    return (*w, *w1);
-}
-
 
 /// Calculates the Incomplete Beta Function I_x(a, b)
 ///
@@ -320,6 +186,173 @@ pub fn bratio(a: f64, b: f64, x: f64, y: f64, log_p: bool) -> (f64, f64, i32) {
     return (0.0, 0.0, 0);
 }
 
+/// Evaluates I (A, B) for `b < min(eps, eps * a)` and `x <= 0.5`.
+fn fpser(a: f64, b: f64, x: f64, eps: f64, log_p: bool) -> f64 {
+    let mut ans: f64;
+    let mut c: f64;
+    let mut s: f64;
+    let mut t: f64;
+    let mut an: f64;
+    let mut tol: f64;
+
+    if log_p {
+        ans = a * log(x);
+    } else if a > eps * 0.001 {
+        t = a * log(x);
+        if t < exparg(1) {
+            // exp(t) would underflow.
+            return 0.0;
+        }
+        ans = exp(t);
+    } else {
+        ans = 1.0;
+    }
+
+    return 0.0;
+}
+
+fn apser(a: f64, b: f64, x: f64, eps: f64) -> f64 {
+    panic!("Not implemented yet.");
+}
+
+/// Power SERies expansion for evaluating I_x(a, b) when b <= 1 or b*x <= 0.7.
+/// `eps` is the tolerance used.
+/// Note: if `log_p` is true, then also use it if `(b < 40 & lambda > 650)`.
+fn bpser(a: f64, b: f64, x: f64, eps: f64, log_p: bool) -> f64 {
+    let mut i: i32;
+    let mut m: i32;
+    let mut ans: f64;
+    let mut c: f64;
+    let mut t: f64;
+    let mut u: f64;
+    let mut z: f64;
+    let mut a0: f64;
+    let mut b0: f64;
+    let mut apb: f64;
+
+    if x == 0.0 {
+        return r_d__0(log_p);
+    }
+
+    // Compute the factor x^a / (a*Beta(a, b)).
+    a0 = min(a, b);
+    if a0 >= 1.0 {
+        // TODO: Implement betaln.
+        // z = a * log(x) - betaln(a, b);
+    }
+
+    // TODO
+    return 0.0;
+}
+
+fn bup(a: f64, b: f64, x: f64, y: f64, n: f64, eps: f64, log_p: bool) -> f64 {
+    panic!("Not implemented yet.");
+}
+
+fn bfrac(a: f64, b: f64, x: f64, y: f64, lambda: f64, eps: f64, log_p: bool) -> f64 {
+    panic!("Not implemented yet.");
+}
+
+fn brcomp(a: f64, b: f64, x: f64, y: f64, log_p: bool) -> f64 {
+    panic!("Not implemented yet.");
+}
+
+fn brcmp1(mu: i32, a: f64, b: f64, x: f64, y: f64, give_log: bool) -> f64 {
+    panic!("Not implemented yet.");
+}
+
+/// Compute w := w + I_x(a, b) which is asymptotic expansion for I_x(a, b) when a > b.
+///
+/// Returns `(w, ierr)`.
+fn bgrat(a: f64, b: f64, x: f64, y: f64, eps: f64, log_w: bool) -> (f64, f64) {
+    panic!("Not implemented yet.");
+}
+
+fn grat_r(a: f64, x: f64, log_r: f64, eps: f64) -> f64 {
+    panic!("Not implemented yet.");
+}
+
+fn basym(a: f64, b: f64, lambda: f64, eps: f64, log_p: bool) -> f64 {
+    panic!("Not implemented yet.");
+}
+
+fn exparg(l: i32) -> f64 {
+    // --------------------------------------------------------------------
+    // If l = 0 then  exparg(l) = The largest positive W for which
+    // exp(W) can be computed. With 0.99999 fuzz  ==> exparg(0) = 709.7756 nowadays.
+
+    // Iff l = 1 (nonzero) then  exparg(l) = the largest negative W for
+    // which the computed value of exp(W) is nonzero.
+    // With 0.99999 fuzz ==> exparg(1) = -709.0825 nowadays.
+
+    // Note: only an approximate value for exparg(L) is needed.
+    // -------------------------------------------------------------------- */
+    let lnb: f64 = 0.69314718055995;
+    let m: i32 = if l == 0 { i1mach(16) } else { i1mach(15) - 1 };
+    m as f64 * lnb * 0.99999
+}
+
+fn esum(mu: i32, x: f64, give_log: i32) -> f64 {
+    panic!("Not implemented yet.");
+}
+
+/// Calculates the function exp(x) - 1
+fn rexpm1(x: f64) -> f64 {
+    let p1: f64 = 9.14041914819518e-10;
+    let p2: f64 = 0.0238082361044469;
+    let q1: f64 = -0.499999999085958;
+    let q2: f64 = 0.107141568980644;
+    let q3: f64 = -0.0119041179760821;
+    let q4: f64 = 5.95130811860248e-4;
+
+    if x.abs() <= 0.15 {
+        return x * (((p2 * x + p1) * x + 1.) /
+            ((((q4 * x + q3) * x + q2) * x + q1) * x + 1.));
+    } else { /* |x| > 0.15 : */
+        let w: f64 = exp(x);
+        if x > 0.0 {
+            return w * (0.5 - 1. / w + 0.5);
+        } else {
+            return w - 0.5 - 0.5;
+        }
+    }
+}
+
+// Computes ln(1 + 1).
+fn alnrel(a: f64) -> f64 {
+    if a.abs() > 0.375 {
+        return log(1.0 + a);
+    } else {
+        let p1: f64 = -1.29418923021993;
+        let p2: f64 = 0.405303492862024;
+        let p3: f64 = -0.0178874546012214;
+        let q1: f64 = -1.62752256355323;
+        let q2: f64 = 0.747811014037616;
+        let q3: f64 = -0.0845104217945565;
+        let t = a / (a + 2.0);
+        let t2 = t * t;
+        let w = (((p3 * t2 + p2) * t2 + p1) * t2 + 1.) /
+            (((q3 * t2 + q2) * t2 + q1) * t2 + 1.);
+        return t * 2. * w;
+    }
+}
+
+fn rlog1(x: f64) -> f64 {
+    panic!("Not implemented yet.");
+}
+
+fn erf__(x: f64) -> f64 {
+    panic!("Not implemented yet.");
+}
+
+fn erfc1(ind: i32, x: f64) -> f64 {
+    panic!("Not implemented yet.");
+}
+
+fn gam1(a: f64) -> f64 {
+    panic!("Not implemented yet.");
+}
+
 /// Evaluates ln(gamma(1 + a)) for -0.2 <= a <= 1.25.
 fn gamln1(a: f64) -> f64 {
     let w: f64;
@@ -359,6 +392,46 @@ fn gamln1(a: f64) -> f64 {
     }
 }
 
+fn r_log1_exp(x: f64) -> f64 {
+    if x > -M_LN2 {
+        log(-rexpm1(x))
+    } else {
+        log1p(-exp(x))
+    }
+}
+
+fn l_end(do_swap: bool, w: &mut f64, w1: &mut f64) {
+    if do_swap {
+        let tmp = *w;
+        *w = *w1;
+        *w1 = tmp;
+    }
+}
+
+fn l_w_bpser(do_swap: bool, a0: f64, b0: f64, x0: f64, eps: f64, log_p: bool, w: &mut f64, w1: &mut f64) -> (f64, f64) {
+    *w = bpser(a0, b0, x0, eps, log_p);
+    *w1 = if log_p { r_log1_exp(*w) } else { 0.5 - *w + 0.5 };
+    l_end(do_swap, w, w1);
+    return (*w, *w1);
+}
+
+
+fn psi(x: f64) {
+    panic!("Not implemented yet.");
+}
+
+fn betaln(a0: f64, b0: f64) -> f64 {
+    panic!("Not implemented yet.");
+}
+
+fn gsumln(a: f64, b: f64) -> f64 {
+    panic!("Not implemented yet.");
+}
+
+fn bcorr(a0: f64, b0: f64) -> f64 {
+    panic!("Not implemented yet.");
+}
+
 /// Computes ln(gamma(b) / gamma(a + b)) when b >= 8.
 fn algdiv(a: f64, b: f64) -> f64 {
     // In this algorithm, del(x) is the function defined
@@ -370,20 +443,20 @@ fn algdiv(a: f64, b: f64) -> f64 {
     let c4: f64 = 8.37308034031215e-4;
     let c5: f64 = -0.00165322962780713;
 
-    let mut c: f64;
-    let mut d: f64;
-    let mut h: f64;
-    let mut t: f64;
-    let mut u: f64;
-    let mut v: f64;
+    let c: f64;
+    let d: f64;
+    let h: f64;
+    let t: f64;
+    let u: f64;
+    let v: f64;
     let mut w: f64;
-    let mut x: f64;
-    let mut s3: f64;
-    let mut s5: f64;
-    let mut x2: f64;
-    let mut s7: f64;
-    let mut s9: f64;
-    let mut s11: f64;
+    let x: f64;
+    let s3: f64;
+    let s5: f64;
+    let x2: f64;
+    let s7: f64;
+    let s9: f64;
+    let s11: f64;
 
     if a > b {
         h = b / a;
@@ -458,16 +531,3 @@ fn gamln(a: f64) -> f64 {
         return d + w + (a - 0.5) * (log(a) - 1.0);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
