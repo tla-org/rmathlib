@@ -14,6 +14,8 @@ mod test_math {
             pub fn Rf_stirlerr(n: f64) -> f64;
             pub fn cospi(x: f64) -> f64;
             pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64;
+            pub fn dpois(x: f64, lambda: f64, give_log: bool) -> f64;
+            pub fn dpois_raw(x: f64, lambda: f64, give_log: bool) -> f64;
             pub fn gammafn(x: f64) -> f64;
             pub fn lbeta(a: f64, b: f64) -> f64;
             pub fn log1pmx(x: f64) -> f64;
@@ -145,6 +147,18 @@ mod test_math {
         assert_eq!(dnorm(-1.0, 0.0, 1.0, true), unsafe {
             c::dnorm4(-1.0, 0.0, 1.0, true)
         });
+    }
+
+    #[test]
+    fn test_dpois() {
+        assert_eq!(dpois(0.0, 0.0, false), unsafe { c::dpois(0.0, 0.0, false) });
+        assert_eq!(dpois(0.0, 0.0, false), unsafe { c::dpois(0.0, 0.0, false) });
+        assert_eq!(dpois(0.0, 0.0, true), unsafe { c::dpois(0.0, 0.0, true) });
+
+        assert!(dpois(-1.0, -1.0, false).is_nan());
+        assert!(dpois(1.0, -1.0, false).is_nan());
+        assert!(dpois(-1.0, -1.0, true).is_nan());
+        assert!(dpois(1.0, -1.0, true).is_nan());
     }
 
     #[test]
