@@ -12,6 +12,120 @@ use crate::d1mach::d1mach;
 use crate::i1mach::i1mach;
 use crate::dpq::*;
 
+fn l_end(do_swap: bool, w: &mut f64, w1: &mut f64) {
+    if do_swap {
+        let tmp = *w;
+        *w = *w1;
+        *w1 = tmp;
+    }
+}
+
+fn l_end_from_w1(do_swap: bool, w: &mut f64, w1: &mut f64, log_p: bool) {
+    if log_p {
+        *w1 = log1p(-*w);
+        *w = log(*w);
+    } else {
+        *w1 = 0.5 - *w + 0.5;
+    }
+    l_end(do_swap, w, w1);
+}
+
+fn r_log1_exp(x: f64) -> f64 {
+    if x > -M_LN2 {
+        log(-rexpm1(x))
+    } else {
+        log1p(-exp(x))
+    }
+}
+
+fn l_w_bpser(do_swap: bool, a0: f64, b0: f64, x0: f64, eps: f64, log_p: bool, w: &mut f64, w1: &mut f64) {
+    *w = bpser(a0, b0, x0, eps, log_p);
+    *w1 = if log_p { r_log1_exp(*w) } else { 0.5 - *w + 0.5 };
+    l_end(do_swap, w, w1);
+}
+
+fn l_w1_bpser(do_swap: bool, a0: f64, b0: f64, y0: f64, eps: f64, w: &mut f64, w1: &mut f64, log_p: bool) {
+    *w1 = bpser(b0, a0, y0, eps, log_p);
+    *w = if log_p { r_log1_exp(*w1) } else { 0.5 - *w1 + 0.5 };
+    l_end(do_swap, w, w1);
+}
+
+fn l131() {
+    let (w1, ierr) = bgrat(b0, a0, y0, x0, 15*eps, false);
+	if (w1 == 0 || (0 < w1 && w1 < DBL_MIN)) { // w1=0 or very close:
+	    // "almost surely" from underflow, try more: [2013-03-04]
+// FIXME: it is even better to do this in bgrat *directly* at least for the case
+//  !did_bup, i.e., where w1 = (0 or -Inf) on entry
+	    R_ifDEBUG_printf(" denormalized or underflow (?) -> retrying: ");
+	    if(did_bup) { // re-do that part on log scale:
+		w1 = bup(b0-n, a0, y0, x0, n, eps, TRUE);
+	    }
+	    else {
+            w1 = ML_NEGINF; // = 0 on log-scale
+        }
+        let (w1, ierr1) = bgrat(b0, a0, y0, x0, 15*eps, true);
+	    if ierr1 != 0 {
+            ierr = 10 + ierr1;
+	        goto l_end_from_w1_log();
+        }
+	}
+	// else
+	if(ierr1) *ierr = 10 + ierr1;
+	if(*w1 < 0)
+	    MATHLIB_WARNING4("bratio(a=%g, b=%g, x=%g): bgrat() -> w1 = %g",
+			     a,b,x, *w1);
+	goto L_end_from_w1;
+    }
+    else { /* L30: -------------------- both  a, b > 1  {a0 > 1  &  b0 > 1} ---*/
+
+	/* lambda := a y - b x  =  (a + b)y  =  a - (a+b)x    {using x + y == 1},
+	 * ------ using the numerically best version : */
+	lambda = R_FINITE(a+b)
+	    ? ((a > b) ? (a + b) * y - b : a - (a + b) * x)
+	    : a*y - b*x;
+	do_swap = (lambda < 0.);
+	if (do_swap) {
+	    lambda = -lambda;
+	    SET_0_swap;
+	} else {
+	    SET_0_noswap;
+	}
+
+	R_ifDEBUG_printf("  L30:  both  a, b > 1; |lambda| = %#g, do_swap = %d\n",
+			 lambda, do_swap);
+
+	if (b0 < 40.) {
+	    R_ifDEBUG_printf("  b0 < 40;");
+	    if (b0 * x0 <= 0.7
+		|| (log_p && lambda > 650.)) // << added 2010-03; svn r51327
+		goto L_w_bpser;
+	    else
+		goto L140;
+	}
+	else if (a0 > b0) { /* ----  a0 > b0 >= 40  ---- */
+	    R_ifDEBUG_printf("  a0 > b0 >= 40;");
+	    if (b0 <= 100. || lambda > b0 * 0.03)
+		goto L_bfrac;
+
+	} else if (a0 <= 100.) {
+	    R_ifDEBUG_printf("  a0 <= 100; a0 <= b0 >= 40;");
+	    goto L_bfrac;
+	}
+	else if (lambda > a0 * 0.03) {
+	    R_ifDEBUG_printf("  b0 >= a0 > 100; lambda > a0 * 0.03 ");
+	    goto L_bfrac;
+	}
+
+	/* else if none of the above    L180: */
+	*w = basym(a0, b0, lambda, eps * 100., log_p);
+	*w1 = log_p ? R_Log1_Exp(*w) : 0.5 - *w + 0.5;
+	R_ifDEBUG_printf("  b0 >= a0 > 100; lambda <= a0 * 0.03: *w:= basym(*) =%.15g\n",
+			 *w);
+	goto L_end;
+
+    } /* else: a, b > 1 */
+}
+
 /// Calculates the Incomplete Beta Function I_x(a, b)
 ///
 /// ALGORITHM 708, COLLECTED ALGORITHMS FROM ACM.
@@ -174,10 +288,25 @@ pub fn bratio(a: f64, b: f64, x: f64, y: f64, log_p: bool) -> (f64, f64, i32) {
             return (w, w1, ierr);
         }
 
+        if a0 < min(eps, eps * b0) && b0 * x0 <= 1.0 {
+            w1 = apser(a0, b0, x0, eps);
+            l_end_from_w1(do_swap, &mut w, &mut w1, log_p);
+            return (w, w1, ierr);
+        }
+
         let did_bup: bool = false;
         if max(a0, b0) > 1.0 {
             if b0 <= 1.0 {
-                // TODO: implement bpser.
+                l_w_bpser(do_swap, a0, b0, x0, eps, log_p, &mut w, &mut w1);
+                return (w, w1, ierr);
+            }
+            if x0 >= 0.29 {
+                l_w1_bpser(do_swap, a0, b0, y0, eps, &mut w, &mut w1, log_p);
+                return (w, w1, ierr);
+            }
+            if b0 > 15.0 {
+                w1 = 0.0;
+                l131();
             }
         }
 
@@ -391,30 +520,6 @@ fn gamln1(a: f64) -> f64 {
         return x * w;
     }
 }
-
-fn r_log1_exp(x: f64) -> f64 {
-    if x > -M_LN2 {
-        log(-rexpm1(x))
-    } else {
-        log1p(-exp(x))
-    }
-}
-
-fn l_end(do_swap: bool, w: &mut f64, w1: &mut f64) {
-    if do_swap {
-        let tmp = *w;
-        *w = *w1;
-        *w1 = tmp;
-    }
-}
-
-fn l_w_bpser(do_swap: bool, a0: f64, b0: f64, x0: f64, eps: f64, log_p: bool, w: &mut f64, w1: &mut f64) -> (f64, f64) {
-    *w = bpser(a0, b0, x0, eps, log_p);
-    *w1 = if log_p { r_log1_exp(*w) } else { 0.5 - *w + 0.5 };
-    l_end(do_swap, w, w1);
-    return (*w, *w1);
-}
-
 
 fn psi(x: f64) {
     panic!("Not implemented yet.");
