@@ -1,3 +1,5 @@
+//! Rust version by Rik Huijzer and Jose Storopoli
+
 use std::f64::EPSILON;
 use std::f64::MIN_POSITIVE;
 
@@ -17,7 +19,7 @@ use libm::*;
 /// arithmetic system, the compiler, the intrinsic functions, and
 /// proper selection of the machine-dependent constants.
 ///
-/// REFERENCE
+/// ## REFERENCE
 ///
 /// Cody, W. D. (1993).
 /// ALGORITHM 715: SPECFUN - A Portable FORTRAN Package of

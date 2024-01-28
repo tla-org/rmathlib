@@ -1,3 +1,5 @@
+//! Rust version by Rik Huijzer and Jose Storopoli
+
 use core::f32;
 use core::f64;
 use core::i32;

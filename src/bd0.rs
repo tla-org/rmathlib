@@ -1,5 +1,6 @@
+//! Rust version by Rik Huijzer and Jose Storopoli
 //!
-//! AUTHORS
+//! ## AUTHORS
 //! Catherine Loader, catherine@research.bell-labs.com, October 23, 2000. [ bd0() ]
 //! Morten Welinder, see Bugzilla PR#15628, 2014                          [ebd0() ]
 //!

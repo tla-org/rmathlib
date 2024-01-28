@@ -1,3 +1,5 @@
+//! Rust version by Rik Huijzer and Jose Storopoli
+
 use crate::dpq::*;
 use crate::libc::*;
 use crate::nmath::*;
@@ -13,7 +15,6 @@ use crate::rmath::*;
 /// Wichura, M.J. (1988).
 /// Algorithm AS 241: The Percentage Points of the Normal Distribution.
 /// Applied Statistics, 37, 477-484.
-///
 pub fn qnorm5(p: f64, mu: f64, sigma: f64, lower_tail: bool, log_p: bool) -> f64 {
     let mut r: f64;
     let mut val: f64;

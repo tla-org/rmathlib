@@ -1,3 +1,5 @@
+//! Rust version by Rik Huijzer and Jose Storopoli
+
 pub const DBL_MIN: f64 = core::f64::MIN;
 pub const DBL_MAX: f64 = core::f64::MAX;
 

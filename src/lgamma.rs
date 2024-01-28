@@ -1,3 +1,5 @@
+//! Rust version by Rik Huijzer and Jose Storopoli
+
 use std::f64::INFINITY;
 
 use crate::gammafn;

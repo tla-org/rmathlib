@@ -1,3 +1,5 @@
+//! Rust version by Rik Huijzer and Jose Storopoli
+
 use std::f64::MANTISSA_DIGITS;
 use std::f64::MAX;
 use std::f64::MIN_EXP;

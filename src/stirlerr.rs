@@ -1,3 +1,5 @@
+//! Rust version by Rik Huijzer and Jose Storopoli
+
 use crate::lgamma::*;
 use crate::nmath::*;
 

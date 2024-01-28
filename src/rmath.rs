@@ -1,3 +1,5 @@
+//! Rust version by Rik Huijzer and Jose Storopoli
+
 use crate::dnorm::dnorm4;
 use crate::pnorm::pnorm5;
 use crate::qnorm::qnorm5;

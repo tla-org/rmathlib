@@ -1,5 +1,7 @@
 //! Chebyshev functions.
 //!
+//! Rust version by Rik Huijzer and Jose Storopoli
+//!
 //! ## DESCRIPTION
 //!
 //! - `chebyshev_init` determines the number of terms for the

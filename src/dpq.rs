@@ -1,3 +1,5 @@
+//! Rust version by Rik Huijzer and Jose Storopoli
+
 #![allow(non_snake_case)]
 
 use crate::nmath::*;
