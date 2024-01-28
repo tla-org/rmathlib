@@ -15,6 +15,8 @@ mod lgamma;
 mod lgammacor;
 mod libc;
 mod nmath;
+mod pbeta;
+mod pt;
 // mod pgamma;
 mod i1mach;
 mod lbeta;
@@ -44,6 +46,8 @@ pub use rmath::pnorm;
 pub use rmath::qnorm;
 // pub use pgamma::*;
 pub use lbeta::lbeta;
+pub use pbeta::pbeta;
+pub use pt::pt;
 pub use stirlerr::stirlerr;
 
 // TODO: Remove these exports later; once they are used by lgamma.
