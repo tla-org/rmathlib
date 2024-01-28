@@ -1,53 +1,26 @@
-//!
-//!  Mathlib : A C Library of Special Functions
-//!  Copyright (C) 2006-2019 The R Core Team
-//!  Copyright (C) 2005-6 Morten Welinder <terra@gnome.org>
-//!  Copyright (C) 2005-10 The R Foundation
-//!
-//!  This program is free software; you can redistribute it and/or modify
-//!  it under the terms of the GNU General Public License as published by
-//!  the Free Software Foundation; either version 2 of the License, or
-//!  (at your option) any later version.
-//!
-//!  This program is distributed in the hope that it will be useful,
-//!  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//!  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//!  GNU General Public License for more details.
-//!
-//!  You should have received a copy of the GNU General Public License
-//!  along with this program; if not, a copy is available at
-//!  <https://www.R-project.org/Licenses/>
-//!
-//!  SYNOPSIS
-//!
-//!  #include <Rmath.h>
-//!
-//!  double pgamma (double x, double alph, double scale,
-//!     int lower_tail, int log_p)
-//!
-//!  double log1pmx (double x)
-//!  double lgamma1p (double a)
-//!
-//!  double logspace_add (double logx, double logy)
-//!  double logspace_sub (double logx, double logy)
-//!  double logspace_sum (double* logx, int n)
-//!
-//!
-//!  DESCRIPTION
-//!
-//!  This function computes the distribution function for the
-//!  gamma distribution with shape parameter alph and scale parameter
-//!  scale. This is also known as the incomplete gamma function.
-//!  See Abramowitz and Stegun (6.5.1) for example.
-//!
-//!  NOTES
-//!
-//!  Complete redesign by Morten Welinder, originally for Gnumeric.
-//!  Improvements (e.g. "while NEEDED_SCALE") by Martin Maechler
-
 use libm::log1p;
 
 const SCALEFACTOR: f64 = 1.157921e+77;
+
+/// Computes the distribution function for the gamma distribution
+/// with shape parameter alph and scale parameter scale.
+///
+/// This is also known as the incomplete gamma function.
+/// See Abramowitz and Stegun (6.5.1) for example.
+///
+/// ## NOTES
+///
+/// Complete redesign by Morten Welinder, originally for Gnumeric.
+/// Improvements (e.g. "while NEEDED_SCALE") by Martin Maechler
+///
+/// ## AUTHORS
+///
+/// 2006-2019 The R Core Team
+/// 2005-6 Morten Welinder <terra@gnome.org>
+/// 2005-10 The R Foundation
+pub fn pgamma(x: f64, alph: f64, scale: f64, lower_tail: bool, log_p: bool) -> f64 {
+    todo!()
+}
 
 /// Continued fraction for calculation of 1/i + x/(i+d) + x^2/(i+2*d) + x^3/(i+3*d) + ... = sum_{k=0}^Inf x^k/(i+k*d)
 ///
