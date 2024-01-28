@@ -1,6 +1,9 @@
 #![allow(non_snake_case)]
 
-use crate::nmath::*;
+use crate::libc::exp;
+use crate::nmath::ml_warn_return_nan;
+use crate::nmath::ML_NEGINF;
+
 use libm::expm1;
 
 pub fn r_d__0(log_p: bool) -> f64 {
@@ -50,6 +53,13 @@ pub fn r_d_cval(p: f64, lower_tail: bool) -> f64 {
         0.5 - p + 0.5
     } else {
         p
+    }
+}
+
+pub fn r_d_exp(x: f64, log_p: bool) -> f64 {
+    match log_p {
+        true => x,
+        false => exp(x),
     }
 }
 

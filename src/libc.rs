@@ -5,6 +5,10 @@ pub fn log(x: f64) -> f64 {
     x.ln()
 }
 
+pub fn exp(x: f64) -> f64 {
+    x.exp()
+}
+
 pub fn sqrt(x: f64) -> f64 {
     x.sqrt()
 }
