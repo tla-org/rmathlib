@@ -31,6 +31,26 @@ fn rexpm1(x: f64) -> f64 {
     }
 }
 
+// Computes ln(1 + 1).
+fn alnrel(a: f64) -> f64 {
+    if a.abs() > 0.375 {
+        return log(1.0 + a);
+    } else {
+        let p1: f64 = -1.29418923021993;
+        let p2: f64 = 0.405303492862024;
+        let p3: f64 = -0.0178874546012214;
+        let q1: f64 = -1.62752256355323;
+        let q2: f64 = 0.747811014037616;
+        let q3: f64 = -0.0845104217945565;
+        let t = a / (a + 2.0);
+        let t2 = t * t;
+        let w = (((p3 * t2 + p2) * t2 + p1) * t2 + 1.) /
+            (((q3 * t2 + q2) * t2 + q1) * t2 + 1.);
+        return t * 2. * w;
+    }
+
+}
+
 fn r_log1_exp(x: f64) -> f64 {
     if x > -M_LN2 {
         log(-rexpm1(x))
@@ -339,12 +359,77 @@ fn gamln1(a: f64) -> f64 {
     }
 }
 
+/// Computes ln(gamma(b) / gamma(a + b)) when b >= 8.
+fn algdiv(a: f64, b: f64) -> f64 {
+    // In this algorithm, del(x) is the function defined
+    // by ln(gamma(x)) = (x - 0.5) * ln(x) - x + 0.5 * ln(2 * pi) + del(x).
+    let c0: f64 = 0.0833333333333333;
+    let c1: f64 = -0.00277777777760991;
+    let c2: f64 = 7.9365066682539e-4;
+    let c3: f64 = -5.9520293135187e-4;
+    let c4: f64 = 8.37308034031215e-4;
+    let c5: f64 = -0.00165322962780713;
+
+    let mut c: f64;
+    let mut d: f64;
+    let mut h: f64;
+    let mut t: f64;
+    let mut u: f64;
+    let mut v: f64;
+    let mut w: f64;
+    let mut x: f64;
+    let mut s3: f64;
+    let mut s5: f64;
+    let mut x2: f64;
+    let mut s7: f64;
+    let mut s9: f64;
+    let mut s11: f64;
+
+    if a > b {
+        h = b / a;
+        c = 1.0 / (h + 1.0);
+        x = h / (h + 1.0);
+        d = a + (b - 0.5);
+    } else {
+        h = a / b;
+        c = h / (h + 1.0);
+        x = 1.0 / (h + 1.0);
+        d = b + (a - 0.5);
+    }
+
+    // Set s<n> = (1 - x^n) / (1 - x).
+    
+    x2 = x * x;
+    s3 = x + x2 + 1.0;
+    s5 = x + x2 * s3 + 1.0;
+    s7 = x + x2 * s5 + 1.0;
+    s9 = x + x2 * s7 + 1.0;
+    s11 = x + x2 * s9 + 1.0;
+
+    // w := del(b) - del(a + b).
+    
+    t = 1.0 / (b*b);
+    w = ((((c5 * s11 * t + c4 * s9) * t + c3 * s7) * t + c2 * s5) * t + c1 *
+        s3) * t + c0;
+    w *= c / b;
+
+    // Combine the results.
+    
+    u = d * alnrel(a / b);
+    v = a * (log(b) - 1.);
+    if u > v {
+        return w - v - u;
+    } else {
+        return w - u - v;
+    }
+}
+
 /// Evaluates ln(gamma(a)) for positive a.
 ///
 /// Written by Alfred H. Morris.
 /// Naval Surface Warfare Center.
 /// Dahlgren, Virginia.
-pub fn gamln(a: f64) -> f64 {
+fn gamln(a: f64) -> f64 {
     let d: f64 = 0.418938533204673; // d == 0.5*(LN(2*PI) - 1)
     let c0: f64 = 0.0833333333333333;
     let c1: f64 = -0.002277777777760991;
