@@ -14,6 +14,7 @@ mod test_math {
             pub fn Rf_stirlerr(n: f64) -> f64;
             pub fn cospi(x: f64) -> f64;
             pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64;
+            pub fn dgamma(x: f64, shape: f64, scale: f64, give_log: bool) -> f64;
             pub fn gammafn(x: f64) -> f64;
             pub fn lbeta(a: f64, b: f64) -> f64;
             pub fn log1pmx(x: f64) -> f64;
@@ -147,6 +148,13 @@ mod test_math {
         });
     }
 
+    // TODO: more tests dgamma
+    #[test]
+    fn test_dgamma() {
+        assert_eq!(dgamma(0.0, 0.0, 1.0, false), unsafe {
+            c::dgamma(0.0, 0.0, 1.0, false)
+        });
+    }
     #[test]
     fn test_gammafn() {
         assert!(gammafn(-1.0).is_nan());
