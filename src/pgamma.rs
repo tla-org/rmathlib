@@ -203,13 +203,15 @@ pub fn logspace_add(logx: f64, logy: f64) -> f64 {
 
 /// Compute the log of a difference from logs of terms, i.e., log(exp(logx) - exp(logy))
 /// without causing overflows and without throwing away large handfuls of accuracy.
-pub fn logspace_sub(logx: f64, logy: f64) -> f64 {
+#[allow(dead_code)]
+fn logspace_sub(logx: f64, logy: f64) -> f64 {
     logx + (logy - logx).exp().ln_1p().neg()
 }
 
 /// Compute the log of a sum from logs of terms, i.e.,
 /// log(sum_i exp(logx\[i\])) in a way that avoids overflows.
-pub fn logspace_sum(logx: &[f64]) -> f64 {
+#[allow(dead_code)]
+fn logspace_sum(logx: &[f64]) -> f64 {
     match logx.len() {
         0 => ML_NEGINF, // log(0) for empty input
         1 => logx[0],
