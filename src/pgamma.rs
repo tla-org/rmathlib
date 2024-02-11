@@ -1,12 +1,20 @@
 use libm::lgamma;
-use std::f64::{EPSILON, MAX, MIN};
+use std::f64::EPSILON;
+use std::f64::MAX;
+use std::f64::MIN;
 use std::ops::Neg;
 
-use crate::dpq::{r_dt_0, r_dt_1};
+use crate::dnorm::dnorm4;
+use crate::dpois::dpois_raw;
+use crate::dpq::r_dt_0;
+use crate::dpq::r_dt_1;
 use crate::lgamma::lgammafn;
-use crate::rmath::ML_LN2;
-use crate::{dnorm4, dpois_raw, pnorm5};
-use crate::{r_log1_exp, ML_NAN, ML_NEGINF, ML_POSINF};
+use crate::nmath::r_log1_exp;
+use crate::nmath::ML_NAN;
+use crate::nmath::ML_NEGINF;
+use crate::nmath::ML_POSINF;
+use crate::pnorm::pnorm5;
+use crate::rmath::M_LN2;
 
 /// This function computes the distribution function for the
 /// gamma distribution with shape parameter alph and scale parameter
@@ -49,7 +57,7 @@ pub fn pgamma(x: f64, alph: f64, scale: f64, lower_tail: bool, log_p: bool) -> f
 const SQR: fn(f64) -> f64 = |x| x * x;
 
 /// If |x| > |k| * M_cutoff,  then  log\[ exp(-x) * k^x \] =~= -x
-const M_CUTOFF: f64 = ML_LN2 * MAX / MIN; // 3.196577e18
+const M_CUTOFF: f64 = M_LN2 * MAX / MIN; // 3.196577e18
 
 /// Continued fraction for calculation of
 /// 1/i + x/(i+d) + x^2/(i+2*d) + x^3/(i+3*d) + ... = sum_{k=0}^Inf x^k/(i+k*d)
@@ -99,7 +107,7 @@ fn logcf(x: f64, i: f64, d: f64, eps: f64) -> f64 {
 }
 
 /// Accurate calculation of log(1+x)-x, particularly for small x.
-fn log1pmx(x: f64) -> f64 {
+pub fn log1pmx(x: f64) -> f64 {
     const MIN_LOG1_VALUE: f64 = -0.79149064;
 
     if !(MIN_LOG1_VALUE..=1.0).contains(&x) {
@@ -236,8 +244,7 @@ fn dpois_wrap(x_plus_1: f64, lambda: f64, give_log: bool) -> f64 {
             res.exp()
         }
     } else {
-        // FIXME: port C function
-        let d = unsafe { dpois_raw(x_plus_1, lambda, give_log) };
+        let d = dpois_raw(x_plus_1, lambda, give_log);
         if give_log {
             d + (x_plus_1 / lambda).ln()
         } else {
