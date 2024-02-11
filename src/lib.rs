@@ -6,22 +6,25 @@
 mod bd0;
 mod chebyshev;
 mod cospi;
+mod d1mach;
 mod dnorm;
-mod pgamma;
+mod dpois;
 mod dpq;
-mod toms708;
 mod gamma;
+mod i1mach;
+mod i1mach;
+mod lbeta;
+mod lbeta;
 mod lgamma;
 mod lgammacor;
 mod libc;
 mod nmath;
-mod i1mach;
-mod d1mach;
-mod lbeta;
+mod pgamma;
 mod pnorm;
 mod qnorm;
 mod rmath;
 mod stirlerr;
+mod toms708;
 
 // Use only explicit exports and no wildcard exports to avoid accidentally
 // exporting symbols that should not be exported.
@@ -32,6 +35,7 @@ pub use chebyshev::chebyshev_init;
 pub use cospi::cospi;
 pub use cospi::sinpi;
 pub use cospi::tanpi;
+pub use dpois::dpois;
 pub use gamma::gammafn;
 pub use i1mach::rf_i1mach;
 pub use lbeta::lbeta;
@@ -39,12 +43,9 @@ pub use lgamma::lgammafn;
 pub use lgamma::lgammafn_sign;
 pub use lgammacor::lgammacor;
 pub use pgamma::log1pmx;
+pub use pgamma::logspace_add;
+pub use pgamma::pgamma;
 pub use rmath::dnorm;
 pub use rmath::pnorm;
 pub use rmath::qnorm;
 pub use stirlerr::stirlerr;
-
-// TODO: Remove these exports later; once they are used by lgamma.
-pub use nmath::r_d_nonint_check;
-pub use nmath::r_log1_exp;
-pub use nmath::r_nonint;

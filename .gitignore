@@ -1,4 +1,9 @@
+.vscode/
+.DS_Store
+
 **/target/
 **/Cargo.lock
 **/*.rs.bk
 **/*.pdb
+
+**/rustfmt.toml
