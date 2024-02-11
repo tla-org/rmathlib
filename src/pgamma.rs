@@ -1,7 +1,6 @@
 use libm::lgamma;
 use std::f64::EPSILON;
 use std::f64::MAX;
-use std::f64::MIN;
 use std::ops::Neg;
 
 use crate::dnorm::dnorm4;
@@ -57,7 +56,7 @@ pub fn pgamma(x: f64, alph: f64, scale: f64, lower_tail: bool, log_p: bool) -> f
 const SQR: fn(f64) -> f64 = |x| x * x;
 
 /// If |x| > |k| * M_cutoff,  then  log\[ exp(-x) * k^x \] =~= -x
-const M_CUTOFF: f64 = M_LN2 * MAX / MIN; // 3.196577e18
+const M_CUTOFF: f64 = M_LN2 * MAX / EPSILON; // 3.196577e18
 
 /// Continued fraction for calculation of
 /// 1/i + x/(i+d) + x^2/(i+2*d) + x^3/(i+3*d) + ... = sum_{k=0}^Inf x^k/(i+k*d)
