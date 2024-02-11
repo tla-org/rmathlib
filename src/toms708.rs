@@ -2,15 +2,18 @@
 //!
 //! These routines provide very high relative accuracy; about 14 digits.
 
-#![allow(dead_code)]
-#![allow(unused_variables)]
-
-use crate::libc::*;
+use crate::libc::log;
+use crate::libc::exp;
+use crate::libc::max;
+use crate::libc::min;
+use crate::libc::DBL_MIN;
 use libm::log1p;
-use crate::rmath::*;
+use crate::rmath::M_LN2;
+use crate::nmath::ML_NEGINF;
 use crate::d1mach::d1mach;
 use crate::i1mach::i1mach;
-use crate::dpq::*;
+use crate::dpq::r_d__0;
+use crate::dpq::r_d__1;
 
 fn l_end(do_swap: bool, w: &mut f64, w1: &mut f64) {
     if do_swap {
@@ -58,7 +61,7 @@ fn l131() {
 //  !did_bup, i.e., where w1 = (0 or -Inf) on entry
 	    R_ifDEBUG_printf(" denormalized or underflow (?) -> retrying: ");
 	    if(did_bup) { // re-do that part on log scale:
-		w1 = bup(b0-n, a0, y0, x0, n, eps, TRUE);
+            w1 = bup(b0-n, a0, y0, x0, n, eps, TRUE);
 	    }
 	    else {
             w1 = ML_NEGINF; // = 0 on log-scale
