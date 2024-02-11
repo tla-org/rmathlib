@@ -9,7 +9,7 @@ use crate::rmath::M_PI;
 use crate::stirlerr;
 
 #[allow(non_upper_case_globals)]
-const x_LRG: f64 = 2.86111748575702815380240589208115399625e+307; // = 2^1023 / pi
+const x_LRG: f64 = 2.861_117_485_757_028_3e307; // = 2^1023 / pi
 
 /// Computes the Poisson probability lb^x exp(-lb) / x!.
 ///
