@@ -397,7 +397,10 @@ fn pd_lower_cf(y: f64, d: f64) -> f64 {
         }
     }
 
-    println!("Non-convergence in pd_lower_cf after {MAX_IT} iterations.");
+    println!(
+        "Non-convergence in pd_lower_cf after {} iterations.",
+        MAX_IT
+    );
     f // Returning the last computed value of `f` as a fallback.
 }
 
