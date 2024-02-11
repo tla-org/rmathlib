@@ -20,6 +20,7 @@ mod test_math {
             pub fn log1pmx(x: f64) -> f64;
             pub fn lgammafn(x: f64) -> f64;
             pub fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64;
+            pub fn pgamma(x: f64, alph: f64, scale: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn pnorm5(x: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn qnorm5(p: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn sinpi(x: f64) -> f64;
@@ -218,6 +219,32 @@ mod test_math {
         // Test logcf via log1pmx.
         assert_eq!(log1pmx(0.91), unsafe { c::log1pmx(0.91) });
         assert_eq!(log1pmx(0.81), unsafe { c::log1pmx(0.81) });
+    }
+
+    #[test]
+    fn test_pgamma() {
+        assert!(pgamma(0.0, -1.0, 1.0, true, false).is_nan());
+        assert!(pgamma(0.0, 1.0, -1.0, true, false).is_nan());
+        assert!(pgamma(0.0, -1.0, -1.0, true, false).is_nan());
+        assert_eq!(pgamma(0.1, 0.1, 1.0, false, false), unsafe {
+            c::pgamma(0.1, 0.1, 1.0, 0, 0)
+        });
+        assert!(abs_diff_eq!(
+            pgamma(0.65, 0.2, 0.34, false, false),
+            unsafe { c::pgamma(0.65, 0.2, 0.34, 0, 0) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            pgamma(3.21, 0.2, 0.34, false, false),
+            unsafe { c::pgamma(3.21, 0.2, 0.34, 0, 0) },
+            epsilon = 1e-15
+        ));
+        assert_eq!(pgamma(3.21, 0.2, 0.34, false, true), unsafe {
+            c::pgamma(3.21, 0.2, 0.34, 0, 1)
+        });
+        assert_eq!(pgamma(123.0, 0.2, 0.34, false, true), unsafe {
+            c::pgamma(123.0, 0.2, 0.34, 0, 1)
+        });
     }
 
     #[test]
