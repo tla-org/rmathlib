@@ -1,4 +1,6 @@
 //! A Rust port of R's C Library of Special Functions.
+//!
+//! Authors: Rik Huijzer and Jose Storopoli.
 
 // Avoid converting `if n < 1 || n > 1000` to `if !(1..=1000).contains(&n)`.
 #![allow(clippy::manual_range_contains)]
