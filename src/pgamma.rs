@@ -15,15 +15,22 @@ use crate::nmath::ML_POSINF;
 use crate::pnorm::pnorm5;
 use crate::rmath::M_LN2;
 
-/// This function computes the distribution function for the
-/// gamma distribution with shape parameter alph and scale parameter
-/// scale. This is also known as the incomplete gamma function.
+/// Computes the distribution function for the gamma distribution
+/// with shape parameter alph and scale parameter scale.
+///
+/// This is also known as the incomplete gamma function.
 /// See Abramowitz and Stegun (6.5.1) for example.
 ///
 /// ## NOTES
 ///
 /// Complete redesign by Morten Welinder, originally for Gnumeric.
 /// Improvements (e.g. "while NEEDED_SCALE") by Martin Maechler
+///
+/// ## AUTHORS
+///
+/// 2006-2019 The R Core Team
+/// 2005-6 Morten Welinder <terra@gnome.org>
+/// 2005-10 The R Foundation
 pub fn pgamma(x: f64, alph: f64, scale: f64, lower_tail: bool, log_p: bool) -> f64 {
     // Handling special cases
     if x.is_nan() || alph.is_nan() || scale.is_nan() {
