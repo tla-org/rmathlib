@@ -53,80 +53,9 @@ fn l_w1_bpser(do_swap: bool, a0: f64, b0: f64, y0: f64, eps: f64, w: &mut f64, w
     l_end(do_swap, w, w1);
 }
 
-fn l131() {
-    let (w1, ierr) = bgrat(b0, a0, y0, x0, 15*eps, false);
-	if (w1 == 0 || (0 < w1 && w1 < DBL_MIN)) { // w1=0 or very close:
-	    // "almost surely" from underflow, try more: [2013-03-04]
-// FIXME: it is even better to do this in bgrat *directly* at least for the case
-//  !did_bup, i.e., where w1 = (0 or -Inf) on entry
-	    R_ifDEBUG_printf(" denormalized or underflow (?) -> retrying: ");
-	    if(did_bup) { // re-do that part on log scale:
-            w1 = bup(b0-n, a0, y0, x0, n, eps, TRUE);
-	    }
-	    else {
-            w1 = ML_NEGINF; // = 0 on log-scale
-        }
-        let (w1, ierr1) = bgrat(b0, a0, y0, x0, 15*eps, true);
-	    if ierr1 != 0 {
-            ierr = 10 + ierr1;
-	        goto l_end_from_w1_log();
-        }
-	}
-	// else
-	if(ierr1) *ierr = 10 + ierr1;
-	if(*w1 < 0)
-	    MATHLIB_WARNING4("bratio(a=%g, b=%g, x=%g): bgrat() -> w1 = %g",
-			     a,b,x, *w1);
-	goto L_end_from_w1;
-    }
-    else { /* L30: -------------------- both  a, b > 1  {a0 > 1  &  b0 > 1} ---*/
-
-	/* lambda := a y - b x  =  (a + b)y  =  a - (a+b)x    {using x + y == 1},
-	 * ------ using the numerically best version : */
-	lambda = R_FINITE(a+b)
-	    ? ((a > b) ? (a + b) * y - b : a - (a + b) * x)
-	    : a*y - b*x;
-	do_swap = (lambda < 0.);
-	if (do_swap) {
-	    lambda = -lambda;
-	    SET_0_swap;
-	} else {
-	    SET_0_noswap;
-	}
-
-	R_ifDEBUG_printf("  L30:  both  a, b > 1; |lambda| = %#g, do_swap = %d\n",
-			 lambda, do_swap);
-
-	if (b0 < 40.) {
-	    R_ifDEBUG_printf("  b0 < 40;");
-	    if (b0 * x0 <= 0.7
-		|| (log_p && lambda > 650.)) // << added 2010-03; svn r51327
-		goto L_w_bpser;
-	    else
-		goto L140;
-	}
-	else if (a0 > b0) { /* ----  a0 > b0 >= 40  ---- */
-	    R_ifDEBUG_printf("  a0 > b0 >= 40;");
-	    if (b0 <= 100. || lambda > b0 * 0.03)
-		goto L_bfrac;
-
-	} else if (a0 <= 100.) {
-	    R_ifDEBUG_printf("  a0 <= 100; a0 <= b0 >= 40;");
-	    goto L_bfrac;
-	}
-	else if (lambda > a0 * 0.03) {
-	    R_ifDEBUG_printf("  b0 >= a0 > 100; lambda > a0 * 0.03 ");
-	    goto L_bfrac;
-	}
-
-	/* else if none of the above    L180: */
-	*w = basym(a0, b0, lambda, eps * 100., log_p);
-	*w1 = log_p ? R_Log1_Exp(*w) : 0.5 - *w + 0.5;
-	R_ifDEBUG_printf("  b0 >= a0 > 100; lambda <= a0 * 0.03: *w:= basym(*) =%.15g\n",
-			 *w);
-	goto L_end;
-
-    } /* else: a, b > 1 */
+fn l131(b0: f64, a0: f64, y0: f64, x0: f64, w1: &mut f64, eps: f64, ierr1: &mut i32) {
+    let eps = 15 as f64 * eps;
+    bgrat(b0, a0, y0, x0, w1, eps, ierr1, false);
 }
 
 /// Calculates the Incomplete Beta Function I_x(a, b)
@@ -178,7 +107,7 @@ pub fn bratio(a: f64, b: f64, x: f64, y: f64, log_p: bool) -> (f64, f64, i32) {
 
     let do_swap: bool;
     let n: i32 = 0;
-    let mut ierr: i32 = 0;
+    let mut ierr1: i32 = 0;
     let z: f64;
     let a0: f64;
     let b0: f64;
@@ -195,56 +124,56 @@ pub fn bratio(a: f64, b: f64, x: f64, y: f64, log_p: bool) -> (f64, f64, i32) {
     let mut w1: f64 = r_d__0(log_p);
 
     if x.is_nan() || y.is_nan() || a.is_nan() || b.is_nan() {
-        ierr = 9;
-        return (w, w1, ierr);
+        ierr1 = 9;
+        return (w, w1, ierr1);
     }
     if a < 0.0 || b < 0.0 {
-        ierr = 1;
-        return (w, w1, ierr);
+        ierr1 = 1;
+        return (w, w1, ierr1);
     }
     if a == 0.0 && b == 0.0 {
-        ierr = 2;
-        return (w, w1, ierr);
+        ierr1 = 2;
+        return (w, w1, ierr1);
     }
     if x < 0.0 || x > 1.0 {
-        ierr = 3;
-        return (w, w1, ierr);
+        ierr1 = 3;
+        return (w, w1, ierr1);
     }
     if y < 0.0 || y > 1.0 {
-        ierr = 4;
-        return (w, w1, ierr);
+        ierr1 = 4;
+        return (w, w1, ierr1);
     }
 
     // Check that `y == 1 - x`.
     z = x + y - 0.5 - 0.5;
 
     if z.abs() > eps * 3.0 {
-        ierr = 5;
-        return (w, w1, ierr);
+        ierr1 = 5;
+        return (w, w1, ierr1);
     }
 
-    ierr = 0;
+    ierr1 = 0;
     if x == 0.0 {
         if a == 0.0 {
-            ierr = 6;
-            return (w, w1, ierr);
+            ierr1 = 6;
+            return (w, w1, ierr1);
         }
     }
     if y == 0.0 {
         if b == 0.0 {
-            ierr = 7;
-            return (w, w1, ierr);
+            ierr1 = 7;
+            return (w, w1, ierr1);
         }
     }
     if a == 0.0 {
         w = r_d__1(log_p);
         w1 = r_d__0(log_p);
-        return (w, w1, ierr);
+        return (w, w1, ierr1);
     }
     if b == 0.0 {
         w = r_d__0(log_p);
         w1 = r_d__1(log_p);
-        return (w, w1, ierr);
+        return (w, w1, ierr1);
     }
 
     eps = max(eps, 1e-15);
@@ -265,7 +194,7 @@ pub fn bratio(a: f64, b: f64, x: f64, y: f64, log_p: bool) -> (f64, f64, i32) {
             w = b / (a + b);
             w1 = a / (a + b);
         }
-        return (w, w1, ierr);
+        return (w, w1, ierr1);
     }
 
     if min(a, b) <= 1.0 {
@@ -288,28 +217,28 @@ pub fn bratio(a: f64, b: f64, x: f64, y: f64, log_p: bool) -> (f64, f64, i32) {
             w = fpser(a0, b0, x0, eps, log_p);
             w1 = if log_p { r_log1_exp(w) } else { 0.5 - w + 0.5 };
             l_end(do_swap, &mut w, &mut w1);
-            return (w, w1, ierr);
+            return (w, w1, ierr1);
         }
 
         if a0 < min(eps, eps * b0) && b0 * x0 <= 1.0 {
             w1 = apser(a0, b0, x0, eps);
             l_end_from_w1(do_swap, &mut w, &mut w1, log_p);
-            return (w, w1, ierr);
+            return (w, w1, ierr1);
         }
 
         let did_bup: bool = false;
         if max(a0, b0) > 1.0 {
             if b0 <= 1.0 {
                 l_w_bpser(do_swap, a0, b0, x0, eps, log_p, &mut w, &mut w1);
-                return (w, w1, ierr);
+                return (w, w1, ierr1);
             }
             if x0 >= 0.29 {
                 l_w1_bpser(do_swap, a0, b0, y0, eps, &mut w, &mut w1, log_p);
-                return (w, w1, ierr);
+                return (w, w1, ierr1);
             }
             if b0 > 15.0 {
                 w1 = 0.0;
-                l131();
+                l131(b0, a0, y0, x0, &mut w1, eps, &mut ierr1);
             }
         }
 
@@ -396,7 +325,7 @@ fn brcmp1(mu: i32, a: f64, b: f64, x: f64, y: f64, give_log: bool) -> f64 {
 /// Compute w := w + I_x(a, b) which is asymptotic expansion for I_x(a, b) when a > b.
 ///
 /// Returns `(w, ierr)`.
-fn bgrat(a: f64, b: f64, x: f64, y: f64, eps: f64, log_w: bool) -> (f64, f64) {
+fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i32, log_w: bool) -> (f64, f64) {
     panic!("Not implemented yet.");
 }
 
