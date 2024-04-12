@@ -7,6 +7,7 @@ use libm::fabs;
 use libm::log;
 use libm::log1p;
 use libm::pow;
+use libm::sqrt;
 
 const ML_NEGINF: f64 = f64::NEG_INFINITY;
 const M_LN_SQRT_2PI: f64 = 0.918_938_533_204_672_8;
@@ -1078,11 +1079,158 @@ fn bfrac(a: f64, b: f64, x: f64, y: f64, lambda: f64, eps: f64, log_p: bool) -> 
     }
 }
 
-#[allow(unused_variables)]
 #[allow(clippy::too_many_arguments)]
 /// Evaluates x^a * y^b / Beta(a,b)
 fn brcomp(a: f64, b: f64, x: f64, y: f64, log_p: bool) -> f64 {
-    panic!("not implemented");
+    let const__ = 0.398942280401433; /* == 1/sqrt(2*pi); */
+    let n: i32;
+    let mut c: f64;
+    let mut e: f64;
+    let mut u: f64;
+    let v: f64;
+    let mut z: f64;
+    let mut b0: f64;
+    let apb: f64;
+
+    if x == 0.0 || y == 0.0 {
+        return r_d_0(log_p);
+    }
+    let a0 = min(a, b);
+    if a0 < 8.0 {
+        let lnx: f64;
+        let lny: f64;
+        #[allow(clippy::collapsible_else_if)]
+        if x <= 0.375 {
+            lnx = log(x);
+            lny = alnrel(-x);
+        } else {
+            if y > 0.375 {
+                lnx = log(x);
+                lny = log(y);
+            } else {
+                lnx = alnrel(-y);
+                lny = log(y);
+            }
+        }
+
+        z = a * lnx + b * lny;
+        if a0 >= 1.0 {
+            z -= betaln(a, b);
+            return r_d_exp(log_p, z);
+        }
+
+        // Procedure for a < 1 OR b < 1.
+
+        b0 = max(a, b);
+        if b0 >= 8.0 {
+            /* L80: */
+            u = gamln1(a0) + algdiv(a0, b0);
+
+            return if log_p {
+                log(a0) + (z - u)
+            } else {
+                a0 * exp(z - u)
+            };
+        }
+        /* else : */
+
+        if b0 <= 1.0 {
+            /* algorithm for max(a,b) = b0 <= 1 */
+
+            let e_z = r_d_exp(log_p, z);
+
+            if !log_p && e_z == 0.0 {
+                /* exp() underflow */
+                return 0.0;
+            }
+
+            apb = a + b;
+            if apb > 1.0 {
+                u = a + b - 1.;
+                z = (gam1(u) + 1.) / apb;
+            } else {
+                z = gam1(apb) + 1.;
+            }
+
+            c = (gam1(a) + 1.) * (gam1(b) + 1.) / z;
+            /* FIXME? log(a0*c)= log(a0)+ log(c) and that is improvable */
+            return if log_p {
+                e_z + log(a0 * c) - log1p(a0 / b0)
+            } else {
+                e_z * (a0 * c) / (a0 / b0 + 1.0)
+            };
+        }
+
+        // else: algorithm for 1 < b0 < 8.
+        u = gamln1(a0);
+        n = (b0 - 1.0) as i32;
+        if n >= 1 {
+            c = 1.0;
+            for _i in 1..=n {
+                b0 += -1.0;
+                c *= b0 / (a0 + b0);
+            }
+            u += log(c);
+        }
+        z -= u;
+        b0 += -1.0;
+        apb = a0 + b0;
+        let t = if apb > 1.0 {
+            u = a0 + b0 - 1.;
+            (gam1(u) + 1.0) / apb
+        } else {
+            gam1(apb) + 1.0
+        };
+
+        if log_p {
+            log(a0) + z + log1p(gam1(b0)) - log(t)
+        } else {
+            a0 * exp(z) * (gam1(b0) + 1.0) / t
+        }
+    } else {
+        // Procedure for a >= 8 and b >= 8.
+        let h: f64;
+        let x0: f64;
+        let y0: f64;
+        let lambda: f64;
+        if a <= b {
+            h = a / b;
+            x0 = h / (h + 1.0);
+            y0 = 1. / (h + 1.0);
+            lambda = a - (a + b) * x;
+        } else {
+            h = b / a;
+            x0 = 1.0 / (h + 1.0);
+            y0 = h / (h + 1.0);
+            lambda = (a + b) * y - b;
+        }
+
+        e = -lambda / a;
+        if fabs(e) > 0.6 {
+            u = e - log(x / x0);
+        } else {
+            u = rlog1(e);
+        }
+
+        e = lambda / b;
+        if fabs(e) <= 0.6 {
+            v = rlog1(e);
+        } else {
+            v = e - log(y / y0);
+        }
+
+        z = if log_p {
+            -(a * u + b * v)
+        } else {
+            exp(-(a * u + b * v))
+        };
+
+        if log_p {
+            -M_LN_SQRT_2PI + 0.5 * log(b * x0) + z - bcorr(a, b)
+        } else {
+            const__ * sqrt(b * x0) * z * exp(-bcorr(a, b))
+        }
+    }
 }
 
 #[allow(unused_variables)]
