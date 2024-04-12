@@ -42,4 +42,5 @@ fn main() {
         .include("nmath")
         .include("nmath/R_ext")
         .compile("nmath");
+    println!("cargo:rerun-if-changed=nmath");
 }

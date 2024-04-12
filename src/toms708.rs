@@ -815,11 +815,57 @@ pub fn bratio(
     } /* else: a, b > 1 */
 }
 
-#[allow(unused_variables)]
 #[allow(clippy::too_many_arguments)]
 /// Evaluates I_x(a,b) for b < min(eps, eps*a) and x <= 0.5.
 fn fpser(a: f64, b: f64, x: f64, eps: f64, log_p: bool) -> f64 {
-    panic!("not implemented");
+    let mut ans: f64;
+    let mut c: f64;
+    let mut s: f64;
+    let mut t: f64;
+    let mut an: f64;
+
+    // Set ans := x^a.
+    if log_p {
+        ans = a * log(x);
+    } else if a > eps * 0.001 {
+        t = a * log(x);
+        if t < exparg(1) {
+            /* exp(t) would underflow */
+            return 0.0;
+        }
+        ans = exp(t);
+    } else {
+        ans = 1.0;
+    }
+
+    /* Note that 1/b(a,b) = b */
+
+    if log_p {
+        ans += log(b) - log(a);
+    } else {
+        ans *= b / a;
+    }
+
+    let tol: f64 = eps / a;
+    an = a + 1.;
+    t = x;
+    s = t / an;
+    loop {
+        an += 1.;
+        t *= x;
+        c = t / an;
+        s += c;
+        if fabs(c) <= tol {
+            break;
+        }
+    }
+
+    if log_p {
+        ans += log1p(a * s);
+    } else {
+        ans *= a * s + 1.;
+    }
+    ans
 }
 
 #[allow(unused_variables)]
@@ -905,7 +951,7 @@ fn basym(a: f64, b: f64, lambda: f64, eps: f64, log_p: bool) -> f64 {
 /// nowadays
 ///
 /// Note... only an approximate value for exparg(L) is needed.
-fn exparg(l: i32) {
+fn exparg(l: i32) -> f64 {
     panic!("not implemented");
 }
 
