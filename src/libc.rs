@@ -13,15 +13,3 @@ pub fn sqrt(x: f64) -> f64 {
 pub fn fabs(x: f64) -> f64 {
     x.abs()
 }
-
-pub fn exp(x: f64) -> f64 {
-    x.exp()
-}
-
-pub fn max(a: f64, b: f64) -> f64 {
-    a.max(b)
-}
-
-pub fn min(a: f64, b: f64) -> f64 {
-    a.min(b)
-}

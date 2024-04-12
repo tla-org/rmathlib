@@ -20,6 +20,9 @@ const DBL_MIN: f64 = f64::MIN;
 const DBL_MAX: f64 = f64::MAX;
 const DBL_EPSILON: f64 = f64::EPSILON;
 
+// Be careful when replacing these min and max with libm functions.
+// The definition below is how they are defined in the original code.
+// Other implementations may handle NaN values differently.
 fn min(a: f64, b: f64) -> f64 {
     if a < b {
         a
@@ -901,13 +904,83 @@ pub fn apser(a: f64, b: f64, x: f64, eps: f64) -> f64 {
     -a * (c + s)
 }
 
-#[allow(unused_variables)]
 #[allow(clippy::too_many_arguments)]
 /// Evaluates I_x(a,b) - I_x(a+n,b) where n is a positive int.
 ///
 /// eps is the tolerance used.
 fn bup(a: f64, b: f64, x: f64, y: f64, n: i32, eps: f64, give_log: bool) -> f64 {
-    panic!("not implemented");
+    let apb: f64 = a + b;
+    let ap1: f64 = a + 1.0;
+    let mut mu: i32;
+    let mut k: i32;
+    let mut d: f64;
+    if n > 1 && a >= 1.0 && apb >= ap1 * 1.10 {
+        mu = fabs(exparg(1)) as i32;
+        k = exparg(0) as i32;
+        if mu > k {
+            mu = k;
+        }
+        d = exp(-mu as f64);
+    } else {
+        mu = 0;
+        d = 1.0;
+    }
+
+    /* L10: */
+    let mut ret_val = if give_log {
+        brcmp1(mu, a, b, x, y, true) - log(a)
+    } else {
+        brcmp1(mu, a, b, x, y, false) / a
+    };
+    if n == 1 || (give_log && ret_val == ML_NEGINF) || (!give_log && ret_val == 0.) {
+        return ret_val;
+    }
+
+    let nm1: i32 = n - 1;
+    let mut w = d;
+    let mut l: f64;
+
+    // Let k be the index of the maximum term.
+
+    k = 0;
+    if b > 1.0 {
+        if y > 1e-4 {
+            let r = (b - 1.) * x / y - a;
+            if r >= 1.0 {
+                k = if r < nm1 as f64 { r as i32 } else { nm1 };
+            }
+        } else {
+            k = nm1;
+        }
+
+        // Add the increasing terms of the series - if k > 0.
+        /* L30: */
+        for i in 0..k {
+            l = i as f64;
+            d *= (apb + l) / (ap1 + l) * x;
+            w += d;
+        }
+    }
+
+    // L40: Add the remaining terms of the series.
+
+    for i in k..nm1 {
+        l = i as f64;
+        d *= (apb + l) / (ap1 + l) * x;
+        w += d;
+        if d <= eps * w {
+            /* relativ convergence (eps) */
+            break;
+        }
+    }
+
+    // L50: Terminate the procedure.
+    if give_log {
+        ret_val += log(w);
+    } else {
+        ret_val *= w;
+    }
+    ret_val
 }
 
 #[allow(unused_variables)]
