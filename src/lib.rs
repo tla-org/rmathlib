@@ -37,7 +37,7 @@ pub use cospi::sinpi;
 pub use cospi::tanpi;
 pub use dpois::dpois;
 pub use gamma::gammafn;
-pub use i1mach::rf_i1mach;
+pub use i1mach::i1mach;
 pub use lbeta::lbeta;
 pub use lgamma::lgammafn;
 pub use lgamma::lgammafn_sign;
