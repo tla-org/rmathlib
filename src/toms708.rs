@@ -983,13 +983,99 @@ fn bup(a: f64, b: f64, x: f64, y: f64, n: i32, eps: f64, give_log: bool) -> f64 
     ret_val
 }
 
-#[allow(unused_variables)]
 #[allow(clippy::too_many_arguments)]
 /// Continued fraction expansion for I_x(a,b) when a, b > 1.
 ///
 /// It is assumed that  lambda = (a + b)*y - b.
 fn bfrac(a: f64, b: f64, x: f64, y: f64, lambda: f64, eps: f64, log_p: bool) -> f64 {
-    panic!("not implemented");
+    let mut e: f64;
+    let mut n: f64;
+    let mut p: f64;
+    let mut r: f64;
+    let mut s: f64;
+    let mut t: f64;
+    let mut w: f64;
+    let mut r0: f64;
+    let mut an: f64;
+    let mut bn: f64;
+    let mut anp1: f64;
+    let mut bnp1: f64;
+    let mut beta: f64;
+    let mut alpha: f64;
+
+    if !lambda.is_finite() {
+        return f64::NAN;
+    }
+
+    let brc = brcomp(a, b, x, y, log_p);
+
+    if brc.is_nan() {
+        // e.g. from   L <- 1e308; pnbinom(L, L, mu = 5)
+        return f64::NAN;
+    }
+    if !log_p && brc == 0.0 {
+        return 0.0;
+    }
+
+    let c = lambda + 1.0;
+    let c0 = b / a;
+    let c1 = 1.0 / a + 1.0;
+    let yp1 = y + 1.0;
+
+    n = 0.0;
+    p = 1.0;
+    s = a + 1.0;
+    an = 0.0;
+    bn = 1.0;
+    anp1 = 1.0;
+    bnp1 = c / c1;
+    r = c1 / c;
+
+    // Continued fraction calculation.
+
+    loop {
+        n += 1.0;
+        t = n / a;
+        w = n * (b - n) * x;
+        e = a / s;
+        alpha = p * (p + c0) * e * e * (w * x);
+        e = (t + 1.0) / (c1 + t + t);
+        beta = n + w / s + e * (c + n * yp1);
+        p = t + 1.0;
+        s += 2.0;
+
+        /* update an, bn, anp1, and bnp1 */
+
+        t = alpha * an + beta * anp1;
+        an = anp1;
+        anp1 = t;
+        t = alpha * bn + beta * bnp1;
+        bn = bnp1;
+        bnp1 = t;
+
+        r0 = r;
+        r = anp1 / bnp1;
+
+        if fabs(r - r0) <= eps * r {
+            break;
+        }
+
+        // Rescale an, bn, anp1, and bnp1.
+
+        an /= bnp1;
+        bn /= bnp1;
+        anp1 = r;
+        bnp1 = 1.0;
+        if n >= 10000.0 {
+            break;
+        }
+    }
+
+    if log_p {
+        brc + log(r)
+    } else {
+        brc * r
+    }
 }
 
 #[allow(unused_variables)]
