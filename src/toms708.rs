@@ -8,8 +8,6 @@ use libm::log;
 use libm::log1p;
 use libm::pow;
 
-use crate::i1mach::i1mach;
-
 const ML_NEGINF: f64 = f64::NEG_INFINITY;
 const M_LN_SQRT_2PI: f64 = 0.918_938_533_204_672_8;
 #[allow(clippy::approx_constant)]
