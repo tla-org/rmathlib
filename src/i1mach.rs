@@ -1,6 +1,3 @@
-use core::f32;
-use core::f64;
-use core::i32;
 use core::mem::size_of;
 
 const CHAR_BIT: i32 = 8;
