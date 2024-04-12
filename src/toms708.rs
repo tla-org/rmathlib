@@ -868,12 +868,37 @@ fn fpser(a: f64, b: f64, x: f64, eps: f64, log_p: bool) -> f64 {
     ans
 }
 
-#[allow(unused_variables)]
 #[allow(clippy::too_many_arguments)]
 /// Yields the incomplete beta ratio I_{1-x}(b,a) for a <= min(eps,eps*b),
 /// b*x <= 1, and x <= 0.5, i.e., a is very small. Use only if above inequalities are satisfied.
 pub fn apser(a: f64, b: f64, x: f64, eps: f64) -> f64 {
-    panic!("not implemented");
+    let g: f64 = 0.577215664901533;
+
+    let bx: f64 = b * x;
+
+    let mut t: f64;
+    t = x - bx;
+    let c: f64 = if b * eps <= 0.02 {
+        log(x) + psi(b) + g + t
+    } else {
+        // b > 2e13 : psi(b) ~= log(b)
+        log(bx) + g + t
+    };
+    let tol: f64 = eps * 5.0 * fabs(c);
+    let mut j: f64 = 1.0;
+    let mut s: f64 = 0.0;
+    let mut aj: f64;
+    loop {
+        j += 1.;
+        t *= x - bx / j;
+        aj = t / j;
+        s += aj;
+        if fabs(aj) <= tol {
+            break;
+        }
+    }
+
+    -a * (c + s)
 }
 
 #[allow(unused_variables)]
