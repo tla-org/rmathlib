@@ -2611,10 +2611,61 @@ fn bcorr(a0: f64, b0: f64) -> f64 {
     (((((c5 * t + c4) * t + c3) * t + c2) * t + c1) * t + c0) / a + w
 }
 
-#[allow(unused_variables)]
 /// Computation of ln(gamma(b)/gamma(a+b)) when b >= 8.
 fn algdiv(a: f64, b: f64) -> f64 {
-    panic!("not implemented");
+    /* IN THIS ALGORITHM, DEL(X) IS THE FUNCTION DEFINED BY */
+    /*  LN(GAMMA(X)) = (X - 0.5)*LN(X) - X + 0.5*LN(2*PI) + DEL(X). */
+    let c0 = 0.0833333333333333;
+    let c1 = -0.00277777777760991;
+    let c2 = 7.9365066682539e-4;
+    let c3 = -5.9520293135187e-4;
+    let c4 = 8.37308034031215e-4;
+    let c5 = -0.00165322962780713;
+
+    let c: f64;
+    let d: f64;
+    let h: f64;
+
+    let mut w: f64;
+    let x: f64;
+
+    /* ------------------------ */
+    if a > b {
+        h = b / a;
+        c = 1. / (h + 1.);
+        x = h / (h + 1.);
+        d = a + (b - 0.5);
+    } else {
+        h = a / b;
+        c = h / (h + 1.);
+        x = 1. / (h + 1.);
+        d = b + (a - 0.5);
+    }
+
+    /* Set s<n> = (1 - x^n)/(1 - x) : */
+
+    let x2: f64 = x * x;
+    let s3: f64 = x + x2 + 1.;
+    let s5: f64 = x + x2 * s3 + 1.;
+    let s7: f64 = x + x2 * s5 + 1.;
+    let s9: f64 = x + x2 * s7 + 1.;
+    let s11: f64 = x + x2 * s9 + 1.;
+
+    /* w := Del(b) - Del(a + b) */
+
+    let t: f64 = 1. / (b * b);
+    w = ((((c5 * s11 * t + c4 * s9) * t + c3 * s7) * t + c2 * s5) * t + c1 * s3) * t + c0;
+    w *= c / b;
+
+    /*                    COMBINE THE RESULTS */
+
+    let u: f64 = d * alnrel(a / b);
+    let v: f64 = a * (log(b) - 1.);
+    if u > v {
+        w - v - u
+    } else {
+        w - u - v
+    }
 }
 
 #[allow(unused_variables)]
