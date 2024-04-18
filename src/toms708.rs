@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 #![allow(clippy::manual_range_contains)]
 
+use crate::i1mach::i1mach;
 use libm::exp;
 use libm::expm1;
 use libm::fabs;
@@ -1754,7 +1755,6 @@ fn basym(a: f64, b: f64, lambda: f64, eps: f64, log_p: bool) -> f64 {
     }
 }
 
-#[allow(unused_variables)]
 #[allow(clippy::too_many_arguments)]
 /// If l = 0 then exparg(l) = The largest possible w for which exp(w) can be computed.
 ///
@@ -1767,7 +1767,10 @@ fn basym(a: f64, b: f64, lambda: f64, eps: f64, log_p: bool) -> f64 {
 ///
 /// Note... only an approximate value for exparg(L) is needed.
 fn exparg(l: i32) -> f64 {
-    panic!("not implemented");
+    #[allow(clippy::approx_constant)]
+    const LNB: f64 = 0.69314718055995;
+    let m = if l == 0 { i1mach(16) } else { i1mach(15) - 1 };
+    (m as f64) * LNB * 0.99999
 }
 
 #[allow(unused_variables)]
