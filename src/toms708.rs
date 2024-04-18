@@ -2446,10 +2446,102 @@ fn psi(mut x: f64) -> f64 {
     aug + log(x)
 }
 
+/// 1 < A <= B < 8 :  reduction of B
+fn l40(a: f64, mut b: f64, w: f64) -> f64 {
+    let n = (b - 1.0) as i32;
+    let mut z = 1.0;
+    for _i in 1..=n {
+        b += -1.0;
+        z *= b / (a + b);
+    }
+    w + log(z) + (gamln(a) + (gamln(b) - gsumln(a, b)))
+}
+
 #[allow(unused_variables)]
 /// Evaluates the logarithm of the beta function ln(beta(a0,b0)).
 fn betaln(a0: f64, b0: f64) -> f64 {
-    panic!("not implemented");
+    let e = 0.918938533204673; /* e == 0.5*LN(2*PI) */
+
+    let mut a = min(a0, b0);
+    let b = max(a0, b0);
+
+    if a < 8.0 {
+        if a < 1. {
+            /* -----------------------------------------------------------------------
+             */
+            //                    		A < 1
+            /* -----------------------------------------------------------------------
+             */
+            if b < 8. {
+                return gamln(a) + (gamln(b) - gamln(a + b));
+            } else {
+                return gamln(a) + algdiv(a, b);
+            }
+        }
+        /* else */
+        /* -----------------------------------------------------------------------
+         */
+        //				1 <= A < 8
+        /* -----------------------------------------------------------------------
+         */
+        let mut w: f64;
+        if a < 2.0 {
+            if b <= 2.0 {
+                return gamln(a) + gamln(b) - gsumln(a, b);
+            }
+            /* else */
+
+            if b < 8.0 {
+                w = 0.0;
+                return l40(a, b, w);
+            }
+            return gamln(a) + algdiv(a, b);
+        }
+        // else L30:    REDUCTION OF A WHEN B <= 1000
+
+        if b <= 1e3 {
+            let n = (a - 1.) as i32;
+            w = 1.0;
+            for i in 1..=n {
+                a += -1.0;
+                let h = a / b;
+                w *= h / (h + 1.0);
+            }
+            w = log(w);
+
+            if b >= 8.0 {
+                return w + gamln(a) + algdiv(a, b);
+            }
+
+            // else
+            l40(a, b, w)
+        } else {
+            // L50:	reduction of A when  B > 1000
+            let n = (a - 1.) as i32;
+            w = 1.0;
+            for i in 1..=n {
+                a += -1.0;
+                w *= a / (a / b + 1.);
+            }
+            log(w) - (n as f64) * log(b) + (gamln(a) + algdiv(a, b))
+        }
+    } else {
+        /* -----------------------------------------------------------------------
+         */
+        // L60:			A >= 8
+        /* -----------------------------------------------------------------------
+         */
+
+        let w = bcorr(a, b);
+        let h = a / b;
+        let u = -(a - 0.5) * log(h / (h + 1.));
+        let v = b * alnrel(h);
+        if u > v {
+            log(b) * -0.5 + e + w - v - u
+        } else {
+            log(b) * -0.5 + e + w - u - v
+        }
+    }
 }
 
 #[allow(unused_variables)]
