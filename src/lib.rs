@@ -51,3 +51,4 @@ pub use rmath::dnorm;
 pub use rmath::pnorm;
 pub use rmath::qnorm;
 pub use stirlerr::stirlerr;
+pub use toms708::bratio;

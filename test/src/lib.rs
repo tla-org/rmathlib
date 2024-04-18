@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod test_math {
     use approx::abs_diff_eq;
+    use approx::assert_abs_diff_eq;
     use rmathlib::*;
 
     mod c {
@@ -225,9 +226,33 @@ mod test_math {
         assert_eq!(log1pmx(0.81), unsafe { c::log1pmx(0.81) });
     }
 
-    // TODO: add more tests
     #[test]
-    fn test_pbeta() {
+    // This test is based on `toms708_test.f` subroutine `TEST01`.
+    // Test BRATIO computes the Beta ratio function.
+    fn subroutine_test01() {
+        let a: f64 = 5.3;
+        let b: f64 = 10.1;
+
+        for i in 1..=50 {
+            let x: f64 = (i as f64) / 100.0;
+            let y: f64 = 0.5 + (0.5 - x);
+            let log_p = false;
+
+            let mut _w: f64 = 0.0;
+            let mut _w1: f64 = 0.0;
+            let mut ierr: i32 = 1;
+            bratio(a, b, x, y, &mut _w, &mut _w1, &mut ierr, log_p);
+            assert!(ierr == 0);
+        }
+    }
+
+    #[test]
+    fn test_pbeta_and_toms708() {
+        // Manual values obtained from R 4.3.2.
+        assert_eq!(pbeta(0.9, 0.1, 0.1, false, false), 0.40638509393627587);
+        // assert!(pbeta(0.9, 0.0, 1.0, false, false).is_nan());
+        // assert_eq!(pbeta(0.1, 0.5, 0.5, true, true), 0.1285223);
+
         fn helper(x: f64, a: f64, b: f64, lower_tail: bool, log_p: bool) {
             let rs = pbeta(x, a, b, lower_tail, log_p);
             let c = unsafe { c::pbeta(x, a, b, lower_tail as i32, log_p as i32) };
@@ -237,6 +262,8 @@ mod test_math {
                 assert_eq!(rs, c);
             }
         }
+
+
         // These functions do not call `bratio`.
         helper(0.9, 0.0, 1.0, false, false);
         helper(1.1, 0.0, 1.0, false, false);
