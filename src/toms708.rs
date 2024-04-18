@@ -2559,12 +2559,56 @@ fn gsumln(a: f64, b: f64) -> f64 {
     gamln1(x - 1.) + log(x * (x + 1.))
 }
 
-#[allow(unused_variables)]
 /// Evaluates del(a0) + del(b0) - del(a0 + b0) where ln(gamma(a)) = (a - 0.5)*ln(a) - a + 0.5*ln(2*pi) + del(a).
 ///
 /// It is assumed that a0 >= 8 and b0 >= 8.
 fn bcorr(a0: f64, b0: f64) -> f64 {
-    panic!("not implemented");
+    let c0 = 0.0833333333333333;
+    let c1 = -0.00277777777760991;
+    let c2 = 7.9365066682539e-4;
+    let c3 = -5.9520293135187e-4;
+    let c4 = 8.37308034031215e-4;
+    let c5 = -0.00165322962780713;
+
+    /* System generated locals */
+    let mut r1: f64;
+
+    /* Local variables */
+
+    let mut t: f64;
+    let mut w: f64;
+
+    /* ------------------------ */
+    let a: f64 = min(a0, b0);
+    let b: f64 = max(a0, b0);
+
+    let h: f64 = a / b;
+    let c: f64 = h / (h + 1.0);
+    let x: f64 = 1.0 / (h + 1.0);
+    let x2: f64 = x * x;
+
+    /*                SET SN = (1 - X^N)/(1 - X) */
+
+    let s3: f64 = x + x2 + 1.0;
+    let s5: f64 = x + x2 * s3 + 1.0;
+    let s7: f64 = x + x2 * s5 + 1.0;
+    let s9: f64 = x + x2 * s7 + 1.0;
+    let s11: f64 = x + x2 * s9 + 1.0;
+
+    /*                SET W = DEL(B) - DEL(A + B) */
+
+    /* Computing 2nd power */
+    r1 = 1.0 / b;
+    t = r1 * r1;
+    w = ((((c5 * s11 * t + c4 * s9) * t + c3 * s7) * t + c2 * s5) * t + c1 * s3) * t + c0;
+    w *= c / b;
+
+    /*                   COMPUTE  DEL(A) + W */
+
+    /* Computing 2nd power */
+    r1 = 1. / a;
+    t = r1 * r1;
+    (((((c5 * t + c4) * t + c3) * t + c2) * t + c1) * t + c0) / a + w
 }
 
 #[allow(unused_variables)]
