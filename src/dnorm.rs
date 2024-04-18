@@ -1,7 +1,3 @@
-use std::f64::MANTISSA_DIGITS;
-use std::f64::MAX;
-use std::f64::MIN_EXP;
-
 use libm::ldexp;
 
 use crate::nmath::*;
@@ -32,7 +28,7 @@ pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64 {
     }
 
     let x = x.abs();
-    if x >= 2.0 * MAX.sqrt() {
+    if x >= 2.0 * f64::MAX.sqrt() {
         return 0.0;
     }
     if give_log {
@@ -43,7 +39,8 @@ pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64 {
     if x < 5.0 {
         M_1_SQRT_2PI * (-0.5 * x * x).exp() / sigma
     } else {
-        let bound = (-2.0 * M_LN2 * (MIN_EXP as f64 + 1.0 - MANTISSA_DIGITS as f64)).sqrt();
+        let bound =
+            (-2.0 * M_LN2 * (f64::MIN_EXP as f64 + 1.0 - f64::MANTISSA_DIGITS as f64)).sqrt();
         if x > bound {
             0.0
         } else {

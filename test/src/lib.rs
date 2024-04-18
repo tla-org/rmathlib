@@ -14,12 +14,14 @@ mod test_math {
             pub fn Rf_stirlerr(n: f64) -> f64;
             pub fn cospi(x: f64) -> f64;
             pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64;
+            pub fn dpois(x: f64, lambda: f64, give_log: bool) -> f64;
             pub fn gammafn(x: f64) -> f64;
             pub fn lbeta(a: f64, b: f64) -> f64;
             pub fn log1pmx(x: f64) -> f64;
             pub fn lgammafn(x: f64) -> f64;
             pub fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64;
             pub fn pbeta(x: f64, a: f64, b: f64, lower_tail: bool, log_p: bool) -> f64;
+            pub fn pgamma(x: f64, alph: f64, scale: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn pnorm5(x: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn pt(x: f64, n: f64, lower_tail: bool, log_p: bool) -> f64;
             pub fn qnorm5(p: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
@@ -81,22 +83,22 @@ mod test_math {
 
     #[test]
     fn test_i1mach() {
-        assert_eq!(rf_i1mach(1), unsafe { c::Rf_i1mach(1) });
-        assert_eq!(rf_i1mach(2), unsafe { c::Rf_i1mach(2) });
-        assert_eq!(rf_i1mach(3), unsafe { c::Rf_i1mach(3) });
-        assert_eq!(rf_i1mach(4), unsafe { c::Rf_i1mach(4) });
-        assert_eq!(rf_i1mach(5), unsafe { c::Rf_i1mach(5) });
-        assert_eq!(rf_i1mach(6), unsafe { c::Rf_i1mach(6) });
-        assert_eq!(rf_i1mach(7), unsafe { c::Rf_i1mach(7) });
-        assert_eq!(rf_i1mach(8), unsafe { c::Rf_i1mach(8) });
-        assert_eq!(rf_i1mach(9), unsafe { c::Rf_i1mach(9) });
-        assert_eq!(rf_i1mach(10), unsafe { c::Rf_i1mach(10) });
-        assert_eq!(rf_i1mach(11), unsafe { c::Rf_i1mach(11) });
-        assert_eq!(rf_i1mach(12), unsafe { c::Rf_i1mach(12) });
-        assert_eq!(rf_i1mach(13), unsafe { c::Rf_i1mach(13) });
-        assert_eq!(rf_i1mach(14), unsafe { c::Rf_i1mach(14) });
-        assert_eq!(rf_i1mach(15), unsafe { c::Rf_i1mach(15) });
-        assert_eq!(rf_i1mach(16), unsafe { c::Rf_i1mach(16) });
+        assert_eq!(i1mach(1), unsafe { c::Rf_i1mach(1) });
+        assert_eq!(i1mach(2), unsafe { c::Rf_i1mach(2) });
+        assert_eq!(i1mach(3), unsafe { c::Rf_i1mach(3) });
+        assert_eq!(i1mach(4), unsafe { c::Rf_i1mach(4) });
+        assert_eq!(i1mach(5), unsafe { c::Rf_i1mach(5) });
+        assert_eq!(i1mach(6), unsafe { c::Rf_i1mach(6) });
+        assert_eq!(i1mach(7), unsafe { c::Rf_i1mach(7) });
+        assert_eq!(i1mach(8), unsafe { c::Rf_i1mach(8) });
+        assert_eq!(i1mach(9), unsafe { c::Rf_i1mach(9) });
+        assert_eq!(i1mach(10), unsafe { c::Rf_i1mach(10) });
+        assert_eq!(i1mach(11), unsafe { c::Rf_i1mach(11) });
+        assert_eq!(i1mach(12), unsafe { c::Rf_i1mach(12) });
+        assert_eq!(i1mach(13), unsafe { c::Rf_i1mach(13) });
+        assert_eq!(i1mach(14), unsafe { c::Rf_i1mach(14) });
+        assert_eq!(i1mach(15), unsafe { c::Rf_i1mach(15) });
+        assert_eq!(i1mach(16), unsafe { c::Rf_i1mach(16) });
     }
 
     #[test]
@@ -147,6 +149,14 @@ mod test_math {
         assert_eq!(dnorm(-1.0, 0.0, 1.0, true), unsafe {
             c::dnorm4(-1.0, 0.0, 1.0, true)
         });
+    }
+
+    #[test]
+    fn test_dpois() {
+        assert!(dpois(-1.0, -1.0, false).is_nan());
+        assert!(dpois(1.0, -1.0, false).is_nan());
+        assert_eq!(dpois(1.0, 1.0, false), unsafe { c::dpois(1.0, 1.0, false) });
+        assert_eq!(dpois(1.0, 1.0, true), unsafe { c::dpois(1.0, 1.0, true) });
     }
 
     #[test]
@@ -218,6 +228,32 @@ mod test_math {
     fn test_pbeta() {
         assert_eq!(pbeta(0.0, 0.0, 1.0, false, false), unsafe {
             c::pbeta(0.0, 0.0, 1.0, 0, 0)
+        });
+    }
+
+    #[test]
+    fn test_pgamma() {
+        assert!(pgamma(0.0, -1.0, 1.0, true, false).is_nan());
+        assert!(pgamma(0.0, 1.0, -1.0, true, false).is_nan());
+        assert!(pgamma(0.0, -1.0, -1.0, true, false).is_nan());
+        assert_eq!(pgamma(0.1, 0.1, 1.0, false, false), unsafe {
+            c::pgamma(0.1, 0.1, 1.0, 0, 0)
+        });
+        assert!(abs_diff_eq!(
+            pgamma(0.65, 0.2, 0.34, false, false),
+            unsafe { c::pgamma(0.65, 0.2, 0.34, 0, 0) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            pgamma(3.21, 0.2, 0.34, false, false),
+            unsafe { c::pgamma(3.21, 0.2, 0.34, 0, 0) },
+            epsilon = 1e-15
+        ));
+        assert_eq!(pgamma(3.21, 0.2, 0.34, false, true), unsafe {
+            c::pgamma(3.21, 0.2, 0.34, 0, 1)
+        });
+        assert_eq!(pgamma(123.0, 0.2, 0.34, false, true), unsafe {
+            c::pgamma(123.0, 0.2, 0.34, 0, 1)
         });
     }
 

@@ -1,5 +1,3 @@
-use std::f64::INFINITY;
-
 use crate::gammafn;
 use crate::lgammacor;
 use crate::nmath::*;
@@ -45,7 +43,7 @@ pub fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64 {
 
     if x <= 0.0 && x == x.trunc() {
         // Negative integer argument
-        return INFINITY; // +Inf, since lgamma(x) = log|gamma(x)|
+        return f64::INFINITY; // +Inf, since lgamma(x) = log|gamma(x)|
     }
 
     let y = x.abs();
@@ -59,7 +57,7 @@ pub fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64 {
 
     // y = |x| > 10
     if y > XMAX {
-        return INFINITY;
+        return f64::INFINITY;
     }
 
     if x > 0.0 {

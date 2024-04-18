@@ -40,7 +40,7 @@ pub fn pt(x: f64, n: f64, lower_tail: bool, log_p: bool) -> f64 {
            pbeta(z, a, b) ~ z^a(1-z)^b / aB(a,b) ~ z^a / aB(a,b),
            with z = 1/nx,  a = n/2,  b= 1/2 :
         */
-        let lval = -0.5 * n * (2 * log(fabs(x)) - log(n)) - lbeta(0.5 * n, 0.5) - log(0.5 * n);
+        let lval = -0.5 * n * (2.0 * log(fabs(x)) - log(n)) - lbeta(0.5 * n, 0.5) - log(0.5 * n);
         val = if log_p { lval } else { exp(lval) };
     } else {
         val = if n > x * x {
@@ -48,7 +48,7 @@ pub fn pt(x: f64, n: f64, lower_tail: bool, log_p: bool) -> f64 {
                 x * x / (n + x * x),
                 0.5 * n,
                 0.5,
-                /*lower_tail*/ 0,
+                false,
                 log_p,
             )
         } else {
@@ -56,7 +56,7 @@ pub fn pt(x: f64, n: f64, lower_tail: bool, log_p: bool) -> f64 {
                 x * x / (n + x * x),
                 0.5 * n,
                 0.5,
-                /*lower_tail*/ 1,
+                true,
                 log_p,
             )
         }
