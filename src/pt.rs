@@ -13,7 +13,7 @@ use crate::pnorm;
 use crate::rmath::M_LN2;
 
 /// The PDF of the Student's t-distribution.
-pub fn pt(x: f64, n: f64, lower_tail: bool, log_p: bool) -> f64 {
+pub fn pt(x: f64, n: f64, mut lower_tail: bool, log_p: bool) -> f64 {
     if x.is_nan() || n.is_nan() {
         return x + n;
     }
@@ -30,39 +30,26 @@ pub fn pt(x: f64, n: f64, lower_tail: bool, log_p: bool) -> f64 {
         return pnorm(x, 0.0, 1.0, lower_tail, log_p);
     }
 
-    let nx = 1(x / n) * x;
+    let nx = 1.0 + (x / n) * x;
 
-    let mut val;
-
-    if nx > 1e100 {
+    let val = if nx > 1e100 {
         /* <==>  x*x > 1e100 * n  */
         /* Danger of underflow. So use Abramowitz & Stegun 26.5.4
            pbeta(z, a, b) ~ z^a(1-z)^b / aB(a,b) ~ z^a / aB(a,b),
            with z = 1/nx,  a = n/2,  b= 1/2 :
         */
         let lval = -0.5 * n * (2.0 * log(fabs(x)) - log(n)) - lbeta(0.5 * n, 0.5) - log(0.5 * n);
-        val = if log_p { lval } else { exp(lval) };
-    } else {
-        val = if n > x * x {
-            pbeta(
-                x * x / (n + x * x),
-                0.5 * n,
-                0.5,
-                false,
-                log_p,
-            )
+        if log_p {
+            lval
         } else {
-            pbeta(
-                x * x / (n + x * x),
-                0.5 * n,
-                0.5,
-                true,
-                log_p,
-            )
+            exp(lval)
         }
+    } else if n > x * x {
+        pbeta(x * x / (n + x * x), 0.5 * n, 0.5, false, log_p)
+    } else {
+        pbeta(x * x / (n + x * x), 0.5 * n, 0.5, true, log_p)
     };
     // Use "1 - v"  if	lower_tail  and	 x > 0 (but not both):
-    let mut lower_tail: bool;
     if x <= 0.0 {
         lower_tail = !lower_tail;
     }

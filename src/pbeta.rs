@@ -2,11 +2,12 @@ use crate::dpq::r_dt_0;
 use crate::dpq::r_dt_1;
 use crate::nmath::ml_warn_return_nan;
 use crate::rmath::M_LN2;
+use crate::toms708::bratio;
 
 /// Returns distribution function of the beta distribution.
 /// ( = The incomplete beta ratio I_x(p,q) ).
 fn pbeta_raw(x: f64, a: f64, b: f64, lower_tail: bool, log_p: bool) -> f64 {
-    if x >= 1 {
+    if x >= 1.0 {
         return r_dt_1(lower_tail, log_p);
     }
     if a == 0.0 || b == 0.0 || !a.is_finite() || !b.is_finite() {
