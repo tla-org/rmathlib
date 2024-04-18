@@ -1931,7 +1931,7 @@ fn erf_(x: f64) -> f64 {
     ];
 
     let mut t: f64;
-    
+
     let bot: f64;
     let top: f64;
 
