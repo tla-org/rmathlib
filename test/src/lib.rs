@@ -20,8 +20,12 @@ mod test_math {
             pub fn log1pmx(x: f64) -> f64;
             pub fn lgammafn(x: f64) -> f64;
             pub fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64;
+            #[allow(dead_code)]
+            pub fn pbeta(x: f64, a: f64, b: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn pgamma(x: f64, alph: f64, scale: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn pnorm5(x: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
+            #[allow(dead_code)]
+            pub fn pt(x: f64, n: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn qnorm5(p: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn sinpi(x: f64) -> f64;
             pub fn tanpi(x: f64) -> f64;
@@ -221,6 +225,14 @@ mod test_math {
         assert_eq!(log1pmx(0.81), unsafe { c::log1pmx(0.81) });
     }
 
+    // TODO: add more tests
+    #[test]
+    fn test_pbeta() {
+        // assert_eq!(pbeta(0.0, 0.0, 1.0, false, false), unsafe {
+        //    c::pbeta(0.0, 0.0, 1.0, 0, 0)
+        // });
+    }
+
     #[test]
     fn test_pgamma() {
         assert!(pgamma(0.0, -1.0, 1.0, true, false).is_nan());
@@ -266,6 +278,12 @@ mod test_math {
         assert_eq!(pnorm(123.0, 0.2, 0.34, false, true), unsafe {
             c::pnorm5(123.0, 0.2, 0.34, 0, 1)
         });
+    }
+
+    // TODO: add more tests
+    #[test]
+    fn test_pt() {
+        // assert_eq!(pt(0.1, 1.0, false, false), unsafe { c::pt(0.1, 1.0, 0, 0) });
     }
 
     #[test]
