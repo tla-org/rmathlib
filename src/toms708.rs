@@ -1526,7 +1526,6 @@ fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i32, 
     }
 }
 
-#[allow(unused_variables)]
 #[allow(clippy::too_many_arguments)]
 /// Scaled complement of incomplete gamma ratio function
 /// grat_r(a,x,r) :=  Q(a,x) / r
@@ -1537,7 +1536,107 @@ fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i32, 
 /// It is assumed that a <= 1.  eps is the tolerance to be used.
 fn grat_r(a: f64, x: f64, log_r: f64, eps: f64) -> f64 {
     // Called only from bgrat() as q_r = grat_r(b, z, log_r, eps) :
-    panic!("not implemented");
+    if a * x == 0.0 {
+        /* L130: */
+        if x <= a {
+            /* L100: */
+            exp(-log_r)
+        } else {
+            /* L110:*/
+            0.0
+        }
+    } else if a == 0.5 {
+        // e.g. when called from pt()
+        /* L120: */
+        if x < 0.25 {
+            let p: f64 = erf_(sqrt(x));
+            // R_ifDEBUG_printf(" grat_r(a=%g, x=%g ..)): a=1/2 --> p=erf__(.)= %g\n", a,
+            //                 x, p);
+            return (0.5 - p + 0.5) * exp(-log_r);
+        } else {
+            // 2013-02-27: improvement for "large" x: direct computation of
+            // q/r:
+            let sx: f64 = sqrt(x);
+            let q_r = erfc1(1, sx) / sx * M_SQRT_PI;
+            // R_ifDEBUG_printf(
+            //    " grat_r(a=%g, x=%g ..)): a=1/2 --> q_r=erfc1(..)/r= %g\n", a, x,
+            //    q_r);
+            return q_r;
+        }
+    } else if x < 1.1 {
+        /* L10:  Taylor series for  P(a,x)/x^a */
+
+        let mut an = 3.0;
+        let mut c = x;
+        let mut sum = x / (a + 3.0);
+        let tol = eps * 0.1 / (a + 1.0);
+        let mut t;
+        loop {
+            an += 1.;
+            c *= -(x / an);
+            t = c / (a + an);
+            sum += t;
+            if fabs(t) <= tol {
+                break;
+            }
+        }
+
+        // R_ifDEBUG_printf(
+        //    " grat_r(a=%g, x=%g, log_r=%g): sum=%g; Taylor w/ %.0f terms", a, x,
+        //    log_r, sum, an - 3.);
+        let j = a * x * ((sum / 6. - 0.5 / (a + 2.)) * x + 1. / (a + 1.));
+        let z = a * log(x);
+        let h = gam1(a);
+        let g = h + 1.0;
+
+        if (x >= 0.25 && (a < x / 2.59)) || (z > -0.13394) {
+            // L40:
+            let l = rexpm1(z);
+            let q = ((l + 0.5 + 0.5) * j - l) * g - h;
+            if q <= 0.0 {
+                // R_ifDEBUG_printf(" => q_r= 0.\n");
+                /* L110:*/
+                return 0.0;
+            } else {
+                // R_ifDEBUG_printf(" => q_r=%.15g\n", q * exp(-log_r));
+                return q * exp(-log_r);
+            }
+        } else {
+            let p = exp(z) * g * (0.5 - j + 0.5);
+            // R_ifDEBUG_printf(" => q_r=%.15g\n", (0.5 - p + 0.5) * exp(-log_r));
+            return /* q/r = */ (0.5 - p + 0.5) * exp(-log_r);
+        }
+    } else {
+        /* L50: ----  (x >= 1.1)  ---- Continued Fraction Expansion */
+
+        let mut a2n_1 = 1.0;
+        let mut a2n = 1.0;
+        let mut b2n_1 = x;
+        let mut b2n = x + (1. - a);
+        let mut c = 1.0;
+        let mut am0;
+        let mut an0;
+
+        loop {
+            a2n_1 = x * a2n + c * a2n_1;
+            b2n_1 = x * b2n + c * b2n_1;
+            am0 = a2n_1 / b2n_1;
+            c += 1.0;
+            let c_a = c - a;
+            a2n = a2n_1 + c_a * a2n;
+            b2n = b2n_1 + c_a * b2n;
+            an0 = a2n / b2n;
+            if fabs(an0 - am0) < eps * an0 {
+                break;
+            }
+        }
+
+        // R_ifDEBUG_printf(
+        //    " grat_r(a=%g, x=%g, log_r=%g): Cont.frac. %.0f terms => q_r=%.15g\n",
+        //    a, x, log_r, c - 1., an0);
+        /* q/r = (r * an0)/r = */
+        an0
+    }
 }
 
 #[allow(unused_variables)]
