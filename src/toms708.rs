@@ -1907,7 +1907,7 @@ fn erf_(x: f64) -> f64 {
         300.459261020162,
     ];
     const Q: [f64; 8] = [
-        1.,
+        1.0,
         12.7827273196294,
         77.0001529352295,
         277.585444743988,
@@ -1980,13 +1980,124 @@ fn erf_(x: f64) -> f64 {
     }
 }
 
-#[allow(unused_variables)]
 /// Evaluates the complementary error function.
 ///
 /// erfc1(ind,x) = erfc(x) if ind = 0,
 /// erfc1(ind,x) = exp(x*x)*erfc(x) otherwise.
 fn erfc1(ind: i32, x: f64) -> f64 {
-    panic!("not implemented");
+    const C: f64 = 0.564189583547756;
+    const A: [f64; 5] = [
+        7.7105849500132e-5,
+        -0.00133733772997339,
+        0.0323076579225834,
+        0.0479137145607681,
+        0.128379167095513,
+    ];
+    const B: [f64; 3] = [0.00301048631703895, 0.0538971687740286, 0.375795757275549];
+    const P: [f64; 8] = [
+        -1.36864857382717e-7,
+        0.564195517478974,
+        7.21175825088309,
+        43.1622272220567,
+        152.98928504694,
+        339.320816734344,
+        451.918953711873,
+        300.459261020162,
+    ];
+    const Q: [f64; 8] = [
+        1.0,
+        12.7827273196294,
+        77.0001529352295,
+        277.585444743988,
+        638.980264465631,
+        931.35409485061,
+        790.950925327898,
+        300.459260956983,
+    ];
+    const R: [f64; 5] = [
+        2.10144126479064,
+        26.2370141675169,
+        21.3688200555087,
+        4.6580782871847,
+        0.282094791773523,
+    ];
+    const S: [f64; 4] = [
+        94.153775055546,
+        187.11481179959,
+        99.0191814623914,
+        18.0124575948747,
+    ];
+
+    let mut ret_val: f64;
+    let e: f64;
+    let mut t: f64;
+    let w: f64;
+    let bot: f64;
+    let top: f64;
+
+    let ax = fabs(x);
+    // |X| <= 0.5 */
+    if ax <= 0.5 {
+        let t = x * x;
+        let top = (((A[0] * t + A[1]) * t + A[2]) * t + A[3]) * t + A[4] + 1.0;
+        let bot = ((B[0] * t + B[1]) * t + B[2]) * t + 1.0;
+        ret_val = 0.5 - x * (top / bot) + 0.5;
+        if ind != 0 {
+            ret_val *= exp(t);
+        }
+        return ret_val;
+    }
+    // else (L10:):		0.5 < |X| <= 4
+    if ax <= 4.0 {
+        top = ((((((P[0] * ax + P[1]) * ax + P[2]) * ax + P[3]) * ax + P[4]) * ax + P[5]) * ax
+            + P[6])
+            * ax
+            + P[7];
+        bot = ((((((Q[0] * ax + Q[1]) * ax + Q[2]) * ax + Q[3]) * ax + Q[4]) * ax + Q[5]) * ax
+            + Q[6])
+            * ax
+            + Q[7];
+        ret_val = top / bot;
+    } else {
+        //			|X| > 4
+        // L20:
+        if x <= -5.6 {
+            // L50:            	LIMIT VALUE FOR "LARGE" NEGATIVE X
+            ret_val = 2.0;
+            if ind != 0 {
+                ret_val = exp(x * x) * 2.0;
+            }
+            return ret_val;
+        }
+        if ind == 0 && (x > 100.0 || x * x > -exparg(1)) {
+            // LIMIT VALUE FOR LARGE POSITIVE X   WHEN IND = 0
+            // L60:
+            return 0.0;
+        }
+
+        // L30:
+        t = 1.0 / (x * x);
+        top = (((R[0] * t + R[1]) * t + R[2]) * t + R[3]) * t + R[4];
+        bot = (((S[0] * t + S[1]) * t + S[2]) * t + S[3]) * t + 1.0;
+        ret_val = (C - t * top / bot) / ax;
+    }
+
+    // L40:                 FINAL ASSEMBLY
+    if ind != 0 {
+        if x < 0.0 {
+            ret_val = exp(x * x) * 2.0 - ret_val;
+        }
+    } else {
+        // L41:  ind == 0 :
+        w = x * x;
+        t = w;
+        e = w - t;
+        ret_val *= (0.5 - e + 0.5) * exp(-t);
+        if x < 0.0 {
+            ret_val = 2.0 - ret_val;
+        }
+    }
+    ret_val
 }
 
 #[allow(unused_variables)]
