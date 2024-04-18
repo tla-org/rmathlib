@@ -1233,11 +1233,169 @@ fn brcomp(a: f64, b: f64, x: f64, y: f64, log_p: bool) -> f64 {
     }
 }
 
-#[allow(unused_variables)]
 #[allow(clippy::too_many_arguments)]
 // called only once from  bup(), as r = brcmp1(mu, a, b, x, y, false) / a;
 fn brcmp1(mu: i32, a: f64, b: f64, x: f64, y: f64, give_log: bool) -> f64 {
-    panic!("not implemented");
+    let const__ = 0.398942280401433; /* == 1/sqrt(2*pi); */
+    let mut c: f64;
+    let t: f64;
+    let mut u: f64;
+    let v: f64;
+    let mut z: f64;
+    let apb: f64;
+
+    let a0 = min(a, b);
+    if a0 < 8. {
+        let lnx: f64;
+        let lny: f64;
+        if x <= 0.375 {
+            lnx = log(x);
+            lny = alnrel(-x);
+        } else if y > 0.375 {
+            // L11:
+            lnx = log(x);
+            lny = log(y);
+        } else {
+            lnx = alnrel(-y);
+            lny = log(y);
+        }
+
+        // L20:
+        z = a * lnx + b * lny;
+        if a0 >= 1.0 {
+            z -= betaln(a, b);
+            return esum(mu, z, give_log);
+        }
+        // else :
+        /* -----------------------------------------------------------------------
+         */
+        /*              PROCEDURE FOR A < 1 OR B < 1 */
+        /* -----------------------------------------------------------------------
+         */
+        // L30:
+        let mut b0 = max(a, b);
+        if b0 >= 8.0 {
+            /* L80:                  ALGORITHM FOR b0 >= 8 */
+            u = gamln1(a0) + algdiv(a0, b0);
+            // R_ifDEBUG_printf(" brcmp1(mu,a,b,*): a0 < 1, b0 >= 8;  z=%.15g\n", z);
+            return if give_log {
+                log(a0) + esum(mu, z - u, true)
+            } else {
+                a0 * esum(mu, z - u, false)
+            };
+        } else if b0 <= 1.0 {
+            //                   a0 < 1, b0 <= 1
+            let ans = esum(mu, z, give_log);
+            if ans == (if give_log { ML_NEGINF } else { 0.0 }) {
+                return ans;
+            }
+
+            apb = a + b;
+            if apb > 1.0 {
+                // L40:
+                u = a + b - 1.0;
+                z = (gam1(u) + 1.0) / apb;
+            } else {
+                z = gam1(apb) + 1.0;
+            }
+            // L50:
+            c = if give_log {
+                log1p(gam1(a)) + log1p(gam1(b)) - log(z)
+            } else {
+                (gam1(a) + 1.) * (gam1(b) + 1.) / z
+            };
+            // R_ifDEBUG_printf(" brcmp1(mu,a,b,*): a0 < 1, b0 <= 1;  c=%.15g\n", c);
+            return if give_log {
+                ans + log(a0) + c - log1p(a0 / b0)
+            } else {
+                ans * (a0 * c) / (a0 / b0 + 1.0)
+            };
+        }
+        // else:               algorithm for	a0 < 1 < b0 < 8
+        // L60:
+        u = gamln1(a0);
+        let n: i32 = (b0 - 1.0) as i32;
+        if n >= 1 {
+            c = 1.0;
+            for _i in 1..=n {
+                b0 += -1.;
+                c *= b0 / (a0 + b0);
+                /* L61: */
+            }
+            u += log(c); // TODO?: log(c) = log( prod(...) ) =  sum( log(...) )
+        }
+        // L70:
+        z -= u;
+        b0 += -1.;
+        apb = a0 + b0;
+        if apb > 1.0 {
+            // L71:
+            t = (gam1(apb - 1.) + 1.) / apb;
+        } else {
+            t = gam1(apb) + 1.;
+        }
+        // R_ifDEBUG_printf(" brcmp1(mu,a,b,*): a0 < 1 < b0 < 8;  t=%.15g\n", t);
+        // L72:
+        if give_log {
+            // TODO? log(t) = log1p(..)
+            log(a0) + esum(mu, z, true) + log1p(gam1(b0)) - log(t)
+        } else {
+            a0 * esum(mu, z, false) * (gam1(b0) + 1.) / t
+        }
+    } else {
+        /* -----------------------------------------------------------------------
+         */
+        /*              PROCEDURE FOR A >= 8 AND B >= 8 */
+        /* -----------------------------------------------------------------------
+         */
+        // L100:
+        let h: f64;
+        let x0: f64;
+        let y0: f64;
+        let lambda: f64;
+        if a > b {
+            // L101:
+            h = b / a;
+            x0 = 1. / (h + 1.); // => lx0 := log(x0) = 0 - log1p(h)
+            y0 = h / (h + 1.);
+            lambda = (a + b) * y - b;
+        } else {
+            h = a / b;
+            x0 = h / (h + 1.); // => lx0 := log(x0) = - log1p(1/h)
+            y0 = 1. / (h + 1.);
+            lambda = a - (a + b) * x;
+        }
+        let lx0 = -log1p(b / a); // in both cases
+
+        // R_ifDEBUG_printf(
+        //    " brcmp1(mu,a,b,*): a,b >= 8;	x0=%.15g, lx0=log(x0)=%.15g\n", x0,
+        //    lx0);
+        // L110:
+        let mut e = -lambda / a;
+        if fabs(e) > 0.6 {
+            // L111:
+            u = e - log(x / x0);
+        } else {
+            u = rlog1(e);
+        }
+
+        // L120:
+        e = lambda / b;
+        if fabs(e) > 0.6 {
+            // L121:
+            v = e - log(y / y0);
+        } else {
+            v = rlog1(e);
+        }
+
+        // L130:
+        z = esum(mu, -(a * u + b * v), give_log);
+        if give_log {
+            log(const__) + (log(b) + lx0) / 2. + z - bcorr(a, b)
+        } else {
+            const__ * sqrt(b * x0) * z * exp(-bcorr(a, b))
+        }
+    }
 }
 
 #[allow(unused_variables)]
@@ -1290,7 +1448,7 @@ fn exparg(l: i32) -> f64 {
 #[allow(unused_variables)]
 #[allow(clippy::too_many_arguments)]
 /// Evaluates exp(mu + x).
-fn esum(mu: i32, x: f64, give_log: i32) -> f64 {
+fn esum(mu: i32, x: f64, give_log: bool) -> f64 {
     panic!("not implemented");
 }
 
