@@ -250,6 +250,9 @@ mod test_math {
         helper(0.1, 0.5, 0.5, true, true);
         helper(0.1, 1.001, 0.99, true, true);
         helper(0.5, 10000.0, 0.2, true, true);
+        helper(0.5, 10000.0, 0.2, true, false);
+        helper(0.5, 10000.0, 0.2, false, false);
+        helper(0.0, 0.0, 0.2, false, false);
     }
 
     #[test]
