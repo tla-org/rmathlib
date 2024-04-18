@@ -2103,7 +2103,6 @@ fn erfc1(ind: i32, x: f64) -> f64 {
     ret_val
 }
 
-#[allow(unused_variables)]
 /// Computes 1/gamma(a+1) - 1 for -0.5 <= a <= 1.5.
 fn gam1(a: f64) -> f64 {
     let w: f64;
@@ -2457,7 +2456,6 @@ fn l40(a: f64, mut b: f64, w: f64) -> f64 {
     w + log(z) + (gamln(a) + (gamln(b) - gsumln(a, b)))
 }
 
-#[allow(unused_variables)]
 /// Evaluates the logarithm of the beta function ln(beta(a0,b0)).
 fn betaln(a0: f64, b0: f64) -> f64 {
     let e = 0.918938533204673; /* e == 0.5*LN(2*PI) */
@@ -2502,7 +2500,7 @@ fn betaln(a0: f64, b0: f64) -> f64 {
         if b <= 1e3 {
             let n = (a - 1.) as i32;
             w = 1.0;
-            for i in 1..=n {
+            for _i in 1..=n {
                 a += -1.0;
                 let h = a / b;
                 w *= h / (h + 1.0);
@@ -2519,7 +2517,7 @@ fn betaln(a0: f64, b0: f64) -> f64 {
             // L50:	reduction of A when  B > 1000
             let n = (a - 1.) as i32;
             w = 1.0;
-            for i in 1..=n {
+            for _i in 1..=n {
                 a += -1.0;
                 w *= a / (a / b + 1.);
             }
@@ -2668,12 +2666,38 @@ fn algdiv(a: f64, b: f64) -> f64 {
     }
 }
 
-#[allow(unused_variables)]
 /// Evaluates ln(gamma(a)) for positive a.
 ///
 /// Written by Alfred H. Morris
 /// Naval Surface Warfare Center
 /// Dahlgren, Virginia
 fn gamln(a: f64) -> f64 {
-    panic!("not implemented");
+    let d = 0.418938533204673; /* d == 0.5*(LN(2*PI) - 1) */
+
+    let c0 = 0.0833333333333333;
+    let c1 = -0.00277777777760991;
+    let c2 = 7.9365066682539e-4;
+    let c3 = -5.9520293135187e-4;
+    let c4 = 8.37308034031215e-4;
+    let c5 = -0.00165322962780713;
+
+    if a <= 0.8 {
+        gamln1(a) - log(a) /* ln(G(a+1)) - ln(a) == ln(G(a+1)/a) = ln(G(a)) */
+    } else if a <= 2.25 {
+        return gamln1(a - 0.5 - 0.5);
+    } else if a < 10. {
+        let n = (a - 1.25) as i32;
+        let mut t = a;
+        let mut w = 1.0;
+        for _i in 1..=n {
+            t += -1.0;
+            w *= t;
+        }
+        return gamln1(t - 1.0) + log(w);
+    } else {
+        /* a >= 10 */
+        let t = 1.0 / (a * a);
+        let w = (((((c5 * t + c4) * t + c3) * t + c2) * t + c1) * t + c0) / a;
+        return d + w + (a - 0.5) * (log(a) - 1.);
+    }
 }
