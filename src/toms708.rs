@@ -2,12 +2,14 @@
 #![allow(clippy::manual_range_contains)]
 
 use crate::i1mach::i1mach;
+use libm::cos;
 use libm::exp;
 use libm::expm1;
 use libm::fabs;
 use libm::log;
 use libm::log1p;
 use libm::pow;
+use libm::sin;
 use libm::sqrt;
 
 const ML_NEGINF: f64 = f64::NEG_INFINITY;
@@ -21,6 +23,7 @@ const M_SQRT_PI: f64 = 1.772_453_850_905_516;
 const DBL_MIN: f64 = f64::MIN;
 const DBL_MAX: f64 = f64::MAX;
 const DBL_EPSILON: f64 = f64::EPSILON;
+const INT_MAX: i32 = i32::MAX;
 
 // Be careful when replacing these min and max with libm functions.
 // The definition below is how they are defined in the original code.
@@ -2212,12 +2215,11 @@ fn gamln1(a: f64) -> f64 {
         let s5: f64 = 1.16165475989616e-4;
         let x = a - 0.5 - 0.5;
         let w = (((((r5 * x + r4) * x + r3) * x + r2) * x + r1) * x + r0)
-            / (((((s5 * x + s4) * x + s3) * x + s2) * x + s1) * x + 1.);
+            / (((((s5 * x + s4) * x + s3) * x + s2) * x + s1) * x + 1.0);
         x * w
     }
 }
 
-#[allow(unused_variables)]
 /// Evaluates the Digamma function psi(x).
 ///
 /// Psi(xx) is assigned the value 0 when the digamma function cannot
@@ -2230,8 +2232,218 @@ fn gamln1(a: f64) -> f64 {
 /// Psi was written at Argonne National Laboratory for the FUNPACK
 /// package of special function subroutines. Psi was modified by
 /// A.H. Morris (NSWC).
-fn psi(x: f64) -> f64 {
-    panic!("not implemented");
+fn psi(mut x: f64) -> f64 {
+    /* Error return. */
+    const L_ERR: f64 = 0.0;
+
+    #[allow(clippy::approx_constant)]
+    let piov4 = 0.785398163397448; /* == pi / 4 */
+    /*     dx0 = zero of psi() to extended precision : */
+    let dx0 = 1.461_632_144_968_362_2;
+
+    /* --------------------------------------------------------------------- */
+    /*     COEFFICIENTS FOR RATIONAL APPROXIMATION OF */
+    /*     PSI(X) / (X - X0),  0.5 <= X <= 3. */
+    let p1: [f64; 7] = [
+        0.0089538502298197,
+        4.77762828042627,
+        142.441585084029,
+        1186.45200713425,
+        3633.51846806499,
+        4138.10161269013,
+        1305.60269827897,
+    ];
+    let q1: [f64; 6] = [
+        44.8452573429826,
+        520.752771467162,
+        2210.0079924783,
+        3641.27349079381,
+        1908.310765963,
+        6.91091682714533e-6,
+    ];
+    /* --------------------------------------------------------------------- */
+
+    /* --------------------------------------------------------------------- */
+    /*     COEFFICIENTS FOR RATIONAL APPROXIMATION OF */
+    /*     PSI(X) - LN(X) + 1 / (2*X),  X > 3. */
+
+    let p2: [f64; 4] = [
+        -2.12940445131011,
+        -7.01677227766759,
+        -4.48616543918019,
+        -0.648157123766197,
+    ];
+    let q2: [f64; 4] = [
+        32.2703493791143,
+        89.2920700481861,
+        54.6117738103215,
+        7.77788548522962,
+    ];
+
+    let mut m: i32;
+    let mut n: i32;
+    let mut nq: i32;
+
+    let mut w: f64;
+    let z: f64;
+
+    let mut den: f64;
+    let mut aug: f64;
+    let mut sgn: f64;
+    let xmx0: f64;
+    let mut xmax1: f64;
+    let mut upper: f64;
+
+    /* --------------------------------------------------------------------- */
+
+    /*     MACHINE DEPENDENT CONSTANTS ... */
+
+    /* --------------------------------------------------------------------- */
+    /*	  XMAX1	 = THE SMALLEST POSITIVE FLOATING POINT CONSTANT
+                      WITH ENTIRELY INT REPRESENTATION.  ALSO USED
+                      AS NEGATIVE OF LOWER BOUND ON ACCEPTABLE NEGATIVE
+                      ARGUMENTS AND AS THE POSITIVE ARGUMENT BEYOND WHICH
+                      PSI MAY BE REPRESENTED AS LOG(X).
+    * Originally:  xmax1 = amin1(ipmpar(3), 1./spmpar(1))  */
+    xmax1 = INT_MAX as f64;
+    let d2: f64 = 0.5 / d1mach(3); /*= 0.5 / (0.5 * DBL_EPS) = 1/DBL_EPSILON = 2^52 */
+    if xmax1 > d2 {
+        xmax1 = d2;
+    }
+
+    /* --------------------------------------------------------------------- */
+    /*        XSMALL = ABSOLUTE ARGUMENT BELOW WHICH PI*COTAN(PI*X) */
+    /*                 MAY BE REPRESENTED BY 1/X. */
+    let xsmall: f64 = 1e-9;
+    /* --------------------------------------------------------------------- */
+    aug = 0.0;
+    if x < 0.5 {
+        /* --------------------------------------------------------------------- */
+        /*     X < 0.5,  USE REFLECTION FORMULA */
+        /*     PSI(1-X) = PSI(X) + PI * COTAN(PI*X) */
+        /* --------------------------------------------------------------------- */
+        if fabs(x) <= xsmall {
+            if x == 0.0 {
+                return L_ERR;
+            }
+            /* ---------------------------------------------------------------------
+             */
+            /*     0 < |X| <= XSMALL.  USE 1/X AS A SUBSTITUTE */
+            /*     FOR  PI*COTAN(PI*X) */
+            /* ---------------------------------------------------------------------
+             */
+            aug = -1.0 / x;
+        } else {
+            /* |x| > xsmall */
+            /* ---------------------------------------------------------------------
+             */
+            /*     REDUCTION OF ARGUMENT FOR COTAN */
+            /* ---------------------------------------------------------------------
+             */
+            /* L100: */
+            w = -x;
+            sgn = piov4;
+            if w <= 0.0 {
+                w = -w;
+                sgn = -sgn;
+            }
+            /* ---------------------------------------------------------------------
+             */
+            /*     MAKE AN ERROR EXIT IF |X| >= XMAX1 */
+            /* ---------------------------------------------------------------------
+             */
+            if w >= xmax1 {
+                return L_ERR;
+            }
+            nq = w as i32;
+            w -= nq as f64;
+            nq = (w * 4.) as i32;
+            w = (w - (nq as f64) * 0.25) * 4.0;
+            /* ---------------------------------------------------------------------
+             */
+            /*     W IS NOW RELATED TO THE FRACTIONAL PART OF  4. * X. */
+            /*     ADJUST ARGUMENT TO CORRESPOND TO VALUES IN FIRST */
+            /*     QUADRANT AND DETERMINE SIGN */
+            /* ---------------------------------------------------------------------
+             */
+            n = nq / 2;
+            if n + n != nq {
+                w = 1. - w;
+            }
+            z = piov4 * w;
+            m = n / 2;
+            if m + m != n {
+                sgn = -sgn;
+            }
+            /* ---------------------------------------------------------------------
+             */
+            /*     DETERMINE FINAL VALUE FOR  -PI*COTAN(PI*X) */
+            /* ---------------------------------------------------------------------
+             */
+            n = (nq + 1) / 2;
+            m = n / 2;
+            m += m;
+            if m == n {
+                /* ---------------------------------------------------------------------
+                 */
+                /*     CHECK FOR SINGULARITY */
+                /* ---------------------------------------------------------------------
+                 */
+                if z == 0.0 {
+                    return L_ERR;
+                }
+                /* ---------------------------------------------------------------------
+                 */
+                /*     USE COS/SIN AS A SUBSTITUTE FOR COTAN, AND */
+                /*     SIN/COS AS A SUBSTITUTE FOR TAN */
+                /* ---------------------------------------------------------------------
+                 */
+                aug = sgn * (cos(z) / sin(z) * 4.0);
+            } else {
+                /* L140: */
+                aug = sgn * (sin(z) / cos(z) * 4.0);
+            }
+        }
+
+        x = 1. - x;
+    }
+    /* L200: */
+    if x <= 3.0 {
+        /* --------------------------------------------------------------------- */
+        /*     0.5 <= X <= 3. */
+        /* --------------------------------------------------------------------- */
+        den = x;
+        upper = p1[0] * x;
+
+        for i in 1..=5 {
+            den = (den + q1[i - 1]) * x;
+            upper = (upper + p1[i]) * x;
+        }
+
+        den = (upper + p1[6]) / (den + q1[5]);
+        xmx0 = x - dx0;
+        return den * xmx0 + aug;
+    }
+
+    /* --------------------------------------------------------------------- */
+    /*     IF X >= XMAX1, PSI = LN(X) */
+    /* --------------------------------------------------------------------- */
+    if x < xmax1 {
+        /* --------------------------------------------------------------------- */
+        /*     3. < X < XMAX1 */
+        /* --------------------------------------------------------------------- */
+        w = 1.0 / (x * x);
+        den = w;
+        upper = p2[0] * w;
+
+        for i in 1..=3 {
+            den = (den + q2[i - 1]) * w;
+            upper = (upper + p2[i]) * w;
+        }
+
+        aug += upper / (den + q2[3]) - 0.5 / x;
+    }
+    aug + log(x)
 }
 
 #[allow(unused_variables)]
