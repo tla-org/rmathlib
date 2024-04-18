@@ -1843,10 +1843,46 @@ fn alnrel(a: f64) -> f64 {
     t * 2. * w
 }
 
-#[allow(unused_variables)]
 /// Evaluates the function x - ln(1 + x).
 fn rlog1(x: f64) -> f64 {
-    panic!("not implemented");
+    let a = 0.0566749439387324;
+    let b = 0.0456512608815524;
+    let p0 = 0.333333333333333;
+    let p1 = -0.224696413112536;
+    let p2 = 0.00620886815375787;
+    let q1 = -1.27408923933623;
+    let q2 = 0.354508718369557;
+
+    let mut h;
+    let w;
+    let w1;
+    if x < -0.39 || x > 0.57 {
+        /* direct evaluation */
+        w = x + 0.5 + 0.5;
+        return x - log(w);
+    }
+    /* else */
+    if x < -0.18 {
+        /* L10: */
+        h = x + 0.3;
+        h /= 0.7;
+        w1 = a - h * 0.3;
+    } else if x > 0.18 {
+        /* L20: */
+        h = x * 0.75 - 0.25;
+        w1 = b + h / 3.0;
+    } else {
+        /*		Argument Reduction */
+        h = x;
+        w1 = 0.0;
+    }
+
+    /* L30:              	Series Expansion */
+
+    let r = h / (h + 2.);
+    let t = r * r;
+    w = ((p2 * t + p1) * t + p0) / ((q2 * t + q1) * t + 1.);
+    t * 2. * (1. / (1. - r) - r * w) + w1
 }
 
 #[allow(unused_variables)]
