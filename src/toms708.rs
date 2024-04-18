@@ -1482,7 +1482,7 @@ fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i32, 
     let mut t = 1.0;
     let mut cn = 1.0;
     let mut n2 = 0.0;
-    for n in 0..=N_TERMS_BGRAT {
+    for n in 1..=N_TERMS_BGRAT {
         let bp2n = b + n2;
         j = (bp2n * (bp2n + 1.0) * j + (z + bp2n + 1.0) * t) * v;
         n2 += 2.0;

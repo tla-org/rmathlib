@@ -285,8 +285,15 @@ mod test_math {
         let epsilon = 1e-12;
         assert_abs_diff_eq!(
             pbeta(0.01, 0.01, 0.01, true, false),
-            // R> pbeta(0.01, 0.01, 0.01, lower.tail = TRUE, log.p = FALSE)
+            // R> sprintf("%.13f", pbeta(0.01, 0.01, 0.01, lower.tail = TRUE, log.p = FALSE))
             0.4776207614162,
+            epsilon = epsilon
+        );
+
+        assert_abs_diff_eq!(
+            pbeta(0.001, 0.001, 0.01, true, false),
+            // R> sprintf("%.13f", pbeta(0.001, 0.001, 0.01, lower.tail = TRUE, log.p = FALSE))
+            0.9028483975306,
             epsilon = epsilon
         );
 
