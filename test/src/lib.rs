@@ -246,6 +246,10 @@ mod test_math {
 
         // These functions call `bratio`.
         helper(0.1, 0.5, 0.5, false, false);
+        helper(0.1, 0.5, 0.5, true, false);
+        helper(0.1, 0.5, 0.5, true, true);
+        helper(0.1, 1.001, 0.99, true, true);
+        helper(0.5, 10000.0, 0.2, true, true);
     }
 
     #[test]
