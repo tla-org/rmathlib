@@ -621,8 +621,6 @@ pub fn bratio(
     log_p: bool,
 ) {
     let do_swap: bool;
-    // n used to be not initialized here, but that meant it was used uninitialized
-    // when going through GOTO L131.
     let mut n: i32 = 0;
     let ierr1: i32 = 0;
     let a0: f64;
@@ -734,6 +732,8 @@ pub fn bratio(
     }
 
     if min(a, b) <= 1.0 {
+    println!("b: {}", b);
+
         /*------------------------ a <= 1  or  b <= 1 ---- */
 
         do_swap = x > 0.5;
