@@ -2544,10 +2544,19 @@ fn betaln(a0: f64, b0: f64) -> f64 {
     }
 }
 
-#[allow(unused_variables)]
 /// Evaluates the function ln(gamma(a + b)) for 1 <= a <= 2 and 1 <= b <= 2.
 fn gsumln(a: f64, b: f64) -> f64 {
-    panic!("not implemented");
+    let x = a + b - 2.; /* in [0, 2] */
+
+    if x <= 0.25 {
+        return gamln1(x + 1.);
+    }
+    /* else */
+    if x <= 1.25 {
+        return gamln1(x) + alnrel(x);
+    }
+    /* else x > 1.25 : */
+    gamln1(x - 1.) + log(x * (x + 1.))
 }
 
 #[allow(unused_variables)]
