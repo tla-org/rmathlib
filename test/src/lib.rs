@@ -272,6 +272,25 @@ mod test_math {
         helper(0.1, 0.0, 1.0, false, false);
 
         // These functions call `bratio`.
+        // Thanks to the `pbeta` definition in `pbeta.rs`, we can compare the
+        // outcome of `bratio` against the outcome of `pbeta` in R.
+        // Expected values are from R version 4.3.4.
+        //
+        // `pbeta.rs` is mostly handling edge cases and then calling `bratio`.
+        // Cases which end up in `bratio` are where 0 < a < Inf and 0 < b < Inf.
+
+        // R> pbeta(0.5, 1.0, 1.0, lower.tail = TRUE, log.p = FALSE)
+        assert_eq!(pbeta(0.5, 1.0, 1.0, true, false), 0.5);
+
+        let epsilon = 1e-12;
+        assert_abs_diff_eq!(
+            pbeta(0.01, 0.01, 0.01, true, false),
+            // R> pbeta(0.01, 0.01, 0.01, lower.tail = TRUE, log.p = FALSE)
+            0.4776207614162,
+            epsilon = epsilon
+        );
+
+        // Tests via the helper function.
         helper(0.1, 0.5, 0.5, false, false);
         helper(0.1, 0.5, 0.5, true, false);
         helper(0.1, 0.5, 0.5, true, true);
