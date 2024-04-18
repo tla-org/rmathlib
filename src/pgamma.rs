@@ -1,6 +1,4 @@
 use libm::lgamma;
-use std::f64::EPSILON;
-use std::f64::MAX;
 use std::ops::Neg;
 
 use crate::dnorm::dnorm4;
@@ -63,7 +61,7 @@ pub fn pgamma(x: f64, alph: f64, scale: f64, lower_tail: bool, log_p: bool) -> f
 const SQR: fn(f64) -> f64 = |x| x * x;
 
 /// If |x| > |k| * M_cutoff,  then  log\[ exp(-x) * k^x \] =~= -x
-const M_CUTOFF: f64 = M_LN2 * MAX / EPSILON; // 3.196577e18
+const M_CUTOFF: f64 = M_LN2 * f64::MAX / f64::EPSILON; // 3.196577e18
 
 /// Continued fraction for calculation of
 /// 1/i + x/(i+d) + x^2/(i+2*d) + x^3/(i+3*d) + ... = sum_{k=0}^Inf x^k/(i+k*d)
@@ -275,7 +273,7 @@ fn pgamma_smallx(x: f64, alph: f64, lower_tail: bool, log_p: bool) -> f64 {
         term = c / (alph + n);
         sum += term;
 
-        if term.abs() <= EPSILON * sum.abs() {
+        if term.abs() <= f64::EPSILON * sum.abs() {
             break;
         }
     }
@@ -317,7 +315,7 @@ fn pd_upper_series(x: f64, y: f64, log_p: bool) -> f64 {
     let mut sum = term;
     let mut y = y;
 
-    while term > sum * EPSILON {
+    while term > sum * f64::EPSILON {
         y += 1.0;
         term *= x / y;
         sum += term;
@@ -336,7 +334,7 @@ fn pd_lower_series(lambda: f64, y: f64) -> f64 {
     let mut sum = 0.0;
     let mut y = y;
 
-    while y >= 1.0 && term > sum * EPSILON {
+    while y >= 1.0 && term > sum * f64::EPSILON {
         term *= y / lambda;
         sum += term;
         y -= 1.0;
@@ -397,7 +395,7 @@ fn pd_lower_cf(y: f64, d: f64) -> f64 {
 
         if b2 != 0.0 {
             f = a2 / b2;
-            if (f - of).abs() <= EPSILON * f.abs() {
+            if (f - of).abs() <= f64::EPSILON * f.abs() {
                 return f;
             }
             of = f;
@@ -521,7 +519,7 @@ fn pgamma_raw(x: f64, alph: f64, lower_tail: bool, log_p: bool) -> f64 {
         }
     } else if alph - 1.0 < x && alph < 0.8 * (x + 50.0) {
         let sum = if alph < 1.0 {
-            if x * EPSILON > 1.0 - alph {
+            if x * f64::EPSILON > 1.0 - alph {
                 1.0 // To avoid division by zero
             } else {
                 let f = pd_lower_cf(alph, x - (alph - 1.0)) * x / alph;

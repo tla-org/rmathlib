@@ -1,5 +1,3 @@
-use std::f64::MIN;
-
 use crate::ebd0;
 use crate::lgammafn;
 use crate::nmath::ml_warn_return_nan;
@@ -26,10 +24,10 @@ pub fn dpois_raw(x: f64, lambda: f64, give_log: bool) -> f64 {
     if x < 0.0 {
         return 0.0;
     }
-    if x <= lambda * MIN {
+    if x <= lambda * f64::MIN {
         return (-lambda).exp();
     }
-    if lambda < x * MIN {
+    if lambda < x * f64::MIN {
         if !x.is_finite() {
             return 0.0;
         }

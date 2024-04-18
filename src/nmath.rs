@@ -1,12 +1,8 @@
-use std::f64::INFINITY;
-use std::f64::NAN;
-use std::f64::NEG_INFINITY;
-
 use crate::dpq::r_d__0;
 use crate::rmath::M_LN2;
 
-pub const ML_POSINF: f64 = INFINITY;
-pub const ML_NEGINF: f64 = NEG_INFINITY;
+pub const ML_POSINF: f64 = f64::INFINITY;
+pub const ML_NEGINF: f64 = f64::NEG_INFINITY;
 
 pub fn ml_warn_return_nan() -> f64 {
     println!("argument out of domain");
@@ -17,7 +13,7 @@ pub fn r_finite(x: f64) -> bool {
     x.is_finite()
 }
 
-pub const ML_NAN: f64 = NAN;
+pub const ML_NAN: f64 = f64::NAN;
 
 /// log(sqrt(2*pi)) == log(2*pi)/2
 pub const M_LN_SQRT_2PI: f64 = 0.918_938_533_204_672_8;
