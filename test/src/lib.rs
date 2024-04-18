@@ -237,9 +237,15 @@ mod test_math {
                 assert_eq!(rs, c);
             }
         }
+        // These functions do not call `bratio`.
         helper(0.9, 0.0, 1.0, false, false);
         helper(1.1, 0.0, 1.0, false, false);
         helper(0.0, -1.0, 1.0, false, false);
+        helper(f64::NAN, 1.0, 1.0, false, false);
+        helper(0.1, 0.0, 1.0, false, false);
+
+        // These functions call `bratio`.
+        helper(0.1, 0.5, 0.5, false, false);
     }
 
     #[test]
