@@ -1639,7 +1639,6 @@ fn grat_r(a: f64, x: f64, log_r: f64, eps: f64) -> f64 {
     }
 }
 
-#[allow(unused_variables)]
 #[allow(clippy::too_many_arguments)]
 /// Asymptotic expansion for I_x(a,b) for large a and b.
 ///
@@ -1647,7 +1646,112 @@ fn grat_r(a: f64, x: f64, log_r: f64, eps: f64) -> f64 {
 /// It is assumed that lambda is nonnegative and that a and b are
 /// greater than or equal to 15.
 fn basym(a: f64, b: f64, lambda: f64, eps: f64, log_p: bool) -> f64 {
-    panic!("not implemented");
+    /* ------------------------ */
+    /*     ****** NUM IS THE MAXIMUM VALUE THAT N CAN TAKE IN THE DO LOOP */
+    /*            ENDING AT STATEMENT 50. IT IS REQUIRED THAT NUM BE EVEN. */
+    const NUM_IT: usize = 20;
+    /*            THE ARRAYS A0, B0, C, D HAVE DIMENSION NUM + 1. */
+
+    #[allow(clippy::approx_constant)]
+    const E0: f64 = 1.12837916709551; /* e0 == 2/sqrt(pi) */
+    const E1: f64 = 0.353553390593274; /* e1 == 2^(-3/2)   */
+    const LN_E0: f64 = 0.120782237635245; /* == ln(e0) */
+
+    let mut a0: [f64; NUM_IT + 1] = [0.0; NUM_IT + 1];
+    let mut b0: [f64; NUM_IT + 1] = [0.0; NUM_IT + 1];
+    let mut c: [f64; NUM_IT + 1] = [0.0; NUM_IT + 1];
+    let mut d: [f64; NUM_IT + 1] = [0.0; NUM_IT + 1];
+
+    let f = a * rlog1(-lambda / a) + b * rlog1(lambda / b);
+    let t;
+    if log_p {
+        t = -f;
+    } else {
+        t = exp(-f);
+        if t == 0.0 {
+            return 0.0; /* once underflow, always underflow .. */
+        }
+    }
+    let z0 = sqrt(f);
+    let z = z0 / E1 * 0.5;
+    let z2 = f + f;
+    let h: f64;
+    let r0: f64;
+    let r1: f64;
+    let w0: f64;
+
+    if a < b {
+        h = a / b;
+        r0 = 1.0 / (h + 1.);
+        r1 = (b - a) / b;
+        w0 = 1.0 / sqrt(a * (h + 1.));
+    } else {
+        h = b / a;
+        r0 = 1. / (h + 1.);
+        r1 = (b - a) / a;
+        w0 = 1. / sqrt(b * (h + 1.));
+    }
+
+    a0[0] = r1 * 0.666_666_666_666_666_6;
+    c[0] = a0[0] * -0.5;
+    d[0] = -c[0];
+    let mut j0 = 0.5 / E0 * erfc1(1, z0);
+    let mut j1 = E1;
+    let mut sum = j0 + d[0] * w0 * j1;
+
+    let mut s = 1.0;
+    let h2 = h * h;
+    let mut hn = 1.0;
+    let mut w = w0;
+    let mut znm1 = z;
+    let mut zn = z2;
+    for n in (2..=NUM_IT).step_by(2) {
+        hn *= h2;
+        a0[n - 1] = r0 * 2. * (h * hn + 1.) / (n as f64 + 2.);
+        let np1 = n + 1;
+        s += hn;
+        a0[np1 - 1] = r1 * 2. * s / (n as f64 + 3.0);
+
+        for i in n..=np1 {
+            let r = (i as f64 + 1.0) * -0.5;
+            b0[0] = r * a0[0];
+            for m in 2..=i {
+                let mut bsum = 0.0;
+                for j in 1..=(m - 1) {
+                    let mmj = m - j;
+                    bsum += (j as f64 * r - mmj as f64) * a0[j - 1] * b0[mmj - 1];
+                }
+                b0[m - 1] = r * a0[m - 1] + bsum / m as f64;
+            }
+            c[i - 1] = b0[i - 1] / (i as f64 + 1.0);
+
+            let mut dsum = 0.0;
+            for j in 1..=i {
+                dsum += d[i - j - 1] * c[j - 1];
+            }
+            d[i - 1] = -(dsum + c[i - 1]);
+        }
+
+        j0 = E1 * znm1 + (n as f64 - 1.0) * j0;
+        j1 = E1 * zn + n as f64 * j1;
+        znm1 *= z2;
+        zn *= z2;
+        w *= w0;
+        let t0 = d[n - 1] * w * j0;
+        w *= w0;
+        let t1 = d[np1 - 1] * w * j1;
+        sum += t0 + t1;
+        if fabs(t0) + fabs(t1) <= eps * sum {
+            break;
+        }
+    }
+
+    if log_p {
+        LN_E0 + t - bcorr(a, b) + log(sum)
+    } else {
+        let u = exp(-bcorr(a, b));
+        E0 * t * u * sum
+    }
 }
 
 #[allow(unused_variables)]
