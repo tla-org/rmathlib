@@ -11,7 +11,6 @@ fn pbeta_raw(x: f64, a: f64, b: f64, lower_tail: bool, log_p: bool) -> f64 {
         return r_dt_1(lower_tail, log_p);
     }
     if a == 0.0 || b == 0.0 || !a.is_finite() || !b.is_finite() {
-        // NB: 0 < x < 1 :
         if a == 0.0 && b == 0.0 {
             // point mass 1/2 at each of {0, 1} :
             return if log_p { -M_LN2 } else { 0.5 };

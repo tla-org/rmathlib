@@ -228,9 +228,18 @@ mod test_math {
     // TODO: add more tests
     #[test]
     fn test_pbeta() {
-        // assert_eq!(pbeta(0.0, 0.0, 1.0, false, false), unsafe {
-        //    c::pbeta(0.0, 0.0, 1.0, 0, 0)
-        // });
+        fn helper(x: f64, a: f64, b: f64, lower_tail: bool, log_p: bool) {
+            let rs = pbeta(x, a, b, lower_tail, log_p);
+            let c = unsafe { c::pbeta(x, a, b, lower_tail as i32, log_p as i32) };
+            if rs.is_nan() {
+                assert!(c.is_nan());
+            } else {
+                assert_eq!(rs, c);
+            }
+        }
+        helper(0.9, 0.0, 1.0, false, false);
+        helper(1.1, 0.0, 1.0, false, false);
+        helper(0.0, -1.0, 1.0, false, false);
     }
 
     #[test]
