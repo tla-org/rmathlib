@@ -1773,11 +1773,35 @@ fn exparg(l: i32) -> f64 {
     (m as f64) * LNB * 0.99999
 }
 
-#[allow(unused_variables)]
 #[allow(clippy::too_many_arguments)]
 /// Evaluates exp(mu + x).
 fn esum(mu: i32, x: f64, give_log: bool) -> f64 {
-    panic!("not implemented");
+    if give_log {
+        return x + mu as f64;
+    }
+
+    // else :
+    let w: f64;
+    if x > 0.0 {
+        /* L10: */
+        if mu > 0 {
+            return exp(mu as f64) * exp(x);
+        }
+        w = (mu as f64) + x;
+        if w < 0.0 {
+            return exp(mu as f64) * exp(x);
+        }
+    } else {
+        /* x <= 0 */
+        if mu < 0 {
+            return exp(mu as f64) * exp(x);
+        }
+        w = (mu as f64) + x;
+        if w > 0.0 {
+            return exp(mu as f64) * exp(x);
+        }
+    }
+    exp(w)
 }
 
 /// Evaluates the function exp(x) - 1.
