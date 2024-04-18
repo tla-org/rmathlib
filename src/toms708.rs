@@ -1825,10 +1825,22 @@ fn rexpm1(x: f64) -> f64 {
     }
 }
 
-#[allow(unused_variables)]
 /// Calculates the function ln(1 + a).
-fn alnrel(x: f64) -> f64 {
-    panic!("not implemented");
+fn alnrel(a: f64) -> f64 {
+    if fabs(a) > 0.375 {
+        return log(1.0 + a);
+    }
+    // else : |a| <= 0.375
+    let p1 = -1.29418923021993;
+    let p2 = 0.405303492862024;
+    let p3 = -0.0178874546012214;
+    let q1 = -1.62752256355323;
+    let q2 = 0.747811014037616;
+    let q3 = -0.0845104217945565;
+    let t = a / (a + 2.);
+    let t2 = t * t;
+    let w = (((p3 * t2 + p2) * t2 + p1) * t2 + 1.0) / (((q3 * t2 + q2) * t2 + q1) * t2 + 1.0);
+    t * 2. * w
 }
 
 #[allow(unused_variables)]
