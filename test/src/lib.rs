@@ -21,7 +21,6 @@ mod test_math {
             pub fn log1pmx(x: f64) -> f64;
             pub fn lgammafn(x: f64) -> f64;
             pub fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64;
-            #[allow(dead_code)]
             pub fn pbeta(x: f64, a: f64, b: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn pgamma(x: f64, alph: f64, scale: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn pnorm5(x: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
@@ -256,13 +255,11 @@ mod test_math {
         fn helper(x: f64, a: f64, b: f64, lower_tail: bool, log_p: bool) {
             let rs = pbeta(x, a, b, lower_tail, log_p);
             let c = unsafe { c::pbeta(x, a, b, lower_tail as i32, log_p as i32) };
-            if rs.is_nan() {
-                assert!(c.is_nan());
-            } else {
+            // If both NaN, then avoid comparing since that would fail.
+            if !(rs.is_nan() && c.is_nan()) {
                 assert_eq!(rs, c);
             }
         }
-
 
         // These functions do not call `bratio`.
         helper(0.9, 0.0, 1.0, false, false);
@@ -297,8 +294,16 @@ mod test_math {
             epsilon = epsilon
         );
 
+        assert_abs_diff_eq!(
+            pbeta(0.1, 0.8, 2.0, true, true),
+            // R> sprintf("%.13f", pbeta(0.1, 0.8, 2.0, lower.tail=TRUE, log.p=TRUE))
+            -1.2997437835699,
+            epsilon = epsilon
+        );
+
         println!("Problem case after this");
 
+        helper(0.1, 0.8, 2.0, false, true);
         // One case from the loop below.
         assert_abs_diff_eq!(
             pbeta(0.1, 0.8, 2.0, false, true),

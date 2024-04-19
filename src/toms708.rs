@@ -431,7 +431,7 @@ fn l131(
     do_swap: bool,
     log_p: bool,
 ) {
-    // R_ifDEBUG_printf(" L131: bgrat(*, w1=%.15g) ", *w1);
+    println!(" L131: bgrat(*, w1={w1}) ");
     bgrat(b0, a0, y0, x0, w1, 15.0 * eps, &mut ierr1, false);
     // #ifdef DEBUG_bratio
     //   REprintf(" ==> new w1=%.15g", *w1);
@@ -624,7 +624,7 @@ pub fn bratio(
     *w = r_d__0(log_p);
     *w1 = r_d__0(log_p);
 
-    println!("w: {}", w);
+    println!("w1: {}", w1);
 
     // safeguard, preventing infinite loops further down
     if x.is_nan() || y.is_nan() || a.is_nan() || b.is_nan() {
@@ -799,6 +799,7 @@ pub fn bratio(
         did_bup = true;
         // R_ifDEBUG_printf("  ... n=20 and *w1 := bup(*) = %.15g; ", *w1);
         b0 += n as f64;
+        println!("here w1: {w1}");
         l131(
             a, b, x, n, a0, b0, x0, y0, w, w1, eps, ierr, ierr1, did_bup, do_swap, log_p,
         )
@@ -1401,7 +1402,7 @@ fn brcmp1(mu: i32, a: f64, b: f64, x: f64, y: f64, give_log: bool) -> f64 {
 /// compute w := w + I_x(a,b)  but return *w = log(w):
 /// ////// *w := log(exp(*w) + I_x(a,b)) = logspace_add(*w, log( I_x(a,b) ))
 /// ----------------------------------------------------------------------- */
-fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i32, log_w: bool) {
+pub fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i32, log_w: bool) {
     const N_TERMS_BGRAT: usize = 30;
     let mut c: [f64; N_TERMS_BGRAT] = [0.0; N_TERMS_BGRAT];
     let mut d: [f64; N_TERMS_BGRAT] = [0.0; N_TERMS_BGRAT];
