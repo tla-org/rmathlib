@@ -112,7 +112,7 @@ fn l_end_from_w(w: &mut f64, w1: &mut f64, do_swap: bool, log_p: bool) {
 fn l_end_from_w1(w: &mut f64, w1: &mut f64, do_swap: bool, log_p: bool) {
     if log_p {
         *w = log1p(-*w1);
-        *w1 = log(-*w1);
+        *w1 = log(*w1);
     } else {
         *w = 0.5 - *w1 + 0.5;
     }
