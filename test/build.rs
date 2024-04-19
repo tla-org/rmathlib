@@ -1,5 +1,5 @@
 fn main() {
-    std::env::set_var("CFLAGS", "-DDEBUG_bratio");
+    // std::env::set_var("CFLAGS", "-DDEBUG_bratio");
     cc::Build::new()
         .file("nmath/bd0.c")
         .file("nmath/chebyshev.c")

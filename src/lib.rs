@@ -6,8 +6,8 @@
 mod bd0;
 mod chebyshev;
 mod cospi;
-mod debug;
 mod d1mach;
+mod debug;
 mod dnorm;
 mod dpois;
 mod dpq;

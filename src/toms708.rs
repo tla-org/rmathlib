@@ -1,10 +1,10 @@
 #![allow(dead_code)]
 #![allow(clippy::manual_range_contains)]
 
-use crate::i1mach::i1mach;
+use crate::debug::debug_print;
 use crate::dpq::r_d__0;
 use crate::dpq::r_d__1;
-use crate::debug::debug_print;
+use crate::i1mach::i1mach;
 use libm::cos;
 use libm::exp;
 use libm::expm1;
@@ -473,7 +473,10 @@ fn l131(
         *ierr = 10 + ierr1;
     }
     if *w1 < 0.0 {
-        debug_print(&format!("bratio(a={}, b={}, x={}): bgrat() -> w1 = {}", a, b, x, *w1));
+        debug_print(&format!(
+            "bratio(a={}, b={}, x={}): bgrat() -> w1 = {}",
+            a, b, x, *w1
+        ));
     }
     l_end_from_w1(w, w1, do_swap, log_p)
 }
@@ -657,8 +660,10 @@ pub fn bratio(
         return;
     }
 
-    debug_print(&format!("bratio(a={}, b={}, x={}, y={}, .., log_p={}): ", a, b, x,
-                y, log_p));
+    debug_print(&format!(
+        "bratio(a={}, b={}, x={}, y={}, .., log_p={}): ",
+        a, b, x, y, log_p
+    ));
     *ierr = 0;
     if x == 0.0 {
         if a == 0.0 {
@@ -720,7 +725,6 @@ pub fn bratio(
     }
 
     if min(a, b) <= 1.0 {
-
         /*------------------------ a <= 1  or  b <= 1 ---- */
 
         do_swap = x > 0.5;
@@ -1418,7 +1422,8 @@ pub fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i
         // Warning ... bgrat(a=20.5, b=1e-05, x=1, y=9.99989e-321): ..
         debug_print(&format!(
             "bgrat(a={}, b={}, x={}, y={}): z={}, b*z == 0 underflow, hence inaccurate pbeta()",
-            a, b, x, y, z));
+            a, b, x, y, z
+        ));
         /* L_Error:    THE EXPANSION CANNOT BE COMPUTED */
         *ierr = 1;
         return;
@@ -1461,8 +1466,9 @@ pub fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i
      } else if *w == 0.0 { 0.0 } else { exp(log(*w) - log_u) };
 
     debug_print(&format!(
-            "bgrat(a={}, b={}, x={}, *) -> u={}, l='w/u'={}, ",
-            a, b, x, u, l));
+        "bgrat(a={}, b={}, x={}, *) -> u={}, l='w/u'={}, ",
+        a, b, x, u, l
+    ));
     let q_r = grat_r(b, z, log_r, eps); // = q/r of former grat1(b,z, r, &p, &q)
     let v = 0.25 / (nu * nu);
     let t2 = lnx * 0.25 * lnx;
@@ -1626,8 +1632,13 @@ fn grat_r(a: f64, x: f64, log_r: f64, eps: f64) -> f64 {
 
         debug_print(&format!(
             " grat_r(a={}, x={}, log_r={}): Cont.frac. {} terms => q_r={}",
-            a, x, log_r, c - 1., an0));
-            /* q/r = (r * an0)/r = */
+            a,
+            x,
+            log_r,
+            c - 1.,
+            an0
+        ));
+        /* q/r = (r * an0)/r = */
         an0
     }
 }
@@ -2158,8 +2169,10 @@ fn gam1(a: f64) -> f64 {
         top = (((((P[6] * t + P[5]) * t + P[4]) * t + P[3]) * t + P[2]) * t + P[1]) * t + P[0];
         bot = (((Q[4] * t + Q[3]) * t + Q[2]) * t + Q[1]) * t + 1.;
         w = top / bot;
-        debug_print(&format!("  gam1(a = {}): t > 0: (is a < 1.5 ?)  w={}\n",
-            a, w));
+        debug_print(&format!(
+            "  gam1(a = {}): t > 0: (is a < 1.5 ?)  w={}\n",
+            a, w
+        ));
         if d > 0.0 {
             /* L21: */
             t / a * (w - 0.5 - 0.5)

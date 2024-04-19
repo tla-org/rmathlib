@@ -21,7 +21,13 @@ Some benefits of this port over the native C code are:
 
 Some tips for debugging the C code in `test/nmath/`:
 
-To print from C, use `--nocapture` like so:
+To print from C, set
+
+```rust
+std::env::set_var("CFLAGS", "-DDEBUG_bratio");
+```
+
+and use `--nocapture` like so:
 
 ```sh
 $ cargo watch -x 'test -- --nocapture'
@@ -29,6 +35,8 @@ $ cargo watch -x 'test -- --nocapture'
 
 When printing inside C, verify that that the numbers are printed correctly.
 `REprintf` seems to not always print numbers correctly.
+To fix that, `REprintf` can just be replaced with `printf` (and some `\n`'s).
+
 For example, test the representation via:
 
 ```c
