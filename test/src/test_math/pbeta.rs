@@ -188,7 +188,7 @@ mod test_math {
         helper(0.5, 10000.0, 0.2, false, false);
         helper(0.0, 0.0, 0.2, false, false);
 
-         // Based on a test in `d-p-q-r-tst-2.R` at line 850 from the R source code.
+        // Based on a test in `d-p-q-r-tst-2.R` at line 850 from the R source code.
         assert_eq!(pbeta(0.0, 0.0, 3.0, true, false), 1.0);
         assert_eq!(pbeta(1.0, 0.1, 0.0, true, false), 1.0);
         assert_eq!(pbeta(1.1, 3.0, 0.0, true, false), 1.0);
