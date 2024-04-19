@@ -257,7 +257,11 @@ mod test_math {
             let c = unsafe { c::pbeta(x, a, b, lower_tail as i32, log_p as i32) };
             // If both NaN, then avoid comparing since that would fail.
             if !(rs.is_nan() && c.is_nan()) {
-                assert_eq!(rs, c, "pbeta({x}, {a}, {b}, {lower_tail}, {log_p})");
+                assert_eq!(
+                    rs, c,
+                    "pbeta({}, {}, {}, {}, {})",
+                    x, a, b, lower_tail, log_p
+                );
             }
         }
 
