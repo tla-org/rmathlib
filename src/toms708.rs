@@ -102,7 +102,7 @@ fn l_end(w: &mut f64, w1: &mut f64, do_swap: bool) {
 fn l_end_from_w(w: &mut f64, w1: &mut f64, do_swap: bool, log_p: bool) {
     if log_p {
         *w1 = log1p(-*w);
-        *w = log1p(-*w);
+        *w = log(*w);
     } else {
         *w1 = 0.5 - *w + 0.5;
     }
@@ -434,8 +434,7 @@ fn l131(
 ) {
     debug_print(&format!(" L131: bgrat(*, w1={w1}) "));
     bgrat(b0, a0, y0, x0, w1, 15.0 * eps, &mut ierr1, false);
-    // #ifdef DEBUG_bratio
-    //   REprintf(" ==> new w1=%.15g", *w1);
+    debug_print(&format!(" ==> new w1={}", *w1));
     //   if (ierr1) {
     //     REprintf(" ERROR(code=%d)\n", ierr1);
     //   } else {
@@ -658,8 +657,8 @@ pub fn bratio(
         return;
     }
 
-    // R_ifDEBUG_printf("bratio(a=%g, b=%g, x=%9g, y=%9g, .., log_p=%d): ", a, b, x,
-    //                 y, log_p);
+    debug_print(&format!("bratio(a={}, b={}, x={}, y={}, .., log_p={}): ", a, b, x,
+                y, log_p));
     *ierr = 0;
     if x == 0.0 {
         if a == 0.0 {
@@ -762,7 +761,7 @@ pub fn bratio(
         let mut did_bup = false;
         if max(a0, b0) > 1.0 {
             /* L20:  min(a,b) <= 1 < max(a,b)  */
-            debug_print("\n L20:  min(a,b) <= 1 < max(a,b); ");
+            debug_print("L20:  min(a,b) <= 1 < max(a,b); ");
             if b0 <= 1.0 {
                 return l_w_bpser(a0, b0, x0, w, w1, eps, do_swap, log_p);
             }
@@ -1462,7 +1461,7 @@ pub fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i
      } else if *w == 0.0 { 0.0 } else { exp(log(*w) - log_u) };
 
     debug_print(&format!(
-            "bgrat(a={}, b={}, x={}, *)\n -> u={}, l='w/u'={}, ",
+            "bgrat(a={}, b={}, x={}, *) -> u={}, l='w/u'={}, ",
             a, b, x, u, l));
     let q_r = grat_r(b, z, log_r, eps); // = q/r of former grat1(b,z, r, &p, &q)
     let v = 0.25 / (nu * nu);
@@ -1625,10 +1624,10 @@ fn grat_r(a: f64, x: f64, log_r: f64, eps: f64) -> f64 {
             }
         }
 
-        // R_ifDEBUG_printf(
-        //    " grat_r(a=%g, x=%g, log_r=%g): Cont.frac. %.0f terms => q_r=%.15g\n",
-        //    a, x, log_r, c - 1., an0);
-        /* q/r = (r * an0)/r = */
+        debug_print(&format!(
+            " grat_r(a={}, x={}, log_r={}): Cont.frac. {} terms => q_r={}",
+            a, x, log_r, c - 1., an0));
+            /* q/r = (r * an0)/r = */
         an0
     }
 }

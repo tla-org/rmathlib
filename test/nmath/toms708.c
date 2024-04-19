@@ -114,6 +114,7 @@ bratio(double a, double b, double x, double y, double *w, double *w1,
  *     Revised ... Nov 1991
 * ----------------------------------------------------------------------- */
     printf("\nC entered bratio\n");
+    printf("a = %f\n", a);
 
     Rboolean do_swap;
     int n, ierr1 = 0;
@@ -143,7 +144,8 @@ bratio(double a, double b, double x, double y, double *w, double *w1,
 
     if (fabs(z) > eps * 3.) { *ierr = 5; return; }
 
-    R_ifDEBUG_printf("bratio(a=%g, b=%g, x=%9g, y=%9g, .., log_p=%d): ",
+    // R_ifDEBUG_printf prints completely wrong outputs.
+    printf("\nbratio(a=%f, b=%f, x=%9f, y=%9f, .., log_p=%d): \n",
 		     a,b,x,y, log_p);
     *ierr = 0;
     if (x == 0.) goto L200;
@@ -236,7 +238,7 @@ bratio(double a, double b, double x, double y, double *w, double *w1,
 	R_ifDEBUG_printf(" L131: bgrat(*, w1=%.15g) ", *w1);
 	bgrat(b0, a0, y0, x0, w1, 15*eps, &ierr1, FALSE);
 #ifdef DEBUG_bratio
-	REprintf(" ==> new w1=%.15g", *w1);
+	printf("\n ==> new w1=%.15g \n", *w1);
 	if(ierr1) REprintf(" ERROR(code=%d)\n", ierr1) ; else REprintf("\n");
 #endif
 	if(*w1 == 0 || (0 < *w1 && *w1 < DBL_MIN)) { // w1=0 or very close:
@@ -258,6 +260,7 @@ bratio(double a, double b, double x, double y, double *w, double *w1,
 	}
 	// else
 	if(ierr1) *ierr = 10 + ierr1;
+    printf("got past 10 + ierr1\n");
 	if(*w1 < 0)
 	    MATHLIB_WARNING4("bratio(a=%g, b=%g, x=%g): bgrat() -> w1 = %g",
 			     a,b,x, *w1);
@@ -796,7 +799,7 @@ static double bfrac(double a, double b, double x, double y, double lambda,
 	anp1 = r;
 	bnp1 = 1.;
     } while (n < 10000);// arbitrary; had '1' --> infinite loop for  lambda = Inf
-    R_ifDEBUG_printf("  in bfrac(): n=%.0f terms cont.frac.; brc=%g, r=%g\n",
+    printf("\n  in bfrac(): n=%.0f terms cont.frac.; brc=%g, r=%g\n",
 		     n, brc, r);
     if(n >= 10000 && fabs(r - r0) > eps * r)
 	MATHLIB_WARNING5(
@@ -1117,8 +1120,8 @@ static void bgrat(double a, double b, double x, double y, double *w,
     if (b * z == 0.) { // should not happen, but does, e.g.,
 	// for  pbeta(1e-320, 1e-5, 0.5)  i.e., _subnormal_ x,
 	// Warning ... bgrat(a=20.5, b=1e-05, x=1, y=9.99989e-321): ..
-	MATHLIB_WARNING5(
-	    "bgrat(a=%g, b=%g, x=%g, y=%g): z=%g, b*z == 0 underflow, hence inaccurate pbeta()",
+	printf(
+	    "\nbgrat(a=%g, b=%g, x=%g, y=%g): z=%g, b*z == 0 underflow, hence inaccurate pbeta()\n",
 	    a,b,x,y, z);
 	/* L_Error:    THE EXPANSION CANNOT BE COMPUTED */
 	 *ierr = 1; return;
@@ -1153,7 +1156,7 @@ static void bgrat(double a, double b, double x, double y, double *w,
 	? ((*w == ML_NEGINF) ? 0. : exp(  *w    - log_u))
 	: ((*w == 0.)        ? 0. : exp(log(*w) - log_u));
 
-    R_ifDEBUG_printf(" bgrat(a=%g, b=%g, x=%g, *)\n -> u=%g, l='w/u'=%g, ",
+    printf("\n bgrat(a=%g, b=%g, x=%g, *) -> u=%g, l='w/u'=%g, \n",
 		     a,b,x, u, l);
     double
 	q_r = grat_r(b, z, log_r, eps), // = q/r of former grat1(b,z, r, &p, &q)
@@ -1300,7 +1303,7 @@ static double grat_r(double a, double x, double log_r, double eps)
 	    an0 = a2n / b2n;
 	} while (fabs(an0 - am0) >= eps * an0);
 
-	R_ifDEBUG_printf(" grat_r(a=%g, x=%g, log_r=%g): Cont.frac. %.0f terms => q_r=%.15g\n",
+	printf("\n grat_r(a=%g, x=%g, log_r=%g): Cont.frac. %.0f terms => q_r=%.15g\n",
 			 a,x, log_r, c-1., an0);
 	return /* q/r = (r * an0)/r = */ an0;
     }
@@ -1738,7 +1741,7 @@ static double gam1(double a)
 		     ) * t + r[3]) * t + r[2]) * t + r[1]) * t + r[0];
 	bot = (s2 * t + s1) * t + 1.;
 	w = top / bot;
-	R_ifDEBUG_printf("  gam1(a = %.15g): t < 0: w=%.15g\n", a, w);
+	printf("\n  gam1(a = %.15g): t < 0: w=%.15g\n", a, w);
 	if (d > 0.)
 	    return t * w / a;
 	else
