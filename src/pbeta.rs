@@ -41,7 +41,7 @@ fn pbeta_raw(x: f64, a: f64, b: f64, lower_tail: bool, log_p: bool) -> f64 {
     bratio(a, b, x, x1, &mut w, &mut w1, &mut ierr, log_p);
 
     if ierr != 0 && ierr != 11 && ierr != 14 {
-        println!("pbeta_raw({x}, a={a}, b={b}, lower_tail={lower_tail}, log_p={log_p}) -> bratio() gave error code{ierr}");
+        println!("pbeta_raw({}, a={}, b={}, lower_tail={}, log_p={}) -> bratio() gave error code{}", x, a, b, lower_tail, log_p, ierr);
     }
     if lower_tail {
         w

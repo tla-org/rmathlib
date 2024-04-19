@@ -432,7 +432,7 @@ fn l131(
     do_swap: bool,
     log_p: bool,
 ) {
-    debug_print(&format!(" L131: bgrat(*, w1={w1}) "));
+    debug_print(&format!(" L131: bgrat(*, w1={}) ", w1));
     bgrat(b0, a0, y0, x0, w1, 15.0 * eps, &mut ierr1, false);
     debug_print(&format!(" ==> new w1={}", *w1));
     //   if (ierr1) {
@@ -803,7 +803,7 @@ pub fn bratio(
         did_bup = true;
         // R_ifDEBUG_printf("  ... n=20 and *w1 := bup(*) = %.15g; ", *w1);
         b0 += n as f64;
-        println!("here w1: {w1}");
+        println!("here w1: {}", w1);
         l131(
             a, b, x, n, a0, b0, x0, y0, w, w1, eps, ierr, ierr1, did_bup, do_swap, log_p,
         )
