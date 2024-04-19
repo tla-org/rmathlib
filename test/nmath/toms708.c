@@ -1105,7 +1105,6 @@ static void bgrat(double a, double b, double x, double y, double *w,
 *          *w := log(exp(*w) + I_x(a,b)) = logspace_add(*w, log( I_x(a,b) ))
 * ----------------------------------------------------------------------- */
 
-    printf(" bgrat(a=%g, b=%g, x=%g, y=%g, w=%g, eps=%g, ierr=%d, log_w=%d)\n");
 #define n_terms_bgrat 30
     double c[n_terms_bgrat], d[n_terms_bgrat];
     double bm1 = b - 0.5 - 0.5,
