@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod test_math {
     use approx::abs_diff_eq;
+    use approx::assert_abs_diff_eq;
     use rmathlib::*;
 
     mod c {
@@ -20,7 +21,6 @@ mod test_math {
             pub fn log1pmx(x: f64) -> f64;
             pub fn lgammafn(x: f64) -> f64;
             pub fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64;
-            #[allow(dead_code)]
             pub fn pbeta(x: f64, a: f64, b: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn pgamma(x: f64, alph: f64, scale: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn pnorm5(x: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
@@ -225,12 +225,111 @@ mod test_math {
         assert_eq!(log1pmx(0.81), unsafe { c::log1pmx(0.81) });
     }
 
-    // TODO: add more tests
     #[test]
-    fn test_pbeta() {
-        // assert_eq!(pbeta(0.0, 0.0, 1.0, false, false), unsafe {
-        //    c::pbeta(0.0, 0.0, 1.0, 0, 0)
-        // });
+    // This test is based on `toms708_test.f` subroutine `TEST01`.
+    // Test BRATIO computes the Beta ratio function.
+    fn subroutine_test01() {
+        let a: f64 = 5.3;
+        let b: f64 = 10.1;
+
+        for i in 1..=50 {
+            let x: f64 = (i as f64) / 100.0;
+            let y: f64 = 0.5 + (0.5 - x);
+            let log_p = false;
+
+            let mut _w: f64 = 0.0;
+            let mut _w1: f64 = 0.0;
+            let mut ierr: i32 = 1;
+            bratio(a, b, x, y, &mut _w, &mut _w1, &mut ierr, log_p);
+            assert!(ierr == 0);
+        }
+    }
+
+    #[test]
+    fn test_pbeta_and_toms708() {
+        // Manual values obtained from R 4.3.2.
+        assert_eq!(pbeta(0.9, 0.1, 0.1, false, false), 0.40638509393627587);
+        // assert!(pbeta(0.9, 0.0, 1.0, false, false).is_nan());
+        // assert_eq!(pbeta(0.1, 0.5, 0.5, true, true), 0.1285223);
+
+        fn helper(x: f64, a: f64, b: f64, lower_tail: bool, log_p: bool) {
+            let rs = pbeta(x, a, b, lower_tail, log_p);
+            let c = unsafe { c::pbeta(x, a, b, lower_tail as i32, log_p as i32) };
+            // If both NaN, then avoid comparing since that would fail.
+            if !(rs.is_nan() && c.is_nan()) {
+                assert_eq!(
+                    rs, c,
+                    "pbeta({}, {}, {}, {}, {})",
+                    x, a, b, lower_tail, log_p
+                );
+            }
+        }
+
+        // These functions do not call `bratio`.
+        helper(0.9, 0.0, 1.0, false, false);
+        helper(1.1, 0.0, 1.0, false, false);
+        helper(0.0, -1.0, 1.0, false, false);
+        helper(f64::NAN, 1.0, 1.0, false, false);
+        helper(0.1, 0.0, 1.0, false, false);
+
+        // These functions call `bratio`.
+        // Thanks to the `pbeta` definition in `pbeta.rs`, we can compare the
+        // outcome of `bratio` against the outcome of `pbeta` in R.
+        // The values are obtained via R version 4.3.4.
+        //
+        // `pbeta.rs` is mostly handling edge cases and then calling `bratio`.
+        // Cases which end up in `bratio` are where 0 < a < Inf and 0 < b < Inf.
+
+        // R> pbeta(0.5, 1.0, 1.0, lower.tail = TRUE, log.p = FALSE)
+        assert_eq!(pbeta(0.5, 1.0, 1.0, true, false), 0.5);
+
+        let epsilon = 1e-12;
+        assert_abs_diff_eq!(
+            pbeta(0.01, 0.01, 0.01, true, false),
+            // R> sprintf("%.13f", pbeta(0.01, 0.01, 0.01, lower.tail = TRUE, log.p = FALSE))
+            0.4776207614162,
+            epsilon = epsilon
+        );
+
+        assert_abs_diff_eq!(
+            pbeta(0.001, 0.001, 0.01, true, false),
+            // R> sprintf("%.13f", pbeta(0.001, 0.001, 0.01, lower.tail = TRUE, log.p = FALSE))
+            0.9028483975306,
+            epsilon = epsilon
+        );
+
+        assert_abs_diff_eq!(
+            pbeta(0.1, 0.8, 2.0, true, true),
+            // R> sprintf("%.13f", pbeta(0.1, 0.8, 2.0, lower.tail=TRUE, log.p=TRUE))
+            -1.2997437835699,
+            epsilon = epsilon
+        );
+
+        assert_abs_diff_eq!(
+            pbeta(0.1, 0.8, 2.0, false, true),
+            // R> sprintf("%.13f", pbeta(0.1, 0.8, 2.0, lower.tail=FALSE, log.p=TRUE))
+            -0.3182809860569,
+            epsilon = epsilon
+        );
+
+        // Based on a test in `d-p-q-r-tst-2.R` from the R source code.
+        for x in [0.01, 0.10, 0.25, 0.40, 0.55, 0.71, 0.98] {
+            assert_abs_diff_eq!(
+                pbeta(x, 0.8, 2.0, false, true),
+                pbeta(1.0 - x, 2.0, 0.8, true, true),
+                epsilon = epsilon,
+            )
+        }
+
+        // Tests via the helper function.
+        helper(0.1, 0.5, 0.5, false, false);
+        helper(0.1, 0.5, 0.5, true, false);
+        helper(0.1, 0.5, 0.5, true, true);
+        helper(0.1, 1.001, 0.99, true, true);
+        helper(0.5, 10000.0, 0.2, true, true);
+        helper(0.5, 10000.0, 0.2, true, false);
+        helper(0.5, 10000.0, 0.2, false, false);
+        helper(0.0, 0.0, 0.2, false, false);
     }
 
     #[test]

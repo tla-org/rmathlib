@@ -11,7 +11,6 @@ fn pbeta_raw(x: f64, a: f64, b: f64, lower_tail: bool, log_p: bool) -> f64 {
         return r_dt_1(lower_tail, log_p);
     }
     if a == 0.0 || b == 0.0 || !a.is_finite() || !b.is_finite() {
-        // NB: 0 < x < 1 :
         if a == 0.0 && b == 0.0 {
             // point mass 1/2 at each of {0, 1} :
             return if log_p { -M_LN2 } else { 0.5 };
@@ -37,17 +36,20 @@ fn pbeta_raw(x: f64, a: f64, b: f64, lower_tail: bool, log_p: bool) -> f64 {
 
     let x1 = 0.5 - x + 0.5;
     let mut w = 0.0;
-    let mut wc = 0.0;
+    let mut w1 = 0.0;
     let mut ierr = 0;
-    bratio(a, b, x, x1, &mut w, &mut wc, &mut ierr, log_p);
+    bratio(a, b, x, x1, &mut w, &mut w1, &mut ierr, log_p);
 
     if ierr != 0 && ierr != 11 && ierr != 14 {
-        // println!("pbeta_raw({x}, a={a}, b={b}, lower_tail={lower_tail}, log_p={log_p}) -> bratio() gave error code{ierr}");
+        println!(
+            "pbeta_raw({}, a={}, b={}, lower_tail={}, log_p={}) -> bratio() gave error code{}",
+            x, a, b, lower_tail, log_p, ierr
+        );
     }
     if lower_tail {
         w
     } else {
-        wc
+        w1
     }
 }
 

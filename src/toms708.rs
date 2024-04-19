@@ -1,6 +1,9 @@
 #![allow(dead_code)]
 #![allow(clippy::manual_range_contains)]
 
+use crate::debug::debug_print;
+use crate::dpq::r_d__0;
+use crate::dpq::r_d__1;
 use crate::i1mach::i1mach;
 use libm::cos;
 use libm::exp;
@@ -65,22 +68,6 @@ fn d1mach(i: i32) -> f64 {
     }
 }
 
-fn r_d_0(log_p: bool) -> f64 {
-    if log_p {
-        ML_NEGINF
-    } else {
-        0.0
-    }
-}
-
-fn r_d_1(log_p: bool) -> f64 {
-    if log_p {
-        0.0
-    } else {
-        1.0
-    }
-}
-
 fn r_d_exp(log_p: bool, x: f64) -> f64 {
     if log_p {
         x
@@ -115,7 +102,7 @@ fn l_end(w: &mut f64, w1: &mut f64, do_swap: bool) {
 fn l_end_from_w(w: &mut f64, w1: &mut f64, do_swap: bool, log_p: bool) {
     if log_p {
         *w1 = log1p(-*w);
-        *w = log1p(-*w);
+        *w = log(*w);
     } else {
         *w1 = 0.5 - *w + 0.5;
     }
@@ -125,7 +112,7 @@ fn l_end_from_w(w: &mut f64, w1: &mut f64, do_swap: bool, log_p: bool) {
 fn l_end_from_w1(w: &mut f64, w1: &mut f64, do_swap: bool, log_p: bool) {
     if log_p {
         *w = log1p(-*w1);
-        *w1 = log(-*w1);
+        *w1 = log(*w1);
     } else {
         *w = 0.5 - *w1 + 0.5;
     }
@@ -159,7 +146,7 @@ fn bpser(a: f64, b: f64, x: f64, eps: f64, log_p: bool) -> f64 {
     let apb: f64;
 
     if x == 0.0 {
-        return r_d_0(log_p);
+        return r_d__0(log_p);
     }
     // Compute the factor x^a/(a*Beta(a,b)).
     let a0: f64 = min(a, b);
@@ -243,7 +230,7 @@ fn bpser(a: f64, b: f64, x: f64, eps: f64, log_p: bool) -> f64 {
     }
     // R_ifDEBUG_printf(" bpser(a=%g, b=%g, x=%g, log=%d): prelim.ans = %.14g;\n", a,
     // b, x, log_p, ans);
-    if ans == r_d_0(log_p) || (!log_p && a <= eps * 0.1) {
+    if ans == r_d__0(log_p) || (!log_p && a <= eps * 0.1) {
         return ans;
     }
 
@@ -428,9 +415,9 @@ fn l140(
 #[allow(clippy::too_many_arguments)]
 fn l131(
     // These variables are used for debugging in original code.
-    _a: f64,
-    _b: f64,
-    _x: f64,
+    a: f64,
+    b: f64,
+    x: f64,
     n: i32,
     a0: f64,
     b0: f64,
@@ -445,10 +432,9 @@ fn l131(
     do_swap: bool,
     log_p: bool,
 ) {
-    // R_ifDEBUG_printf(" L131: bgrat(*, w1=%.15g) ", *w1);
+    debug_print(&format!(" L131: bgrat(*, w1={}) ", w1));
     bgrat(b0, a0, y0, x0, w1, 15.0 * eps, &mut ierr1, false);
-    // #ifdef DEBUG_bratio
-    //   REprintf(" ==> new w1=%.15g", *w1);
+    debug_print(&format!(" ==> new w1={}", *w1));
     //   if (ierr1) {
     //     REprintf(" ERROR(code=%d)\n", ierr1);
     //   } else {
@@ -487,7 +473,10 @@ fn l131(
         *ierr = 10 + ierr1;
     }
     if *w1 < 0.0 {
-        // printf("bratio(a=%g, b=%g, x=%g): bgrat() -> w1 = %g", a, b, x, *w1);
+        debug_print(&format!(
+            "bratio(a={}, b={}, x={}): bgrat() -> w1 = {}",
+            a, b, x, *w1
+        ));
     }
     l_end_from_w1(w, w1, do_swap, log_p)
 }
@@ -621,8 +610,6 @@ pub fn bratio(
     log_p: bool,
 ) {
     let do_swap: bool;
-    // n used to be not initialized here, but that meant it was used uninitialized
-    // when going through GOTO L131.
     let mut n: i32 = 0;
     let ierr1: i32 = 0;
     let a0: f64;
@@ -637,8 +624,10 @@ pub fn bratio(
     let mut eps: f64 = 2.0 * d1mach(3); /* == DBL_EPSILON (in R, Rmath) */
 
     /* ----------------------------------------------------------------------- */
-    *w = r_d_0(log_p);
-    *w1 = r_d_0(log_p);
+    *w = r_d__0(log_p);
+    *w1 = r_d__0(log_p);
+
+    println!("w1: {}", w1);
 
     // safeguard, preventing infinite loops further down
     if x.is_nan() || y.is_nan() || a.is_nan() || b.is_nan() {
@@ -671,16 +660,18 @@ pub fn bratio(
         return;
     }
 
-    // R_ifDEBUG_printf("bratio(a=%g, b=%g, x=%9g, y=%9g, .., log_p=%d): ", a, b, x,
-    //                 y, log_p);
+    debug_print(&format!(
+        "bratio(a={}, b={}, x={}, y={}, .., log_p={}): ",
+        a, b, x, y, log_p
+    ));
     *ierr = 0;
     if x == 0.0 {
         if a == 0.0 {
             *ierr = 6;
             return;
         } else {
-            *w = r_d_0(log_p);
-            *w1 = r_d_1(log_p);
+            *w = r_d__0(log_p);
+            *w1 = r_d__1(log_p);
             return;
         }
     }
@@ -690,20 +681,20 @@ pub fn bratio(
             *ierr = 7;
             return;
         } else {
-            *w = r_d_1(log_p);
-            *w1 = r_d_0(log_p);
+            *w = r_d__1(log_p);
+            *w1 = r_d__0(log_p);
             return;
         }
     }
 
     if a == 0.0 {
-        *w = r_d_1(log_p);
-        *w1 = r_d_0(log_p);
+        *w = r_d__1(log_p);
+        *w1 = r_d__0(log_p);
         return;
     }
     if b == 0.0 {
-        *w = r_d_0(log_p);
-        *w1 = r_d_1(log_p);
+        *w = r_d__0(log_p);
+        *w1 = r_d__1(log_p);
         return;
     }
 
@@ -774,7 +765,7 @@ pub fn bratio(
         let mut did_bup = false;
         if max(a0, b0) > 1.0 {
             /* L20:  min(a,b) <= 1 < max(a,b)  */
-            // R_ifDEBUG_printf("\n L20:  min(a,b) <= 1 < max(a,b); ");
+            debug_print("L20:  min(a,b) <= 1 < max(a,b); ");
             if b0 <= 1.0 {
                 return l_w_bpser(a0, b0, x0, w, w1, eps, do_swap, log_p);
             }
@@ -812,6 +803,7 @@ pub fn bratio(
         did_bup = true;
         // R_ifDEBUG_printf("  ... n=20 and *w1 := bup(*) = %.15g; ", *w1);
         b0 += n as f64;
+        println!("here w1: {}", w1);
         l131(
             a, b, x, n, a0, b0, x0, y0, w, w1, eps, ierr, ierr1, did_bup, do_swap, log_p,
         )
@@ -1097,7 +1089,7 @@ fn brcomp(a: f64, b: f64, x: f64, y: f64, log_p: bool) -> f64 {
     let apb: f64;
 
     if x == 0.0 || y == 0.0 {
-        return r_d_0(log_p);
+        return r_d__0(log_p);
     }
     let a0 = min(a, b);
     if a0 < 8.0 {
@@ -1281,7 +1273,7 @@ fn brcmp1(mu: i32, a: f64, b: f64, x: f64, y: f64, give_log: bool) -> f64 {
         if b0 >= 8.0 {
             /* L80:                  ALGORITHM FOR b0 >= 8 */
             u = gamln1(a0) + algdiv(a0, b0);
-            // R_ifDEBUG_printf(" brcmp1(mu,a,b,*): a0 < 1, b0 >= 8;  z=%.15g\n", z);
+            debug_print(&format!(" brcmp1(mu, a, b, *): a0 < 1, b0 >= 8; z={}", z));
             return if give_log {
                 log(a0) + esum(mu, z - u, true)
             } else {
@@ -1414,7 +1406,7 @@ fn brcmp1(mu: i32, a: f64, b: f64, x: f64, y: f64, give_log: bool) -> f64 {
 /// compute w := w + I_x(a,b)  but return *w = log(w):
 /// ////// *w := log(exp(*w) + I_x(a,b)) = logspace_add(*w, log( I_x(a,b) ))
 /// ----------------------------------------------------------------------- */
-fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i32, log_w: bool) {
+pub fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i32, log_w: bool) {
     const N_TERMS_BGRAT: usize = 30;
     let mut c: [f64; N_TERMS_BGRAT] = [0.0; N_TERMS_BGRAT];
     let mut d: [f64; N_TERMS_BGRAT] = [0.0; N_TERMS_BGRAT];
@@ -1428,9 +1420,10 @@ fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i32, 
         // should not happen, but does, e.g.,
         // for  pbeta(1e-320, 1e-5, 0.5)  i.e., _subnormal_ x,
         // Warning ... bgrat(a=20.5, b=1e-05, x=1, y=9.99989e-321): ..
-        //printf("bgrat(a=%g, b=%g, x=%g, y=%g): z=%g, b*z == 0 underflow, hence "
-        //       "inaccurate pbeta()",
-        //       a, b, x, y, z);
+        debug_print(&format!(
+            "bgrat(a={}, b={}, x={}, y={}): z={}, b*z == 0 underflow, hence inaccurate pbeta()",
+            a, b, x, y, z
+        ));
         /* L_Error:    THE EXPANSION CANNOT BE COMPUTED */
         *ierr = 1;
         return;
@@ -1444,19 +1437,19 @@ fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i32, 
     // log_r := log(r): r = r1 * exp(a * lnx) * exp(bm1 * 0.5 * lnx);
     // log(r)=log(b) + log1p(gam1(b)) + b * log(z) + (a * lnx) + (bm1 *
     // 0.5 * lnx),
-    let log_r = log(b) + log1p(gam1(b)) + b * log(z) + nu * lnx;
+    let log_r: f64 = log(b) + log1p(gam1(b)) + b * log(z) + nu * lnx;
     // FIXME work with  log_u = log(u)  also when log_p=false  (??)
     // u is 'factored out' from the expansion {and multiplied back, at
     // the end}:
     // algdiv(b,a) = log(gamma(a)/gamma(a+b))
-    let log_u = log_r - (algdiv(b, a) + b * log(nu));
+    let log_u: f64 = log_r - (algdiv(b, a) + b * log(nu));
     /* u = (log_p) ? log_r - u : exp(log_r-u); // =: M  in (9.2) of {reference
     above} */
     /* u = algdiv(b, a) + b * log(nu);// algdiv(b,a) =
     log(gamma(a)/gamma(a+b)) */
     // u = (log_p) ? log_u : exp(log_u); // =: M  in (9.2) of {reference
     // above}
-    let u = exp(log_u);
+    let u: f64 = exp(log_u);
 
     if log_u == ML_NEGINF {
         // R_ifDEBUG_printf(
@@ -1472,8 +1465,10 @@ fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i32, 
      if log_w { if *w == ML_NEGINF { 0.0 } else { exp(*w - log_u) }
      } else if *w == 0.0 { 0.0 } else { exp(log(*w) - log_u) };
 
-    // R_ifDEBUG_printf(" bgrat(a=%g, b=%g, x=%g, *)\n -> u=%g, l='w/u'=%g, ", a, b,
-    //                  x, u, l);
+    debug_print(&format!(
+        "bgrat(a={}, b={}, x={}, *) -> u={}, l='w/u'={}, ",
+        a, b, x, u, l
+    ));
     let q_r = grat_r(b, z, log_r, eps); // = q/r of former grat1(b,z, r, &p, &q)
     let v = 0.25 / (nu * nu);
     let t2 = lnx * 0.25 * lnx;
@@ -1482,7 +1477,7 @@ fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i32, 
     let mut t = 1.0;
     let mut cn = 1.0;
     let mut n2 = 0.0;
-    for n in 0..=N_TERMS_BGRAT {
+    for n in 1..=N_TERMS_BGRAT {
         let bp2n = b + n2;
         j = (bp2n * (bp2n + 1.0) * j + (z + bp2n + 1.0) * t) * v;
         n2 += 2.0;
@@ -1635,9 +1630,14 @@ fn grat_r(a: f64, x: f64, log_r: f64, eps: f64) -> f64 {
             }
         }
 
-        // R_ifDEBUG_printf(
-        //    " grat_r(a=%g, x=%g, log_r=%g): Cont.frac. %.0f terms => q_r=%.15g\n",
-        //    a, x, log_r, c - 1., an0);
+        debug_print(&format!(
+            " grat_r(a={}, x={}, log_r={}): Cont.frac. {} terms => q_r={}",
+            a,
+            x,
+            log_r,
+            c - 1.,
+            an0
+        ));
         /* q/r = (r * an0)/r = */
         an0
     }
@@ -2138,7 +2138,7 @@ fn gam1(a: f64) -> f64 {
             + R[0];
         bot = (s2 * t + s1) * t + 1.;
         w = top / bot;
-        // R_ifDEBUG_printf("  gam1(a = %.15g): t < 0: w=%.15g\n", a, w);
+        debug_print(&format!("  gam1(a = {}): t < 0: w={}\n", a, w));
         if d > 0.0 {
             t * w / a
         } else {
@@ -2169,8 +2169,10 @@ fn gam1(a: f64) -> f64 {
         top = (((((P[6] * t + P[5]) * t + P[4]) * t + P[3]) * t + P[2]) * t + P[1]) * t + P[0];
         bot = (((Q[4] * t + Q[3]) * t + Q[2]) * t + Q[1]) * t + 1.;
         w = top / bot;
-        // R_ifDEBUG_printf("  gam1(a = %.15g): t > 0: (is a < 1.5 ?)  w=%.15g\n", a,
-        //                 w);
+        debug_print(&format!(
+            "  gam1(a = {}): t > 0: (is a < 1.5 ?)  w={}\n",
+            a, w
+        ));
         if d > 0.0 {
             /* L21: */
             t / a * (w - 0.5 - 0.5)
