@@ -66,7 +66,7 @@ double pbeta_raw(double x, double a, double b, int lower_tail, int log_p)
     //====
     // ierr in {10,14} <==> bgrat() error code ierr-10 in 1:4; for 1 and 4, warned *there*
     if(ierr && ierr != 11 && ierr != 14)
-	MATHLIB_WARNING6(_("pbeta_raw(%g, a=%g, b=%g, lower=%d, log=%d) -> bratio() gave error code %d"),
+	MATHLIB_WARNING6(_("pbeta_raw(%g, a=%g, b=%g, lower=%d, log=%d) -> bratio() gave error code %d\n"),
 			 x, a,b, lower_tail, log_p, ierr);
     return lower_tail ? w : wc;
 } /* pbeta_raw() */

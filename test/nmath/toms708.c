@@ -113,6 +113,7 @@ bratio(double a, double b, double x, double y, double *w, double *w1,
  *	  Dahlgren, Virginia
  *     Revised ... Nov 1991
 * ----------------------------------------------------------------------- */
+    printf("\nC entered bratio\n");
 
     Rboolean do_swap;
     int n, ierr1 = 0;
@@ -208,7 +209,7 @@ bratio(double a, double b, double x, double y, double *w, double *w1,
 
 	Rboolean did_bup = FALSE;
 	if (max(a0,b0) > 1.) { /* L20:  min(a,b) <= 1 < max(a,b)  */
-	    R_ifDEBUG_printf("\n L20:  min(a,b) <= 1 < max(a,b); ");
+	    R_ifDEBUG_printf("\n L20:  min(a,b) <= 1 < max(a,b); \n");
 	    if (b0 <= 1.) goto L_w_bpser;
 
 	    if (x0 >= 0.29) /* was 0.3, PR#13786 */	goto L_w1_bpser;

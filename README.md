@@ -21,7 +21,11 @@ Some benefits of this port over the native C code are:
 
 Some tips for debugging the C code in `test/nmath/`:
 
-If you change the C code, run `cargo clean && cargo test` to force recompilation of the code.
+To print from C, use `--nocapture` like so:
+
+```sh
+$ cargo watch -x 'test -- --nocapture'
+```
 
 When printing inside C, verify that that the numbers are printed correctly.
 `REprintf` seems to not always print numbers correctly.

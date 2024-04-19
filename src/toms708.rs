@@ -4,6 +4,7 @@
 use crate::i1mach::i1mach;
 use crate::dpq::r_d__0;
 use crate::dpq::r_d__1;
+use crate::debug::debug_print;
 use libm::cos;
 use libm::exp;
 use libm::expm1;
@@ -414,9 +415,9 @@ fn l140(
 #[allow(clippy::too_many_arguments)]
 fn l131(
     // These variables are used for debugging in original code.
-    _a: f64,
-    _b: f64,
-    _x: f64,
+    a: f64,
+    b: f64,
+    x: f64,
     n: i32,
     a0: f64,
     b0: f64,
@@ -431,7 +432,7 @@ fn l131(
     do_swap: bool,
     log_p: bool,
 ) {
-    println!(" L131: bgrat(*, w1={w1}) ");
+    debug_print(&format!(" L131: bgrat(*, w1={w1}) "));
     bgrat(b0, a0, y0, x0, w1, 15.0 * eps, &mut ierr1, false);
     // #ifdef DEBUG_bratio
     //   REprintf(" ==> new w1=%.15g", *w1);
@@ -473,7 +474,7 @@ fn l131(
         *ierr = 10 + ierr1;
     }
     if *w1 < 0.0 {
-        // printf("bratio(a=%g, b=%g, x=%g): bgrat() -> w1 = %g", a, b, x, *w1);
+        debug_print(&format!("bratio(a={}, b={}, x={}): bgrat() -> w1 = {}", a, b, x, *w1));
     }
     l_end_from_w1(w, w1, do_swap, log_p)
 }
@@ -761,7 +762,7 @@ pub fn bratio(
         let mut did_bup = false;
         if max(a0, b0) > 1.0 {
             /* L20:  min(a,b) <= 1 < max(a,b)  */
-            // R_ifDEBUG_printf("\n L20:  min(a,b) <= 1 < max(a,b); ");
+            debug_print("\n L20:  min(a,b) <= 1 < max(a,b); ");
             if b0 <= 1.0 {
                 return l_w_bpser(a0, b0, x0, w, w1, eps, do_swap, log_p);
             }
@@ -1269,7 +1270,7 @@ fn brcmp1(mu: i32, a: f64, b: f64, x: f64, y: f64, give_log: bool) -> f64 {
         if b0 >= 8.0 {
             /* L80:                  ALGORITHM FOR b0 >= 8 */
             u = gamln1(a0) + algdiv(a0, b0);
-            // R_ifDEBUG_printf(" brcmp1(mu,a,b,*): a0 < 1, b0 >= 8;  z=%.15g\n", z);
+            debug_print(&format!(" brcmp1(mu, a, b, *): a0 < 1, b0 >= 8; z={}", z));
             return if give_log {
                 log(a0) + esum(mu, z - u, true)
             } else {
@@ -1416,9 +1417,9 @@ pub fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i
         // should not happen, but does, e.g.,
         // for  pbeta(1e-320, 1e-5, 0.5)  i.e., _subnormal_ x,
         // Warning ... bgrat(a=20.5, b=1e-05, x=1, y=9.99989e-321): ..
-        //printf("bgrat(a=%g, b=%g, x=%g, y=%g): z=%g, b*z == 0 underflow, hence "
-        //       "inaccurate pbeta()",
-        //       a, b, x, y, z);
+        debug_print(&format!(
+            "bgrat(a={}, b={}, x={}, y={}): z={}, b*z == 0 underflow, hence inaccurate pbeta()",
+            a, b, x, y, z));
         /* L_Error:    THE EXPANSION CANNOT BE COMPUTED */
         *ierr = 1;
         return;
@@ -1460,8 +1461,9 @@ pub fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i
      if log_w { if *w == ML_NEGINF { 0.0 } else { exp(*w - log_u) }
      } else if *w == 0.0 { 0.0 } else { exp(log(*w) - log_u) };
 
-    // R_ifDEBUG_printf(" bgrat(a=%g, b=%g, x=%g, *)\n -> u=%g, l='w/u'=%g, ", a, b,
-    //                  x, u, l);
+    debug_print(&format!(
+            "bgrat(a={}, b={}, x={}, *)\n -> u={}, l='w/u'={}, ",
+            a, b, x, u, l));
     let q_r = grat_r(b, z, log_r, eps); // = q/r of former grat1(b,z, r, &p, &q)
     let v = 0.25 / (nu * nu);
     let t2 = lnx * 0.25 * lnx;
@@ -2126,7 +2128,7 @@ fn gam1(a: f64) -> f64 {
             + R[0];
         bot = (s2 * t + s1) * t + 1.;
         w = top / bot;
-        // R_ifDEBUG_printf("  gam1(a = %.15g): t < 0: w=%.15g\n", a, w);
+        debug_print(&format!("  gam1(a = {}): t < 0: w={}\n", a, w));
         if d > 0.0 {
             t * w / a
         } else {
@@ -2157,8 +2159,8 @@ fn gam1(a: f64) -> f64 {
         top = (((((P[6] * t + P[5]) * t + P[4]) * t + P[3]) * t + P[2]) * t + P[1]) * t + P[0];
         bot = (((Q[4] * t + Q[3]) * t + Q[2]) * t + Q[1]) * t + 1.;
         w = top / bot;
-        // R_ifDEBUG_printf("  gam1(a = %.15g): t > 0: (is a < 1.5 ?)  w=%.15g\n", a,
-        //                 w);
+        debug_print(&format!("  gam1(a = {}): t > 0: (is a < 1.5 ?)  w={}\n",
+            a, w));
         if d > 0.0 {
             /* L21: */
             t / a * (w - 0.5 - 0.5)
