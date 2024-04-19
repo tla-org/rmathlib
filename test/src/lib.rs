@@ -297,6 +297,16 @@ mod test_math {
             epsilon = epsilon
         );
 
+        println!("Problem case after this");
+
+        // One case from the loop below.
+        assert_abs_diff_eq!(
+            pbeta(0.1, 0.8, 2.0, false, true),
+            // R> sprintf("%.13f", pbeta(0.1, 0.8, 2.0, lower.tail=FALSE, log.p=TRUE))
+            -0.3182809860569,
+            epsilon = epsilon
+        );
+
         // Based on a test in `d-p-q-r-tst-2.R` from the R source code.
         // for x in [0.01, 0.10, 0.25, 0.40, 0.55, 0.71, 0.98] {
         //     assert_abs_diff_eq!(
@@ -305,15 +315,6 @@ mod test_math {
         //         epsilon = epsilon,
         //     )
         // }
-
-
-        // One case from the loop above.
-        assert_abs_diff_eq!(
-            pbeta(0.1, 0.8, 2.0, false, true),
-            // R> sprintf("%.13f", pbeta(0.1, 0.8, 2.0, lower.tail=FALSE, log.p=TRUE))
-            -0.3182809860569,
-            epsilon = epsilon
-        );
 
         // Tests via the helper function.
         helper(0.1, 0.5, 0.5, false, false);

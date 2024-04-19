@@ -2,6 +2,8 @@
 #![allow(clippy::manual_range_contains)]
 
 use crate::i1mach::i1mach;
+use crate::dpq::r_d__0;
+use crate::dpq::r_d__1;
 use libm::cos;
 use libm::exp;
 use libm::expm1;
@@ -62,22 +64,6 @@ fn d1mach(i: i32) -> f64 {
         4 => DBL_EPSILON,
         5 => M_LOG10_2,
         _ => 0.0,
-    }
-}
-
-fn r_d_0(log_p: bool) -> f64 {
-    if log_p {
-        ML_NEGINF
-    } else {
-        0.0
-    }
-}
-
-fn r_d_1(log_p: bool) -> f64 {
-    if log_p {
-        0.0
-    } else {
-        1.0
     }
 }
 
@@ -159,7 +145,7 @@ fn bpser(a: f64, b: f64, x: f64, eps: f64, log_p: bool) -> f64 {
     let apb: f64;
 
     if x == 0.0 {
-        return r_d_0(log_p);
+        return r_d__0(log_p);
     }
     // Compute the factor x^a/(a*Beta(a,b)).
     let a0: f64 = min(a, b);
@@ -243,7 +229,7 @@ fn bpser(a: f64, b: f64, x: f64, eps: f64, log_p: bool) -> f64 {
     }
     // R_ifDEBUG_printf(" bpser(a=%g, b=%g, x=%g, log=%d): prelim.ans = %.14g;\n", a,
     // b, x, log_p, ans);
-    if ans == r_d_0(log_p) || (!log_p && a <= eps * 0.1) {
+    if ans == r_d__0(log_p) || (!log_p && a <= eps * 0.1) {
         return ans;
     }
 
@@ -635,8 +621,10 @@ pub fn bratio(
     let mut eps: f64 = 2.0 * d1mach(3); /* == DBL_EPSILON (in R, Rmath) */
 
     /* ----------------------------------------------------------------------- */
-    *w = r_d_0(log_p);
-    *w1 = r_d_0(log_p);
+    *w = r_d__0(log_p);
+    *w1 = r_d__0(log_p);
+
+    println!("w: {}", w);
 
     // safeguard, preventing infinite loops further down
     if x.is_nan() || y.is_nan() || a.is_nan() || b.is_nan() {
@@ -677,8 +665,8 @@ pub fn bratio(
             *ierr = 6;
             return;
         } else {
-            *w = r_d_0(log_p);
-            *w1 = r_d_1(log_p);
+            *w = r_d__0(log_p);
+            *w1 = r_d__1(log_p);
             return;
         }
     }
@@ -688,20 +676,20 @@ pub fn bratio(
             *ierr = 7;
             return;
         } else {
-            *w = r_d_1(log_p);
-            *w1 = r_d_0(log_p);
+            *w = r_d__1(log_p);
+            *w1 = r_d__0(log_p);
             return;
         }
     }
 
     if a == 0.0 {
-        *w = r_d_1(log_p);
-        *w1 = r_d_0(log_p);
+        *w = r_d__1(log_p);
+        *w1 = r_d__0(log_p);
         return;
     }
     if b == 0.0 {
-        *w = r_d_0(log_p);
-        *w1 = r_d_1(log_p);
+        *w = r_d__0(log_p);
+        *w1 = r_d__1(log_p);
         return;
     }
 
@@ -732,7 +720,6 @@ pub fn bratio(
     }
 
     if min(a, b) <= 1.0 {
-    println!("b: {}", b);
 
         /*------------------------ a <= 1  or  b <= 1 ---- */
 
@@ -1097,7 +1084,7 @@ fn brcomp(a: f64, b: f64, x: f64, y: f64, log_p: bool) -> f64 {
     let apb: f64;
 
     if x == 0.0 || y == 0.0 {
-        return r_d_0(log_p);
+        return r_d__0(log_p);
     }
     let a0 = min(a, b);
     if a0 < 8.0 {
@@ -1444,19 +1431,19 @@ fn bgrat(a: f64, b: f64, x: f64, y: f64, w: &mut f64, eps: f64, ierr: &mut i32, 
     // log_r := log(r): r = r1 * exp(a * lnx) * exp(bm1 * 0.5 * lnx);
     // log(r)=log(b) + log1p(gam1(b)) + b * log(z) + (a * lnx) + (bm1 *
     // 0.5 * lnx),
-    let log_r = log(b) + log1p(gam1(b)) + b * log(z) + nu * lnx;
+    let log_r: f64 = log(b) + log1p(gam1(b)) + b * log(z) + nu * lnx;
     // FIXME work with  log_u = log(u)  also when log_p=false  (??)
     // u is 'factored out' from the expansion {and multiplied back, at
     // the end}:
     // algdiv(b,a) = log(gamma(a)/gamma(a+b))
-    let log_u = log_r - (algdiv(b, a) + b * log(nu));
+    let log_u: f64 = log_r - (algdiv(b, a) + b * log(nu));
     /* u = (log_p) ? log_r - u : exp(log_r-u); // =: M  in (9.2) of {reference
     above} */
     /* u = algdiv(b, a) + b * log(nu);// algdiv(b,a) =
     log(gamma(a)/gamma(a+b)) */
     // u = (log_p) ? log_u : exp(log_u); // =: M  in (9.2) of {reference
     // above}
-    let u = exp(log_u);
+    let u: f64 = exp(log_u);
 
     if log_u == ML_NEGINF {
         // R_ifDEBUG_printf(
