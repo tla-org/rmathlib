@@ -2,11 +2,6 @@
 
 A Rust port of [R's C Library of Special Functions](https://cran.r-project.org/doc/manuals/r-release/R-admin.html#The-standalone-Rmath-library).
 
-[![][docs-latest-img]][docs-latest-url]
-
-[docs-latest-img]: https://img.shields.io/badge/docs-preview-blue.svg
-[docs-latest-url]: https://rmathlib.poweranalyses.org
-
 ## Benefits
 
 Some benefits of this port over the native C code are:

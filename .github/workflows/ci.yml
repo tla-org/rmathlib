@@ -77,7 +77,7 @@ jobs:
           cd test/
           cargo fmt --all --check
 
-  docs:
+  test-docs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -102,13 +102,3 @@ jobs:
         run: |
           cargo doc --all --no-deps
           echo '<meta http-equiv="refresh" content="0; url=rmathlib">' > target/doc/index.html
-
-      # Not using actions/deploy-pages because it crashes for some reason.
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v4
-        if: github.ref == 'refs/heads/main'
-        with:
-          cname: 'rmathlib.poweranalyses.org'
-          force_orphan: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: './target/doc'
