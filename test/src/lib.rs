@@ -137,6 +137,19 @@ mod test_math {
         assert_eq!(dgamma(0.0, 0.0, 1.0, false), unsafe {
             c::dgamma(0.0, 0.0, 1.0, false)
         });
+        assert!(
+            dgamma(0.0, -1.0, 1.0, false).is_nan()
+                && unsafe { c::dgamma(0.0, -1.0, 1.0, false).is_nan() }
+        );
+        assert_eq!(dgamma(0.12, 0.34, 0.56, true), unsafe {
+            c::dgamma(0.12, 0.34, 0.56, true)
+        });
+        assert_eq!(dgamma(0.12, 0.34, 0.56, false), unsafe {
+            c::dgamma(0.12, 0.34, 0.56, false)
+        });
+        assert_eq!(dgamma(0.12, 1.34, 0.56, false), unsafe {
+            c::dgamma(0.12, 1.34, 0.56, false)
+        });
     }
 
     #[test]
