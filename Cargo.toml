@@ -18,7 +18,12 @@ keywords = [
   "stats",
   "distribution",
 ]
+readme = "README.md"
 repository = "https://github.com/tla-org/rmathlib"
+homepage = "https://github.com/tla-org/rmathlib"
+documentation = "https://docs.rs/rmathlib"
+exclude = ["/.github/*", "/test/*"]
+rust-version = "1.56.1"
 
 [dependencies]
 libm = "0.2"
