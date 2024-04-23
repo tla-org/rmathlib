@@ -6,7 +6,8 @@ edition = "2018"
 version = "1.0.0"
 
 [build-dependencies]
-cc = "1.0"
+# Newer cc versions require a newer Rust version.
+cc = ">=1.0.0, <1.0.95"
 
 [dependencies]
 rmathlib = { path = "../" }
