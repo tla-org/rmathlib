@@ -15,6 +15,7 @@ mod test_math {
             pub fn Rf_lgammacor(x: f64) -> f64;
             pub fn Rf_stirlerr(n: f64) -> f64;
             pub fn cospi(x: f64) -> f64;
+            pub fn dgamma(x: f64, shape: f64, scale: f64, give_log: bool) -> f64;
             pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64;
             pub fn dpois(x: f64, lambda: f64, give_log: bool) -> f64;
             pub fn gammafn(x: f64) -> f64;
@@ -129,6 +130,13 @@ mod test_math {
     fn test_cospi() {
         assert_eq!(cospi(0.0), unsafe { c::cospi(0.0) });
         assert_eq!(cospi(0.234), unsafe { c::cospi(0.234) });
+    }
+
+    #[test]
+    fn test_dgamma() {
+        assert_eq!(dgamma(0.0, 0.0, 1.0, false), unsafe {
+            c::dgamma(0.0, 0.0, 1.0, false)
+        });
     }
 
     #[test]
