@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["bd0","bratio","chebyshev_eval","chebyshev_init","cospi","dgamma","dnorm","dpois","ebd0","gammafn","i1mach","lbeta","lgammacor","lgammafn","lgammafn_sign","log1pmx","logspace_add","pbeta","pgamma","pnorm","pt","qnorm","sinpi","stirlerr","tanpi"]};
