@@ -8,7 +8,7 @@ authors = [
   "Rik Huijzer <github@huijzer.xyz>",
   "Jose Storopoli <jose@storopoli.io>",
 ]
-license = "GPL 3.0"
+license = "GPL-2.0-or-later"
 categories = ["science", "mathematics", "algorithms"]
 keywords = [
   "rmath",
@@ -18,7 +18,7 @@ keywords = [
   "stats",
   "distribution",
 ]
-repository = "https://github.com/poweranalyses-org/rmathlib"
+repository = "https://github.com/tla-org/rmathlib"
 
 [dependencies]
 libm = "0.2"
