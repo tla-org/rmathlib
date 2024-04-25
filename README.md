@@ -12,12 +12,25 @@ Some benefits of this port over the native C code are:
 - Enables Go To Definition (code navigation) when loading this package as a dependency.
 - More clarity about the used compiler and supported Rust versions.
 
+## Status
+
+The following functions have been ported:
+
+Distribution | Density | Probability | Quantile | Random Generation
+--- | :---: | :---: | :---: | :---:
+Normal | `dnorm` | `pnorm` | `qnorm` |
+Student's t | | `pt` | |
+Beta | | `pbeta` | |
+Poisson | `dpois` | | |
+Gamma | `dgamma` | `pgamma` |
+
 ## License
 
 The original R code is licensed under the GPL-2.0.
 Therefore, this port is also licensed under the GPL-2.0.
 
 The GPL-2.0 is known to be a very restrictive license.
+Each project that includes GPL-2.0 code should also be licensed under the GPL-2.0 (
 One exception to this restriction is to use this library only for a small part of the functionality of your project (see, e.g., [here](https://opensource.stackexchange.com/questions/1579)).
 In such cases, your project would be considered not to be a "derivative work" and therefore not subject to the GPL-2.0.
 
