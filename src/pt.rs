@@ -49,7 +49,7 @@ pub fn pt(x: f64, n: f64, mut lower_tail: bool, log_p: bool) -> f64 {
             exp(lval)
         }
     } else if n > x * x {
-        pbeta(x * x / (n + x * x), 0.5 * n, n / 2.0, false, log_p)
+        pbeta(x * x / (n + x * x), 0.5, n / 2.0, false, log_p)
     } else {
         pbeta(1.0 / nx, n / 2.0, 0.5, true, log_p)
     };

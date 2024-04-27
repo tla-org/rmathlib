@@ -322,9 +322,14 @@ mod test_math {
         assert_eq!(pt(0.1, 1.0, false, false), unsafe {
             c::pt(0.1, 1.0, false, false)
         });
-        assert_eq!(pt(-0.1, 1.0, false, false), unsafe {
-            c::pt(-0.1, 1.0, false, false)
+        assert_eq!(pt(-1.0, 1.0, false, false), unsafe {
+            c::pt(-1.0, 1.0, false, false)
         });
+        assert!(abs_diff_eq!(
+            pt(-1.0, 10.0, false, false),
+            unsafe { c::pt(-1.0, 10.0, false, false) },
+            epsilon = 1e-15
+        ));
         assert_eq!(pt(1.0, 1.0, false, false), unsafe {
             c::pt(1.0, 1.0, false, false)
         });
@@ -336,6 +341,16 @@ mod test_math {
         assert!(abs_diff_eq!(
             pt(1.0, 1.0, true, true),
             unsafe { c::pt(1.0, 1.0, true, true) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            pt(-10.0, 15.0, false, true),
+            unsafe { c::pt(-10.0, 15.0, false, true) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            pt(-10.0, 15.0, true, true),
+            unsafe { c::pt(-10.0, 15.0, true, true) },
             epsilon = 1e-15
         ));
     }
