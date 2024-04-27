@@ -22,7 +22,8 @@ pub const M_LN_SQRT_2PI: f64 = 0.918_938_533_204_672_8;
 pub const DBL_MIN_EXP: f64 = f64::MIN_EXP as f64;
 
 /// sqrt(2/pi)
-pub const M_SQRT_2dPI: f64 = 0.797884560802865355879892119869;
+#[allow(non_upper_case_globals)]
+pub const M_SQRT_2dPI: f64 = 0.797_884_560_802_865_4;
 
 /// log(1 - exp(x)) in more stable form than log1p(- r_d_qiv(x)) :
 pub fn r_log1_exp(x: f64) -> f64 {
