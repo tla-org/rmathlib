@@ -1,13 +1,15 @@
-use libm::{exp, log1p};
+use libm::exp;
+use libm::log1p;
 
-use crate::{
-    bd0, dnorm,
-    dpq::r_d__0,
-    libc::DBL_EPSILON,
-    nmath::{ml_warn_return_nan, r_finite, M_LN_SQRT_2PI},
-    rmath::M_1_SQRT_2PI,
-    stirlerr,
-};
+use crate::bd0;
+use crate::dnorm;
+use crate::dpq::r_d__0;
+use crate::libc::DBL_EPSILON;
+use crate::nmath::ml_warn_return_nan;
+use crate::nmath::r_finite;
+use crate::nmath::M_LN_SQRT_2PI;
+use crate::rmath::M_1_SQRT_2PI;
+use crate::stirlerr;
 
 /// The density of the Student's t-distribution.
 ///
