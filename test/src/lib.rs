@@ -18,6 +18,7 @@ mod test_math {
             pub fn dgamma(x: f64, shape: f64, scale: f64, give_log: bool) -> f64;
             pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64;
             pub fn dpois(x: f64, lambda: f64, give_log: bool) -> f64;
+            pub fn dt(x: f64, n: f64, give_log: bool) -> f64;
             pub fn gammafn(x: f64) -> f64;
             pub fn lbeta(a: f64, b: f64) -> f64;
             pub fn log1pmx(x: f64) -> f64;
@@ -180,6 +181,30 @@ mod test_math {
         assert!(dpois(1.0, -1.0, false).is_nan());
         assert_eq!(dpois(1.0, 1.0, false), unsafe { c::dpois(1.0, 1.0, false) });
         assert_eq!(dpois(1.0, 1.0, true), unsafe { c::dpois(1.0, 1.0, true) });
+    }
+
+    #[test]
+    fn test_dt() {
+        assert!(abs_diff_eq!(
+            dt(1.0, 1.0, false),
+            unsafe { c::dt(1.0, 1.0, false) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            dt(10.0, 10.0, false),
+            unsafe { c::dt(10.0, 10.0, false) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            dt(1.0, 1.0, true),
+            unsafe { c::dt(1.0, 1.0, true) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            dt(10.0, 10.0, true),
+            unsafe { c::dt(10.0, 10.0, true) },
+            epsilon = 1e-15
+        ));
     }
 
     #[test]
