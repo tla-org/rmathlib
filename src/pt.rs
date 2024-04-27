@@ -1,9 +1,9 @@
 use libm::exp;
-use libm::log;
 use libm::log1p;
 
 use crate::dpq::r_d_cval;
 use crate::dpq::r_dt_0;
+use crate::dpq::r_dt_1;
 use crate::lbeta;
 use crate::libc::fabs;
 use crate::nmath::ml_warn_return_nan;
@@ -23,7 +23,11 @@ pub fn pt(x: f64, n: f64, mut lower_tail: bool, log_p: bool) -> f64 {
     }
 
     if !r_finite(x) {
-        return r_dt_0(lower_tail, log_p);
+        if x < 0.0 {
+            return r_dt_0(lower_tail, log_p);
+        } else {
+            return r_dt_1(lower_tail, log_p);
+        }
     }
 
     if !r_finite(n) {
@@ -32,22 +36,22 @@ pub fn pt(x: f64, n: f64, mut lower_tail: bool, log_p: bool) -> f64 {
 
     let nx = 1.0 + (x / n) * x;
 
-    let val = if nx > 1e100 {
+    let mut val = if nx > 1e100 {
         /* <==>  x*x > 1e100 * n  */
         /* Danger of underflow. So use Abramowitz & Stegun 26.5.4
            pbeta(z, a, b) ~ z^a(1-z)^b / aB(a,b) ~ z^a / aB(a,b),
            with z = 1/nx,  a = n/2,  b= 1/2 :
         */
-        let lval = -0.5 * n * (2.0 * log(fabs(x)) - log(n)) - lbeta(0.5 * n, 0.5) - log(0.5 * n);
+        let lval = -0.5 * n * (2.0 * fabs(x).ln() - n.ln()) - lbeta(0.5 * n, 0.5) - (0.5 * n).ln();
         if log_p {
             lval
         } else {
             exp(lval)
         }
     } else if n > x * x {
-        pbeta(x * x / (n + x * x), 0.5 * n, 0.5, false, log_p)
+        pbeta(x * x / (n + x * x), 0.5 * n, n / 2.0, false, log_p)
     } else {
-        pbeta(x * x / (n + x * x), 0.5 * n, 0.5, true, log_p)
+        pbeta(1.0 / nx, n / 2.0, 0.5, true, log_p)
     };
     // Use "1 - v"  if	lower_tail  and	 x > 0 (but not both):
     if x <= 0.0 {
@@ -61,6 +65,7 @@ pub fn pt(x: f64, n: f64, mut lower_tail: bool, log_p: bool) -> f64 {
             val - M_LN2 // = log(.5* pbeta(....))
         }
     } else {
+        val /= 2.0;
         r_d_cval(val, lower_tail)
     }
 }

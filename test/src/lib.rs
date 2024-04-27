@@ -26,8 +26,7 @@ mod test_math {
             pub fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64;
             pub fn pgamma(x: f64, alph: f64, scale: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn pnorm5(x: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
-            #[allow(dead_code)]
-            pub fn pt(x: f64, n: f64, lower_tail: i32, log_p: i32) -> f64;
+            pub fn pt(x: f64, n: f64, lower_tail: bool, log_p: bool) -> f64;
             pub fn qnorm5(p: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn sinpi(x: f64) -> f64;
             pub fn tanpi(x: f64) -> f64;
@@ -318,10 +317,27 @@ mod test_math {
         });
     }
 
-    // TODO: add more tests
     #[test]
     fn test_pt() {
-        // assert_eq!(pt(0.1, 1.0, false, false), unsafe { c::pt(0.1, 1.0, 0, 0) });
+        assert_eq!(pt(0.1, 1.0, false, false), unsafe {
+            c::pt(0.1, 1.0, false, false)
+        });
+        assert_eq!(pt(-0.1, 1.0, false, false), unsafe {
+            c::pt(-0.1, 1.0, false, false)
+        });
+        assert_eq!(pt(1.0, 1.0, false, false), unsafe {
+            c::pt(1.0, 1.0, false, false)
+        });
+        assert!(abs_diff_eq!(
+            pt(1.0, 1.0, false, true),
+            unsafe { c::pt(1.0, 1.0, false, true) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            pt(1.0, 1.0, true, true),
+            unsafe { c::pt(1.0, 1.0, true, true) },
+            epsilon = 1e-15
+        ));
     }
 
     #[test]
