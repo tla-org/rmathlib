@@ -19,7 +19,7 @@ The following functions have been ported:
 Distribution | Density | Probability | Quantile | Random Generation
 --- | :---: | :---: | :---: | :---:
 Normal | `dnorm` | `pnorm` | `qnorm` |
-Student's t | | `pt` | |
+Student's t | `dt` | `pt` | |
 Beta | | `pbeta` | |
 Poisson | `dpois` | | |
 Gamma | `dgamma` | `pgamma` |

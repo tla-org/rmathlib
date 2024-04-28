@@ -18,6 +18,7 @@ mod test_math {
             pub fn dgamma(x: f64, shape: f64, scale: f64, give_log: bool) -> f64;
             pub fn dnorm4(x: f64, mu: f64, sigma: f64, give_log: bool) -> f64;
             pub fn dpois(x: f64, lambda: f64, give_log: bool) -> f64;
+            pub fn dt(x: f64, n: f64, give_log: bool) -> f64;
             pub fn gammafn(x: f64) -> f64;
             pub fn lbeta(a: f64, b: f64) -> f64;
             pub fn log1pmx(x: f64) -> f64;
@@ -25,8 +26,7 @@ mod test_math {
             pub fn lgammafn_sign(x: f64, sgn: Option<&mut i32>) -> f64;
             pub fn pgamma(x: f64, alph: f64, scale: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn pnorm5(x: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
-            #[allow(dead_code)]
-            pub fn pt(x: f64, n: f64, lower_tail: i32, log_p: i32) -> f64;
+            pub fn pt(x: f64, n: f64, lower_tail: bool, log_p: bool) -> f64;
             pub fn qnorm5(p: f64, mu: f64, sigma: f64, lower_tail: i32, log_p: i32) -> f64;
             pub fn sinpi(x: f64) -> f64;
             pub fn tanpi(x: f64) -> f64;
@@ -183,6 +183,30 @@ mod test_math {
     }
 
     #[test]
+    fn test_dt() {
+        assert!(abs_diff_eq!(
+            dt(1.0, 1.0, false),
+            unsafe { c::dt(1.0, 1.0, false) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            dt(10.0, 10.0, false),
+            unsafe { c::dt(10.0, 10.0, false) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            dt(1.0, 1.0, true),
+            unsafe { c::dt(1.0, 1.0, true) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            dt(10.0, 10.0, true),
+            unsafe { c::dt(10.0, 10.0, true) },
+            epsilon = 1e-15
+        ));
+    }
+
+    #[test]
     fn test_gammafn() {
         assert!(gammafn(-1.0).is_nan());
         assert!(gammafn(0.0).is_nan());
@@ -293,10 +317,42 @@ mod test_math {
         });
     }
 
-    // TODO: add more tests
     #[test]
     fn test_pt() {
-        // assert_eq!(pt(0.1, 1.0, false, false), unsafe { c::pt(0.1, 1.0, 0, 0) });
+        assert_eq!(pt(0.1, 1.0, false, false), unsafe {
+            c::pt(0.1, 1.0, false, false)
+        });
+        assert_eq!(pt(-1.0, 1.0, false, false), unsafe {
+            c::pt(-1.0, 1.0, false, false)
+        });
+        assert!(abs_diff_eq!(
+            pt(-1.0, 10.0, false, false),
+            unsafe { c::pt(-1.0, 10.0, false, false) },
+            epsilon = 1e-15
+        ));
+        assert_eq!(pt(1.0, 1.0, false, false), unsafe {
+            c::pt(1.0, 1.0, false, false)
+        });
+        assert!(abs_diff_eq!(
+            pt(1.0, 1.0, false, true),
+            unsafe { c::pt(1.0, 1.0, false, true) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            pt(1.0, 1.0, true, true),
+            unsafe { c::pt(1.0, 1.0, true, true) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            pt(-10.0, 15.0, false, true),
+            unsafe { c::pt(-10.0, 15.0, false, true) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            pt(-10.0, 15.0, true, true),
+            unsafe { c::pt(-10.0, 15.0, true, true) },
+            epsilon = 1e-15
+        ));
     }
 
     #[test]
