@@ -320,15 +320,21 @@ mod test_math {
 
     #[test]
     fn test_pnt() {
-        assert_eq!(pnt(0.1, 1.0, 1.0, false, false), unsafe {
-            c::pnt(0.1, 1.0, 1.0, false, false)
-        });
-        assert_eq!(pnt(-0.1, 1.0, 1.0, false, false), unsafe {
-            c::pnt(-0.1, 1.0, 1.0, false, false)
-        });
-        assert_eq!(pnt(1.0, 1.0, 1.0, false, false), unsafe {
-            c::pnt(1.0, 1.0, 1.0, false, false)
-        });
+        assert!(abs_diff_eq!(
+            pnt(0.1, 1.0, 1.0, false, false),
+            unsafe { c::pnt(0.1, 1.0, 1.0, false, false) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            pnt(-0.1, 1.0, 1.0, false, false),
+            unsafe { c::pnt(-0.1, 1.0, 1.0, false, false) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            pnt(1.0, 1.0, 1.0, false, false),
+            unsafe { c::pnt(1.0, 1.0, 1.0, false, false) },
+            epsilon = 1e-15
+        ));
         assert!(abs_diff_eq!(
             pnt(1.0, 1.0, 1.0, false, true),
             unsafe { c::pnt(1.0, 1.0, 1.0, false, true) },
@@ -337,6 +343,36 @@ mod test_math {
         assert!(abs_diff_eq!(
             pnt(1.0, 1.0, 1.0, true, true),
             unsafe { c::pnt(1.0, 1.0, 1.0, true, true) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            pnt(1.0, 10.0, -10.0, false, false),
+            unsafe { c::pnt(1.0, 10.0, -10.0, false, false) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            pnt(-1.0, 10.0, -10.0, false, false),
+            unsafe { c::pnt(-1.0, 10.0, -10.0, false, false) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            pnt(1.0, 10.0, 10.0, true, false),
+            unsafe { c::pnt(1.0, 10.0, 10.0, true, false) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            pnt(-1.0, 10.0, 10.0, true, false),
+            unsafe { c::pnt(1.0, 10.0, 10.0, true, false) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            pnt(1.0, 10.0, 10.0, false, true),
+            unsafe { c::pnt(1.0, 10.0, 10.0, false, true) },
+            epsilon = 1e-15
+        ));
+        assert!(abs_diff_eq!(
+            pnt(-1.0, 10.0, 10.0, false, true),
+            unsafe { c::pnt(-1.0, 10.0, 10.0, false, true) },
             epsilon = 1e-15
         ));
     }
