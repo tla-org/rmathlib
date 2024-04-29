@@ -15,8 +15,17 @@ pub fn r_finite(x: f64) -> bool {
 
 pub const ML_NAN: f64 = f64::NAN;
 
+/// log(sqrt(pi))
+pub const M_LN_SQRT_PI: f64 = 0.572_364_942_924_700_1;
 /// log(sqrt(2*pi)) == log(2*pi)/2
 pub const M_LN_SQRT_2PI: f64 = 0.918_938_533_204_672_8;
+
+/// for IEEE, DBL_MIN_EXP is -1022 but "effective" is -1074
+pub const DBL_MIN_EXP: f64 = f64::MIN_EXP as f64;
+
+/// sqrt(2/pi)
+#[allow(non_upper_case_globals)]
+pub const M_SQRT_2dPI: f64 = 0.797_884_560_802_865_4;
 
 /// log(1 - exp(x)) in more stable form than log1p(- r_d_qiv(x)) :
 pub fn r_log1_exp(x: f64) -> f64 {
