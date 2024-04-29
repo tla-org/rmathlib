@@ -15,6 +15,8 @@ pub fn r_finite(x: f64) -> bool {
 
 pub const ML_NAN: f64 = f64::NAN;
 
+/// log(sqrt(pi))
+pub const M_LN_SQRT_PI: f64 = 0.572_364_942_924_700_1;
 /// log(sqrt(2*pi)) == log(2*pi)/2
 pub const M_LN_SQRT_2PI: f64 = 0.918_938_533_204_672_8;
 
