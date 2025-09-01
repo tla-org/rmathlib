@@ -25,7 +25,7 @@ jobs:
         toolchain: ['1.56', 'stable', 'beta']
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Install Rust
         run: |
           rustup update ${{ matrix.toolchain }}
@@ -45,7 +45,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install Rust
         run: |
@@ -84,7 +84,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install Rust
         run: |
